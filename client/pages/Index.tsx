@@ -5,9 +5,6 @@ import FilterBar from "@/components/energy/FilterBar";
 import KpiCard from "@/components/energy/KpiCard";
 import Gauge from "@/components/energy/Gauge";
 import StackedBar from "@/components/energy/StackedBar";
-import ScatterBenchmark from "@/components/energy/ScatterBenchmark";
-import MapPanel from "@/components/energy/MapPanel";
-import AlertList from "@/components/energy/AlertList";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {

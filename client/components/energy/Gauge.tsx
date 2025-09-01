@@ -40,12 +40,12 @@ export default function Gauge({
     const s = toXY(start);
     const e = toXY(end);
     const largeArc = 0; // <= 180°
-    const sweep = 0; // counter-clockwise (top arc)
+    const sweep = 1; // clockwise (bottom arc)
     return `M ${s.x} ${s.y} A ${r} ${r} 0 ${largeArc} ${sweep} ${e.x} ${e.y}`;
   };
   const startAngle = Math.PI; // left
-  const endAngle = 0; // right
-  const progressAngle = Math.PI * (1 - pct / 100);
+  const endAngle = Math.PI * 2; // right (360°)
+  const progressAngle = Math.PI + (pct / 100) * Math.PI;
 
   return (
     <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-56 md:h-64 lg:h-72 flex flex-col items-center justify-center text-center">

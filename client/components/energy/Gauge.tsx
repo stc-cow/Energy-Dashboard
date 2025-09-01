@@ -77,14 +77,28 @@ export default function Gauge({
             strokeDasharray={`${dash} ${c - dash}`}
             transform="rotate(-90 50 50)"
           />
-          <text
-            x="50"
-            y="54"
-            textAnchor="middle"
-            className="fill-foreground text-base lg:text-lg font-extrabold"
-          >
-            {pct.toFixed(0)}%
-          </text>
+          <text x="50" y="54" textAnchor="middle" className="fill-foreground text-base lg:text-lg font-extrabold">{pct.toFixed(0)}%</text>
+          {Array.from({ length: 11 }).map((_, i) => {
+            const a = i * 0.1 * Math.PI * 2 - Math.PI / 2;
+            const x1 = 50 + r * Math.cos(a);
+            const y1 = 50 + r * Math.sin(a);
+            const x2 = 50 + (r - (i % 5 === 0 ? 8 : 5)) * Math.cos(a);
+            const y2 = 50 + (r - (i % 5 === 0 ? 8 : 5)) * Math.sin(a);
+            return (
+              <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.6)" strokeWidth={i % 5 === 0 ? 2 : 1} />
+            );
+          })}
+          {(() => {
+            const a = (pct / 100) * Math.PI * 2 - Math.PI / 2;
+            const xt = 50 + (r - 2) * Math.cos(a);
+            const yt = 50 + (r - 2) * Math.sin(a);
+            return (
+              <g>
+                <line x1={50} y1={50} x2={xt} y2={yt} stroke="currentColor" style={styleColor} strokeWidth={3} strokeLinecap="round" />
+                <circle cx={50} cy={50} r={2.5} fill="white" />
+              </g>
+            );
+          })()}
         </svg>
         <div className="mt-2 text-4xl lg:text-5xl font-extrabold text-white">{pct.toFixed(1)}%</div>
       </div>

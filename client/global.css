@@ -12,89 +12,96 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* STC Purple brand theme */
+    --background: 274 86% 36%; /* #6A0DAD */
+    --foreground: 0 0% 100%;  /* White */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 272 87% 34%;           /* #5C0BA2 */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 272 87% 34%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 270 75% 50%;
+    --primary: 274 86% 50%;        /* Brand accent */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 30% 96%;
-    --secondary-foreground: 270 75% 20%;
+    --secondary: 282 68% 38%;      /* #7B1FA2 */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 16% 95%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 274 30% 26%;
+    --muted-foreground: 0 0% 92%;
 
-    --accent: 270 100% 97%;
-    --accent-foreground: 270 75% 35%;
+    --accent: 282 68% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 4 90% 58%;      /* align with red metric */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 90%;
-    --input: 220 20% 90%;
-    --ring: 270 75% 50%;
+    --border: 274 40% 48%;
+    --input: 274 40% 48%;
+    --ring: 0 0% 100%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Sidebar (not used yet) */
+    --sidebar-background: 274 86% 30%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 274 86% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 282 68% 38%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 274 40% 48%;
+    --sidebar-ring: 0 0% 100%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Metric colors */
+    --metric-diesel: 36 100% 50%;         /* #FF9800 */
+    --metric-power: 207 90% 54%;          /* #2196F3 */
+    --metric-co2: 4 90% 58%;              /* #F44336 */
+    --metric-co2-reduction: 122 39% 49%;  /* #4CAF50 */
+    --metric-yellow: 54 100% 60%;         /* #FFEB3B */
+    --metric-green: 122 39% 49%;
+    --metric-red: 4 90% 58%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 274 86% 22%;
+    --foreground: 0 0% 100%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 272 65% 24%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 272 65% 24%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 270 75% 60%;
+    --primary: 274 86% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 30% 20%;
+    --secondary: 282 50% 28%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 65%;
+    --muted: 274 30% 20%;
+    --muted-foreground: 0 0% 85%;
 
-    --accent: 270 40% 22%;
+    --accent: 282 50% 32%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 4 90% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 22%;
-    --input: 220 15% 22%;
-    --ring: 270 75% 60%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 270 75% 60%;
+    --border: 274 30% 32%;
+    --input: 274 30% 32%;
+    --ring: 0 0% 100%;
+
+    --sidebar-background: 274 86% 18%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 274 86% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 282 50% 28%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 274 30% 32%;
+    --sidebar-ring: 0 0% 100%;
+
+    /* Metric colors remain the same */
   }
 }
 

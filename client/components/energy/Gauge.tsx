@@ -44,24 +44,22 @@ export default function Gauge({
     return `M ${s.x} ${s.y} A ${r} ${r} 0 ${largeArc} ${sweep} ${e.x} ${e.y}`;
   };
   const startAngle = Math.PI; // left
-  const endAngle = 0; // right
-  const progressAngle = Math.PI - (pct / 100) * Math.PI;
+  const endAngle = Math.PI * 2; // right
+  const greenEnd = startAngle + 0.6 * Math.PI;
+  const yellowEnd = startAngle + 0.85 * Math.PI;
+  const progressAngle = startAngle + (pct / 100) * Math.PI;
 
   return (
     <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-72 md:h-80 lg:h-96 flex flex-col items-center justify-center text-center">
       <div className="flex flex-col items-center">
         <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90 mb-2">{label}</div>
         <svg viewBox="0 0 100 100" className="h-56 w-56 lg:h-64 lg:w-64 mx-auto">
-          {/* base semicircle track */}
-          <path d={arcPath(startAngle, endAngle)} fill="none" stroke="hsl(var(--muted))" strokeWidth={12} strokeLinecap="round" />
-
-          {/* risk arc (last 25%) for generator load */}
-          {metric === "power" && (
-            <path d={arcPath(Math.PI * 0.75, endAngle)} fill="none" stroke={`hsl(var(--metric-red))`} strokeOpacity={0.6} strokeWidth={12} strokeLinecap="round" />
-          )}
-
-          {/* progress arc */}
-          <path d={arcPath(startAngle, progressAngle)} fill="none" stroke="currentColor" className={colorClass} style={styleColor} strokeWidth={12} strokeLinecap="round" />
+          {/* green 0-60% */}
+          <path d={arcPath(startAngle, greenEnd)} fill="none" stroke={`hsl(var(--metric-green))`} strokeWidth={12} strokeLinecap="round" />
+          {/* yellow 60-85% */}
+          <path d={arcPath(greenEnd, yellowEnd)} fill="none" stroke={`hsl(var(--metric-yellow))`} strokeWidth={12} strokeLinecap="round" />
+          {/* red 85-100% */}
+          <path d={arcPath(yellowEnd, endAngle)} fill="none" stroke={`hsl(var(--metric-red))`} strokeWidth={12} strokeLinecap="round" />
 
           {/* pointer needle */}
           {(() => {
@@ -70,8 +68,8 @@ export default function Gauge({
             const yt = cy + (r - 2) * Math.sin(a);
             return (
               <g>
-                <line x1={cx} y1={cy} x2={xt} y2={yt} stroke="currentColor" style={styleColor} strokeWidth={3} strokeLinecap="round" />
-                <circle cx={cx} cy={cy} r={2.5} fill="white" />
+                <line x1={cx} y1={cy} x2={xt} y2={yt} stroke="#0b0b0b" strokeWidth={3} strokeLinecap="round" />
+                <circle cx={cx} cy={cy} r={3} fill="white" stroke="#0b0b0b" strokeWidth={1} />
               </g>
             );
           })()}

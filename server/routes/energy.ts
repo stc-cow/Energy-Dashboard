@@ -1,6 +1,24 @@
 import { RequestHandler } from "express";
-import { AlertsResponse, BenchmarkResponse, BreakdownResponse, HierarchyFilter, HierarchyResponse, KPIsResponse, TimeSeriesQuery, TimeSeriesResponse } from "@shared/api";
-import { cities, regions, sites, mockAlerts, mockBenchmark, mockBreakdown, mockKPIs, mockTimeSeries } from "./data";
+import {
+  AlertsResponse,
+  BenchmarkResponse,
+  BreakdownResponse,
+  HierarchyFilter,
+  HierarchyResponse,
+  KPIsResponse,
+  TimeSeriesQuery,
+  TimeSeriesResponse,
+} from "@shared/api";
+import {
+  cities,
+  regions,
+  sites,
+  mockAlerts,
+  mockBenchmark,
+  mockBreakdown,
+  mockKPIs,
+  mockTimeSeries,
+} from "./data";
 
 function parseScope(query: any): HierarchyFilter {
   const level = (query.level as string) || "national";
@@ -25,7 +43,10 @@ export const getKPIs: RequestHandler = (req, res) => {
 export const getTimeSeries: RequestHandler = (req, res) => {
   const scope = parseScope(req.query);
   const granularity = (req.query.granularity as string) ?? "daily";
-  const response: TimeSeriesResponse = mockTimeSeries(scope, granularity as any);
+  const response: TimeSeriesResponse = mockTimeSeries(
+    scope,
+    granularity as any,
+  );
   res.json(response);
 };
 

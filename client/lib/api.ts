@@ -1,4 +1,13 @@
-import { AlertsResponse, BenchmarkResponse, BreakdownResponse, HierarchyFilter, HierarchyResponse, KPIsResponse, TimeSeriesQuery, TimeSeriesResponse } from "@shared/api";
+import {
+  AlertsResponse,
+  BenchmarkResponse,
+  BreakdownResponse,
+  HierarchyFilter,
+  HierarchyResponse,
+  KPIsResponse,
+  TimeSeriesQuery,
+  TimeSeriesResponse,
+} from "@shared/api";
 
 function toQuery(params: Record<string, any>): string {
   const q = new URLSearchParams();
@@ -10,9 +19,19 @@ function toQuery(params: Record<string, any>): string {
   return s ? `?${s}` : "";
 }
 
-import { mockAlerts, mockBenchmark, mockBreakdown, mockHierarchy, mockKPIs, mockTimeSeries } from "./mocks";
+import {
+  mockAlerts,
+  mockBenchmark,
+  mockBreakdown,
+  mockHierarchy,
+  mockKPIs,
+  mockTimeSeries,
+} from "./mocks";
 
-const isStatic = typeof window !== "undefined" && (window.location.hostname.includes("github.io") || window.location.protocol === "file:");
+const isStatic =
+  typeof window !== "undefined" &&
+  (window.location.hostname.includes("github.io") ||
+    window.location.protocol === "file:");
 
 export async function fetchHierarchy(): Promise<HierarchyResponse> {
   if (isStatic) return mockHierarchy();
@@ -36,7 +55,10 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
   }
 }
 
-export async function fetchTimeSeries(scope: HierarchyFilter, q: TimeSeriesQuery): Promise<TimeSeriesResponse> {
+export async function fetchTimeSeries(
+  scope: HierarchyFilter,
+  q: TimeSeriesQuery,
+): Promise<TimeSeriesResponse> {
   if (isStatic) return mockTimeSeries(scope, q.granularity);
   try {
     const res = await fetch(`/api/timeseries${toQuery({ ...scope, ...q })}`);
@@ -47,7 +69,10 @@ export async function fetchTimeSeries(scope: HierarchyFilter, q: TimeSeriesQuery
   }
 }
 
-export async function fetchBreakdown(scope: HierarchyFilter, by: "region" | "site"): Promise<BreakdownResponse> {
+export async function fetchBreakdown(
+  scope: HierarchyFilter,
+  by: "region" | "site",
+): Promise<BreakdownResponse> {
   if (isStatic) return mockBreakdown(scope, by);
   try {
     const res = await fetch(`/api/breakdown/${by}${toQuery(scope)}`);
@@ -58,7 +83,9 @@ export async function fetchBreakdown(scope: HierarchyFilter, by: "region" | "sit
   }
 }
 
-export async function fetchBenchmark(scope: HierarchyFilter): Promise<BenchmarkResponse> {
+export async function fetchBenchmark(
+  scope: HierarchyFilter,
+): Promise<BenchmarkResponse> {
   if (isStatic) return mockBenchmark(scope);
   try {
     const res = await fetch(`/api/benchmark${toQuery(scope)}`);
@@ -69,7 +96,9 @@ export async function fetchBenchmark(scope: HierarchyFilter): Promise<BenchmarkR
   }
 }
 
-export async function fetchAlerts(scope: HierarchyFilter): Promise<AlertsResponse> {
+export async function fetchAlerts(
+  scope: HierarchyFilter,
+): Promise<AlertsResponse> {
   if (isStatic) return mockAlerts(scope);
   try {
     const res = await fetch(`/api/alerts${toQuery(scope)}`);

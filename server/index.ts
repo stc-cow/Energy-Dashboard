@@ -2,7 +2,15 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { getHierarchy, getKPIs, getTimeSeries, getBenchmark, getAlerts, getBreakdownByRegion, getBreakdownBySite } from "./routes/energy";
+import {
+  getHierarchy,
+  getKPIs,
+  getTimeSeries,
+  getBenchmark,
+  getAlerts,
+  getBreakdownByRegion,
+  getBreakdownBySite,
+} from "./routes/energy";
 
 export function createServer() {
   const app = express();

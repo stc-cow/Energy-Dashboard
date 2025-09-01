@@ -22,11 +22,17 @@ export default function AlertList({ items }: { items: AlertItem[] }) {
       ) : (
         <ul className="space-y-2">
           {items.map((a) => (
-            <li key={a.id} className="flex items-start gap-3 rounded-md border p-3">
+            <li
+              key={a.id}
+              className="flex items-start gap-3 rounded-md border p-3"
+            >
               <div className="mt-0.5">{iconFor(a.kind)}</div>
               <div className="text-sm">
                 <div className="font-medium">{a.message}</div>
-                <div className="text-xs text-muted-foreground">{new Date(a.createdAt).toLocaleString()} • {a.severity.toUpperCase()}</div>
+                <div className="text-xs text-muted-foreground">
+                  {new Date(a.createdAt).toLocaleString()} •{" "}
+                  {a.severity.toUpperCase()}
+                </div>
               </div>
             </li>
           ))}

@@ -14,18 +14,18 @@
   :root {
     /* STC Purple brand theme */
     --background: 274 86% 36%; /* #6A0DAD */
-    --foreground: 0 0% 100%;  /* White */
+    --foreground: 0 0% 100%; /* White */
 
-    --card: 272 87% 34%;           /* #5C0BA2 */
+    --card: 272 87% 34%; /* #5C0BA2 */
     --card-foreground: 0 0% 100%;
 
     --popover: 272 87% 34%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 274 86% 50%;        /* Brand accent */
+    --primary: 274 86% 50%; /* Brand accent */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 282 68% 38%;      /* #7B1FA2 */
+    --secondary: 282 68% 38%; /* #7B1FA2 */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 274 30% 26%;
@@ -34,7 +34,7 @@
     --accent: 282 68% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 4 90% 58%;      /* align with red metric */
+    --destructive: 4 90% 58%; /* align with red metric */
     --destructive-foreground: 0 0% 100%;
 
     --border: 274 40% 48%;
@@ -54,11 +54,11 @@
     --sidebar-ring: 0 0% 100%;
 
     /* Metric colors */
-    --metric-diesel: 36 100% 50%;         /* #FF9800 */
-    --metric-power: 207 90% 54%;          /* #2196F3 */
-    --metric-co2: 4 90% 58%;              /* #F44336 */
-    --metric-co2-reduction: 122 39% 49%;  /* #4CAF50 */
-    --metric-yellow: 54 100% 60%;         /* #FFEB3B */
+    --metric-diesel: 36 100% 50%; /* #FF9800 */
+    --metric-power: 207 90% 54%; /* #2196F3 */
+    --metric-co2: 4 90% 58%; /* #F44336 */
+    --metric-co2-reduction: 122 39% 49%; /* #4CAF50 */
+    --metric-yellow: 54 100% 60%; /* #FFEB3B */
     --metric-green: 122 39% 49%;
     --metric-red: 4 90% 58%;
   }

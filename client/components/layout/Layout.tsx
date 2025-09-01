@@ -6,7 +6,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header />
       <main className="container mx-auto px-4 py-6">{children}</main>
       <footer className="mt-10 border-t py-6 text-xs text-muted-foreground">
-        <div className="container mx-auto">© {new Date().getFullYear()} STC — COW Energy Analytics</div>
+        <div className="container mx-auto">
+          © {new Date().getFullYear()} STC — COW Energy Analytics
+        </div>
       </footer>
     </div>
   );

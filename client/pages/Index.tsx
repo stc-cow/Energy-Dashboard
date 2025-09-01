@@ -81,7 +81,7 @@ export default function Index() {
         />
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 items-center justify-center">
         <KpiCard
           title="Diesel Consumption"
           value={kpis?.kpis.dieselLitersPerDay.value ?? 0}

@@ -4,7 +4,6 @@ import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";
 import KpiCard from "@/components/energy/KpiCard";
 import Gauge from "@/components/energy/Gauge";
-import TimeSeriesChart from "@/components/energy/TimeSeriesChart";
 import StackedBar from "@/components/energy/StackedBar";
 import ScatterBenchmark from "@/components/energy/ScatterBenchmark";
 import MapPanel from "@/components/energy/MapPanel";
@@ -72,7 +71,7 @@ export default function Index() {
         />
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 items-center justify-center">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 items-center justify-center">
         <KpiCard
           title="Diesel Consumption"
           value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
@@ -84,33 +83,15 @@ export default function Index() {
           unit={kpis?.kpis.powerDemandKw.unit ?? ""}
         />
         <KpiCard
-          title="CO₂ Emissions"
+          title="CO₂ Total Emissions"
           value={kpis?.kpis.co2TonsPerDay.value ?? 0}
           unit={kpis?.kpis.co2TonsPerDay.unit ?? ""}
         />
-        <KpiCard
-          title="Efficiency"
-          value={kpis?.kpis.energyEfficiencyKwhPerLiter.value ?? 0}
-          unit={kpis?.kpis.energyEfficiencyKwhPerLiter.unit ?? ""}
-        />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <TimeSeriesChart data={tsDaily?.series ?? []} />
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          <Gauge
-            value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
-            label="Fuel Tank Level"
-            metric="fuel"
-          />
-          <Gauge
-            value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
-            label="Generator Load"
-            metric="power"
-          />
-        </div>
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
+        <Gauge value={kpis?.kpis.fuelTankLevelPct.value ?? 0} label="Fuel Tank Level" metric="fuel" />
+        <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" metric="power" />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">

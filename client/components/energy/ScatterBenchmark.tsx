@@ -9,13 +9,13 @@ export default function ScatterBenchmark({ data }: { data: BenchmarkPoint[] }) {
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" dataKey="Diesel" name="Diesel (L/day)" tick={{ fontSize: 12 }} />
-            <YAxis type="number" dataKey="Power" name="Power (kW)" tick={{ fontSize: 12 }} />
+            <CartesianGrid stroke="rgba(255,255,255,0.2)" strokeDasharray="3 3" />
+            <XAxis type="number" dataKey="Diesel" name="Diesel (L/day)" tick={{ fontSize: 12, fill: "#fff" }} />
+            <YAxis type="number" dataKey="Power" name="Power (kW)" tick={{ fontSize: 12, fill: "#fff" }} />
             <ZAxis type="number" dataKey="CO2" range={[60, 400]} name="CO₂ (t/day)" />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} />
             <Legend />
-            <Scatter name="Sites" data={d} fill="hsl(var(--primary))" />
+            <Scatter name="Sites" data={d} fill="hsl(var(--metric-power))" />
           </ScatterChart>
         </ResponsiveContainer>
       </div>

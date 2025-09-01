@@ -24,7 +24,7 @@ export const getKPIs: RequestHandler = (req, res) => {
 
 export const getTimeSeries: RequestHandler = (req, res) => {
   const scope = parseScope(req.query);
-  const { granularity = "daily" } = req.query as TimeSeriesQuery;
+  const granularity = (req.query.granularity as string) ?? "daily";
   const response: TimeSeriesResponse = mockTimeSeries(scope, granularity as any);
   res.json(response);
 };

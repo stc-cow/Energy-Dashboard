@@ -58,17 +58,8 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">STC COW Energy Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Nationwide visibility into diesel usage, CO₂ impact, and efficiency
-            across all sites.
-          </p>
-        </div>
-        <div className="text-xs text-muted-foreground">
-          As of {kpis ? new Date(kpis.asOf).toLocaleString() : "—"}
-        </div>
+      <div className="mb-6 text-center">
+        <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">COW Predictive ENERGY Dashboard</h1>
       </div>
 
       {hierarchy && (

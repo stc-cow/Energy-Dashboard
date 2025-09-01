@@ -82,19 +82,16 @@ export default function Index() {
           title="Power Demand"
           value={kpis?.kpis.powerDemandKw.value ?? 0}
           unit={kpis?.kpis.powerDemandKw.unit ?? ""}
-          delta={kpis?.kpis.powerDemandKw.delta}
         />
         <KpiCard
           title="CO₂ Emissions"
           value={kpis?.kpis.co2TonsPerDay.value ?? 0}
           unit={kpis?.kpis.co2TonsPerDay.unit ?? ""}
-          delta={kpis?.kpis.co2TonsPerDay.delta}
         />
         <KpiCard
           title="Efficiency"
           value={kpis?.kpis.energyEfficiencyKwhPerLiter.value ?? 0}
           unit={kpis?.kpis.energyEfficiencyKwhPerLiter.unit ?? ""}
-          delta={kpis?.kpis.energyEfficiencyKwhPerLiter.delta}
         />
       </div>
 

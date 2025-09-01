@@ -12,9 +12,7 @@ export default function Gauge({
   colorClass,
 }: GaugeProps) {
   const r = 36;
-  const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
-  const dash = (pct / 100) * c;
 
   // Choose color by metric or thresholds
   let colorVar = "--metric-power"; // default

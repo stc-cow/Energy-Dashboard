@@ -10,9 +10,11 @@ export default function Header() {
     >
       <div className="container mx-auto flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-extrabold">
-            stc
-          </div>
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F49b74b93ac974c858232234345139aee?format=webp&width=800"
+            alt="ACES"
+            className="h-8 w-auto object-contain bg-transparent"
+          />
           <div>
             <div className="text-sm uppercase tracking-widest text-muted-foreground">
               COW Energy

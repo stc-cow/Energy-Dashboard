@@ -11,7 +11,7 @@ export default function Gauge({
   metric,
   colorClass,
 }: GaugeProps) {
-  const r = 36;
+  const r = 48;
   const pct = Math.max(0, Math.min(100, value));
 
   // Choose color by metric or thresholds

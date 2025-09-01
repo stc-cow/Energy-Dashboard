@@ -57,7 +57,7 @@ export default function Gauge({
 
           {/* risk arc (last 25%) for generator load */}
           {metric === "power" && (
-            <path d={arcPath(Math.PI * 0.25, 0)} fill="none" stroke={`hsl(var(--metric-red))`} strokeOpacity={0.6} strokeWidth={10} strokeLinecap="round" />
+            <path d={arcPath(Math.PI * 1.75, endAngle)} fill="none" stroke={`hsl(var(--metric-red))`} strokeOpacity={0.6} strokeWidth={10} strokeLinecap="round" />
           )}
 
           {/* progress arc */}

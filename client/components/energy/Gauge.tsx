@@ -65,16 +65,16 @@ export default function Gauge({
             x="50"
             y="54"
             textAnchor="middle"
-            className="fill-foreground text-sm font-semibold"
+            className="fill-foreground text-base lg:text-lg font-extrabold"
           >
             {pct.toFixed(0)}%
           </text>
         </svg>
         <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90">
             {label}
           </div>
-          <div className="text-lg font-semibold">{pct.toFixed(1)}%</div>
+          <div className="text-3xl lg:text-4xl font-extrabold text-white">{pct.toFixed(1)}%</div>
         </div>
       </div>
     </div>

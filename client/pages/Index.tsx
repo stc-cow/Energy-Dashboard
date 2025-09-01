@@ -1,62 +1,76 @@
 import { DemoResponse } from "@shared/api";
 import { useEffect, useState } from "react";
 
-export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchDemo();
-  }, []);
+import Layout from "@/components/layout/Layout";
+import FilterBar from "@/components/energy/FilterBar";
+import KpiCard from "@/components/energy/KpiCard";
+import Gauge from "@/components/energy/Gauge";
+import TimeSeriesChart from "@/components/energy/TimeSeriesChart";
+import StackedBar from "@/components/energy/StackedBar";
+import ScatterBenchmark from "@/components/energy/ScatterBenchmark";
+import MapPanel from "@/components/energy/MapPanel";
+import AlertList from "@/components/energy/AlertList";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { fetchAlerts, fetchBenchmark, fetchBreakdown, fetchHierarchy, fetchKPIs, fetchTimeSeries } from "@/lib/api";
+import { HierarchyFilter } from "@shared/api";
 
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
-  };
+export default function Index() {
+  const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
+
+  const { data: hierarchy } = useQuery({ queryKey: ["hierarchy"], queryFn: fetchHierarchy });
+  const { data: kpis } = useQuery({ queryKey: ["kpis", scope], queryFn: () => fetchKPIs(scope), enabled: !!hierarchy });
+  const { data: tsDaily } = useQuery({ queryKey: ["ts", scope, "daily"], queryFn: () => fetchTimeSeries(scope, { granularity: "daily" }), enabled: !!hierarchy });
+  const { data: breakdownRegion } = useQuery({ queryKey: ["br", scope, "region"], queryFn: () => fetchBreakdown(scope, "region"), enabled: !!hierarchy });
+  const { data: benchmark } = useQuery({ queryKey: ["benchmark", scope], queryFn: () => fetchBenchmark(scope), enabled: !!hierarchy });
+  const { data: alerts } = useQuery({ queryKey: ["alerts", scope], queryFn: () => fetchAlerts(scope), enabled: !!hierarchy });
+
+  const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
+    <Layout>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">STC COW Energy Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Nationwide visibility into diesel usage, CO₂ impact, and efficiency across all sites.</p>
+        </div>
+        <div className="text-xs text-muted-foreground">As of {kpis ? new Date(kpis.asOf).toLocaleString() : "—"}</div>
       </div>
-    </div>
+
+      {hierarchy && (
+        <FilterBar regions={hierarchy.regions} cities={hierarchy.cities} sites={hierarchy.sites} scope={scope} onChange={setScope} />
+      )}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <KpiCard title="Diesel Consumption" value={kpis?.kpis.dieselLitersPerDay.value ?? 0} unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""} delta={kpis?.kpis.dieselLitersPerDay.delta} />
+        <KpiCard title="Power Demand" value={kpis?.kpis.powerDemandKw.value ?? 0} unit={kpis?.kpis.powerDemandKw.unit ?? ""} delta={kpis?.kpis.powerDemandKw.delta} />
+        <KpiCard title="CO₂ Emissions" value={kpis?.kpis.co2TonsPerDay.value ?? 0} unit={kpis?.kpis.co2TonsPerDay.unit ?? ""} delta={kpis?.kpis.co2TonsPerDay.delta} />
+        <KpiCard title="Efficiency" value={kpis?.kpis.energyEfficiencyKwhPerLiter.value ?? 0} unit={kpis?.kpis.energyEfficiencyKwhPerLiter.unit ?? ""} delta={kpis?.kpis.energyEfficiencyKwhPerLiter.delta} />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TimeSeriesChart data={tsDaily?.series ?? []} />
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          <Gauge value={kpis?.kpis.fuelTankLevelPct.value ?? 0} label="Fuel Tank Level" />
+          <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" colorClass="text-emerald-600" />
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <StackedBar data={breakdownRegion?.data ?? []} title="Regional Diesel vs Energy" />
+        <ScatterBenchmark data={benchmark?.points ?? []} />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <MapPanel sites={sites} />
+        </div>
+        <div>
+          <AlertList items={alerts?.items ?? []} />
+        </div>
+      </div>
+    </Layout>
   );
 }

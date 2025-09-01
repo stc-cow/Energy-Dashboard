@@ -1,5 +1,4 @@
 import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
 
 import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";

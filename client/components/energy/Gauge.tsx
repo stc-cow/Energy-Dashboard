@@ -48,20 +48,20 @@ export default function Gauge({
   const progressAngle = Math.PI + (pct / 100) * Math.PI;
 
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-56 md:h-64 lg:h-72 flex flex-col items-center justify-center text-center">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-72 md:h-80 lg:h-96 flex flex-col items-center justify-center text-center">
       <div className="flex flex-col items-center">
         <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90 mb-2">{label}</div>
-        <svg viewBox="0 0 100 100" className="h-40 w-40 lg:h-48 lg:w-48">
+        <svg viewBox="0 0 100 100" className="h-56 w-56 lg:h-64 lg:w-64">
           {/* base semicircle track */}
-          <path d={arcPath(startAngle, endAngle)} fill="none" stroke="hsl(var(--muted))" strokeWidth={10} strokeLinecap="round" />
+          <path d={arcPath(startAngle, endAngle)} fill="none" stroke="hsl(var(--muted))" strokeWidth={12} strokeLinecap="round" />
 
           {/* risk arc (last 25%) for generator load */}
           {metric === "power" && (
-            <path d={arcPath(Math.PI * 1.75, endAngle)} fill="none" stroke={`hsl(var(--metric-red))`} strokeOpacity={0.6} strokeWidth={10} strokeLinecap="round" />
+            <path d={arcPath(Math.PI * 1.75, endAngle)} fill="none" stroke={`hsl(var(--metric-red))`} strokeOpacity={0.6} strokeWidth={12} strokeLinecap="round" />
           )}
 
           {/* progress arc */}
-          <path d={arcPath(startAngle, progressAngle)} fill="none" stroke="currentColor" className={colorClass} style={styleColor} strokeWidth={10} strokeLinecap="round" />
+          <path d={arcPath(startAngle, progressAngle)} fill="none" stroke="currentColor" className={colorClass} style={styleColor} strokeWidth={12} strokeLinecap="round" />
 
           {/* pointer needle */}
           {(() => {
@@ -76,7 +76,7 @@ export default function Gauge({
             );
           })()}
         </svg>
-        <div className="mt-2 text-4xl lg:text-5xl font-extrabold text-white">{pct.toFixed(1)}%</div>
+        <div className="mt-3 text-5xl lg:text-6xl font-extrabold text-white">{pct.toFixed(1)}%</div>
         {metric === "fuel" && (
           <div className="text-xs text-white/80 mt-1">Current Tank Average Level</div>
         )}

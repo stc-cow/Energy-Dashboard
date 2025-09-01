@@ -12,14 +12,14 @@ export default function KpiCard({
   delta?: number;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-xl border border-white/20 bg-card p-4 shadow-none">
+      <div className="text-xs uppercase tracking-wider text-white/90">
         {title}
       </div>
       <div className="mt-1 flex items-end justify-between">
         <div className="text-2xl font-semibold tabular-nums">
           {value.toLocaleString()}{" "}
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-sm font-medium text-white/80">
             {unit}
           </span>
         </div>

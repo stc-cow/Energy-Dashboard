@@ -36,8 +36,9 @@ export default function Gauge({
     : ({ color: `hsl(var(${colorVar}))` } as React.CSSProperties);
 
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-36 md:h-40 lg:h-44 flex items-center justify-center">
-      <div className="flex items-center gap-6">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-36 md:h-40 lg:h-44 flex flex-col items-center justify-center text-center">
+      <div className="flex flex-col items-center">
+        <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90 mb-2">{label}</div>
         <svg viewBox="0 0 100 100" className="h-24 w-24 lg:h-28 lg:w-28">
           <circle
             cx="50"
@@ -48,6 +49,21 @@ export default function Gauge({
             strokeWidth="10"
             strokeLinecap="round"
           />
+          {metric === "power" && (
+            <circle
+              cx="50"
+              cy="50"
+              r={r}
+              fill="none"
+              stroke={`hsl(var(--metric-red))`}
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={`${0.25 * c} ${0.75 * c}`}
+              strokeDashoffset={`${0.75 * c}`}
+              transform="rotate(-90 50 50)"
+              opacity={0.6}
+            />
+          )}
           <circle
             cx="50"
             cy="50"
@@ -70,12 +86,7 @@ export default function Gauge({
             {pct.toFixed(0)}%
           </text>
         </svg>
-        <div>
-          <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90">
-            {label}
-          </div>
-          <div className="text-3xl lg:text-4xl font-extrabold text-white">{pct.toFixed(1)}%</div>
-        </div>
+        <div className="mt-2 text-4xl lg:text-5xl font-extrabold text-white">{pct.toFixed(1)}%</div>
       </div>
     </div>
   );

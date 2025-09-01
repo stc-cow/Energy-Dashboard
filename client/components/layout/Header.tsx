@@ -13,7 +13,6 @@ export default function Header() {
           <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-extrabold">stc</div>
           <div>
             <div className="text-sm uppercase tracking-widest text-muted-foreground">COW Energy</div>
-            <div className="text-lg font-semibold">Kingdom-wide Dashboard</div>
           </div>
         </Link>
         <div className="flex items-center gap-6">

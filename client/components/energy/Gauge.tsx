@@ -1,14 +1,28 @@
 interface GaugeProps {
   value: number; // 0-100
   label: string;
-  colorClass?: string; // tailwind class
+  metric?: "fuel" | "power" | "co2" | "diesel" | "efficiency";
+  colorClass?: string; // optional override
 }
 
-export default function Gauge({ value, label, colorClass = "text-primary" }: GaugeProps) {
+export default function Gauge({ value, label, metric, colorClass }: GaugeProps) {
   const r = 36;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
   const dash = (pct / 100) * c;
+
+  // Choose color by metric or thresholds
+  let colorVar = "--metric-power"; // default
+  if (metric === "diesel") colorVar = "--metric-diesel";
+  if (metric === "power") colorVar = "--metric-power";
+  if (metric === "co2") colorVar = "--metric-co2";
+  if (metric === "efficiency") colorVar = "--metric-yellow";
+  if (metric === "fuel") {
+    colorVar = pct < 20 ? "--metric-red" : pct < 50 ? "--metric-yellow" : "--metric-green";
+  }
+
+  const styleColor = colorClass ? undefined : { color: `hsl(var(${colorVar}))` } as React.CSSProperties;
+
   return (
     <div className="rounded-xl border bg-card p-4 shadow-sm">
       <div className="flex items-center gap-4">
@@ -21,6 +35,7 @@ export default function Gauge({ value, label, colorClass = "text-primary" }: Gau
             fill="none"
             stroke="currentColor"
             className={colorClass}
+            style={styleColor}
             strokeWidth="10"
             strokeLinecap="round"
             strokeDasharray={`${dash} ${c - dash}`}

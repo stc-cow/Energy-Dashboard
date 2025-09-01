@@ -77,7 +77,6 @@ export default function Index() {
           title="Diesel Consumption"
           value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
           unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""}
-          delta={kpis?.kpis.dieselLitersPerDay.delta}
         />
         <KpiCard
           title="Power Demand"

@@ -9,13 +9,13 @@ export default function StackedBar({ data, title }: { data: BreakdownPoint[]; ti
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={d} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
+            <CartesianGrid stroke="rgba(255,255,255,0.2)" strokeDasharray="3 3" />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#fff" }} />
+            <YAxis tick={{ fontSize: 12, fill: "#fff" }} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="Diesel" stackId="a" fill="hsl(var(--primary))" />
-            <Bar dataKey="Energy" stackId="a" fill="#4f46e5" />
+            <Bar dataKey="Diesel" stackId="a" fill="hsl(var(--metric-diesel))" />
+            <Bar dataKey="Energy" stackId="a" fill="hsl(var(--metric-power))" />
           </BarChart>
         </ResponsiveContainer>
       </div>

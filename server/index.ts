@@ -20,5 +20,14 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Energy Dashboard APIs
+  app.get("/api/hierarchy", getHierarchy);
+  app.get("/api/kpis", getKPIs);
+  app.get("/api/timeseries", getTimeSeries);
+  app.get("/api/breakdown/region", getBreakdownByRegion);
+  app.get("/api/breakdown/site", getBreakdownBySite);
+  app.get("/api/benchmark", getBenchmark);
+  app.get("/api/alerts", getAlerts);
+
   return app;
 }

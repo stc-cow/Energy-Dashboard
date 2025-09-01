@@ -52,8 +52,8 @@ export default function Index() {
           <TimeSeriesChart data={tsDaily?.series ?? []} />
         </div>
         <div className="grid grid-cols-1 gap-4">
-          <Gauge value={kpis?.kpis.fuelTankLevelPct.value ?? 0} label="Fuel Tank Level" />
-          <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" colorClass="text-emerald-600" />
+          <Gauge value={kpis?.kpis.fuelTankLevelPct.value ?? 0} label="Fuel Tank Level" metric="fuel" />
+          <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" metric="power" />
         </div>
       </div>
 

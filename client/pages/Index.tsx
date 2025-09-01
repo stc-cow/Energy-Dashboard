@@ -94,21 +94,8 @@ export default function Index() {
         <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" metric="power" />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <StackedBar
-          data={breakdownRegion?.data ?? []}
-          title="Regional Diesel vs Energy"
-        />
-        <ScatterBenchmark data={benchmark?.points ?? []} />
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <MapPanel sites={sites} />
-        </div>
-        <div>
-          <AlertList items={alerts?.items ?? []} />
-        </div>
+      <div className="mt-4">
+        <StackedBar data={breakdownRegion?.data ?? []} title="Regional Diesel vs Energy" />
       </div>
     </Layout>
   );

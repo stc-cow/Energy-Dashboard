@@ -36,9 +36,9 @@ export default function Gauge({
     : ({ color: `hsl(var(${colorVar}))` } as React.CSSProperties);
 
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <div className="flex items-center gap-4">
-        <svg viewBox="0 0 100 100" className="h-20 w-20">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-36 md:h-40 lg:h-44 flex items-center justify-center">
+      <div className="flex items-center gap-6">
+        <svg viewBox="0 0 100 100" className="h-24 w-24 lg:h-28 lg:w-28">
           <circle
             cx="50"
             cy="50"

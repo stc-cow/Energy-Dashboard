@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { City, HierarchyFilter, Region, Site } from "@shared/api";
 
 interface Props {
@@ -15,55 +16,54 @@ export default function FilterBar({
   scope,
   onChange,
 }: Props) {
-  const selectedCities = scope.regionId
-    ? cities.filter((c) => c.regionId === scope.regionId)
-    : cities;
-  const selectedSites = scope.cityId
-    ? sites.filter((s) => s.cityId === scope.cityId)
-    : sites;
+  const [regionQuery, setRegionQuery] = useState("");
+  const [cityQuery, setCityQuery] = useState("");
+  const [districtQuery, setDistrictQuery] = useState("");
+  const [siteQuery, setSiteQuery] = useState("");
+
+  const filteredRegions = useMemo(() => {
+    const q = regionQuery.toLowerCase();
+    return regions.filter((r) => r.name.toLowerCase().includes(q));
+  }, [regions, regionQuery]);
+
+  const selectedCities = useMemo(() => {
+    const base = scope.regionId ? cities.filter((c) => c.regionId === scope.regionId) : cities;
+    const q = cityQuery.toLowerCase();
+    return base.filter((c) => c.name.toLowerCase().includes(q));
+  }, [cities, scope.regionId, cityQuery]);
+
+  const selectedSites = useMemo(() => {
+    const base = scope.cityId ? sites.filter((s) => s.cityId === scope.cityId) : sites;
+    const qSite = siteQuery.toLowerCase();
+    const qDistrict = districtQuery.toLowerCase();
+    // District query further narrows sites by name (placeholder until district data exists)
+    return base.filter(
+      (s) => s.name.toLowerCase().includes(qSite) && s.name.toLowerCase().includes(qDistrict)
+    );
+  }, [sites, scope.cityId, siteQuery, districtQuery]);
 
   return (
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <label className="mb-1 block text-xs text-muted-foreground">
-          Level
-        </label>
-        <select
-          className="w-full rounded-md border bg-background px-3 py-2"
-          value={scope.level}
-          onChange={(e) => {
-            const level = e.target.value as HierarchyFilter["level"];
-            const next: HierarchyFilter = { level };
-            if (level === "region" && scope.regionId)
-              next.regionId = scope.regionId;
-            if (level === "city" && scope.cityId) next.cityId = scope.cityId;
-            if (level === "site" && scope.siteId) next.siteId = scope.siteId;
-            onChange(next);
-          }}
-        >
-          <option value="national">National</option>
-          <option value="region">Region</option>
-          <option value="city">City</option>
-          <option value="site">Site</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="mb-1 block text-xs text-muted-foreground">
-          Region
-        </label>
+        <label className="mb-1 block text-xs text-muted-foreground">Region</label>
+        <input
+          className="mb-2 w-full rounded-md border bg-background px-3 py-2"
+          placeholder="Search Region"
+          value={regionQuery}
+          onChange={(e) => setRegionQuery(e.target.value)}
+        />
         <select
           className="w-full rounded-md border bg-background px-3 py-2"
           value={scope.regionId ?? ""}
           onChange={(e) =>
             onChange({
-              level: scope.level === "national" ? "region" : scope.level,
+              level: "region",
               regionId: e.target.value || undefined,
             })
           }
         >
           <option value="">All Regions</option>
-          {regions.map((r) => (
+          {filteredRegions.map((r) => (
             <option key={r.id} value={r.id}>
               {r.name}
             </option>
@@ -73,12 +73,18 @@ export default function FilterBar({
 
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">City</label>
+        <input
+          className="mb-2 w-full rounded-md border bg-background px-3 py-2"
+          placeholder="Search City"
+          value={cityQuery}
+          onChange={(e) => setCityQuery(e.target.value)}
+        />
         <select
           className="w-full rounded-md border bg-background px-3 py-2"
           value={scope.cityId ?? ""}
           onChange={(e) =>
             onChange({
-              level: scope.level === "national" ? "city" : scope.level,
+              level: "city",
               regionId: scope.regionId,
               cityId: e.target.value || undefined,
             })
@@ -94,7 +100,23 @@ export default function FilterBar({
       </div>
 
       <div>
+        <label className="mb-1 block text-xs text-muted-foreground">District</label>
+        <input
+          className="w-full rounded-md border bg-background px-3 py-2"
+          placeholder="Search District"
+          value={districtQuery}
+          onChange={(e) => setDistrictQuery(e.target.value)}
+        />
+      </div>
+
+      <div>
         <label className="mb-1 block text-xs text-muted-foreground">Site</label>
+        <input
+          className="mb-2 w-full rounded-md border bg-background px-3 py-2"
+          placeholder="Search Site"
+          value={siteQuery}
+          onChange={(e) => setSiteQuery(e.target.value)}
+        />
         <select
           className="w-full rounded-md border bg-background px-3 py-2"
           value={scope.siteId ?? ""}

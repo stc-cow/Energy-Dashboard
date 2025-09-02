@@ -93,6 +93,11 @@ export default function Index() {
         <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" metric="power" />
       </div>
 
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <KpiCard title="Accumulative Power Consumption" value={Math.round(accumEnergyKwh)} unit="kWh" />
+        <KpiCard title="Accumulative Fuel Consumption" value={Math.round(accumFuelLiters)} unit="L" />
+      </div>
+
     </Layout>
   );
 }

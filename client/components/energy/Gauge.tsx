@@ -32,7 +32,8 @@ export default function Gauge({
             colors={[green, yellow, red]}
             percent={pct / 100}
             needleColor="#ffffff"
-            textColor="#ffffff"
+            textColor="transparent"
+            formatTextValue={() => ""}
             arcWidth={0.3}
             style={{ width: "100%" }}
           />

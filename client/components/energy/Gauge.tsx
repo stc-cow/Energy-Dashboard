@@ -11,7 +11,8 @@ export default function Gauge({
   metric,
   colorClass,
 }: GaugeProps) {
-  const r = 48;
+  // Radius leaves padding so the stroke doesn't clip the viewBox
+  const r = 44;
   const pct = Math.max(0, Math.min(100, value));
 
   // Choose color by metric or thresholds
@@ -33,7 +34,7 @@ export default function Gauge({
     ? undefined
     : ({ color: `hsl(var(${colorVar}))` } as React.CSSProperties);
 
-  // Semicircle helpers (left=0%, right=100%) using TOP half (π to 0)
+  // Semicircle helpers (left=0%, right=100%) using BOTTOM half
   const cx = 50, cy = 50;
   const toXY = (ang: number) => ({ x: cx + r * Math.cos(ang), y: cy + r * Math.sin(ang) });
   const arcPath = (start: number, end: number) => {
@@ -43,11 +44,13 @@ export default function Gauge({
     const sweep = 1; // clockwise (bottom arc)
     return `M ${s.x} ${s.y} A ${r} ${r} 0 ${largeArc} ${sweep} ${e.x} ${e.y}`;
   };
-  const startAngle = Math.PI; // left
-  const endAngle = Math.PI * 2; // right
-  const greenEnd = startAngle + 0.6 * Math.PI;
-  const yellowEnd = startAngle + 0.85 * Math.PI;
-  const progressAngle = startAngle + (pct / 100) * Math.PI;
+  // Map 0% (left) -> π, 100% (right) -> 0 across bottom half
+  const angleFor = (p: number) => Math.PI * (1 - p);
+  const startAngle = angleFor(0); // π
+  const greenEnd = angleFor(0.6);
+  const yellowEnd = angleFor(0.85);
+  const endAngle = angleFor(1); // 0
+  const progressAngle = angleFor(pct / 100);
 
   return (
     <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-72 md:h-80 lg:h-96 flex flex-col items-center justify-center text-center">

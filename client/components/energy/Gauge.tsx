@@ -53,7 +53,7 @@ export default function Gauge({
   const progressAngle = angleFor(pct / 100);
 
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-72 md:h-80 lg:h-96 flex flex-col items-center justify-center text-center">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-[276px] flex flex-col items-center justify-center text-center">
       <div className="flex flex-col items-center">
         <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90 mb-2">{label}</div>
         <svg viewBox="0 0 100 100" className="h-56 w-56 lg:h-64 lg:w-64 mx-auto">

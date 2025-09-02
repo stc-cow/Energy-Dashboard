@@ -85,7 +85,7 @@ export default function Index() {
         <KpiCard
           title="CO₂ Total Emissions"
           value={kpis?.kpis.co2TonsPerDay.value ?? 0}
-          unit={kpis?.kpis.co2TonsPerDay.unit ?? ""}
+          unit="TON/day"
         />
       </div>
 

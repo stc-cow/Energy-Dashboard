@@ -4,7 +4,6 @@ import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";
 import KpiCard from "@/components/energy/KpiCard";
 import Gauge from "@/components/energy/Gauge";
-import StackedBar from "@/components/energy/StackedBar";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
@@ -32,11 +31,6 @@ export default function Index() {
   const { data: tsDaily } = useQuery({
     queryKey: ["ts", scope, "daily"],
     queryFn: () => fetchTimeSeries(scope, { granularity: "daily" }),
-    enabled: !!hierarchy,
-  });
-  const { data: breakdownRegion } = useQuery({
-    queryKey: ["br", scope, "region"],
-    queryFn: () => fetchBreakdown(scope, "region"),
     enabled: !!hierarchy,
   });
   const { data: benchmark } = useQuery({
@@ -91,9 +85,6 @@ export default function Index() {
         <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" metric="power" />
       </div>
 
-      <div className="mt-4">
-        <StackedBar data={breakdownRegion?.data ?? []} title="Regional Diesel vs Energy" />
-      </div>
     </Layout>
   );
 }

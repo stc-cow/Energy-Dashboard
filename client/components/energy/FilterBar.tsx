@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
 import { City, HierarchyFilter, Region, Site } from "@shared/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Props {
   regions: Region[];
@@ -9,16 +16,10 @@ interface Props {
   onChange: (s: HierarchyFilter) => void;
 }
 
-export default function FilterBar({
-  regions,
-  cities,
-  sites,
-  scope,
-  onChange,
-}: Props) {
+export default function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
   const [regionQuery, setRegionQuery] = useState("");
   const [cityQuery, setCityQuery] = useState("");
-  const [districtQuery, setDistrictQuery] = useState("");
+  const [district, setDistrict] = useState("");
   const [siteQuery, setSiteQuery] = useState("");
 
   const filteredRegions = useMemo(() => {
@@ -26,120 +27,171 @@ export default function FilterBar({
     return regions.filter((r) => r.name.toLowerCase().includes(q));
   }, [regions, regionQuery]);
 
-  const selectedCities = useMemo(() => {
-    const base = scope.regionId ? cities.filter((c) => c.regionId === scope.regionId) : cities;
-    const q = cityQuery.toLowerCase();
-    return base.filter((c) => c.name.toLowerCase().includes(q));
-  }, [cities, scope.regionId, cityQuery]);
+  const citiesByRegion = useMemo(() => {
+    return cities.filter((c) => (scope.regionId ? c.regionId === scope.regionId : true));
+  }, [cities, scope.regionId]);
 
-  const selectedSites = useMemo(() => {
-    const base = scope.cityId ? sites.filter((s) => s.cityId === scope.cityId) : sites;
-    const qSite = siteQuery.toLowerCase();
-    const qDistrict = districtQuery.toLowerCase();
-    // District query further narrows sites by name (placeholder until district data exists)
-    return base.filter(
-      (s) => s.name.toLowerCase().includes(qSite) && s.name.toLowerCase().includes(qDistrict)
-    );
-  }, [sites, scope.cityId, siteQuery, districtQuery]);
+  const filteredCities = useMemo(() => {
+    const q = cityQuery.toLowerCase();
+    return citiesByRegion.filter((c) => c.name.toLowerCase().includes(q));
+  }, [citiesByRegion, cityQuery]);
+
+  const sitesByCity = useMemo(() => {
+    return sites.filter((s) => (scope.cityId ? s.cityId === scope.cityId : true));
+  }, [sites, scope.cityId]);
+
+  const derivedDistricts = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of sitesByCity) {
+      const token = (s.name.split(/[-,]/)[0] || s.name).trim();
+      if (token.length > 1) set.add(token);
+    }
+    return Array.from(set).sort();
+  }, [sitesByCity]);
+
+  const filteredSites = useMemo(() => {
+    const q = siteQuery.toLowerCase();
+    return sitesByCity.filter((s) => {
+      const matchesText = s.name.toLowerCase().includes(q);
+      const matchesDistrict = district ? s.name.startsWith(district) : true;
+      return matchesText && matchesDistrict;
+    });
+  }, [sitesByCity, siteQuery, district]);
 
   return (
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Region */}
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">Region</label>
-        <select
-          className="w-full rounded-md border bg-background px-3 py-2"
+        <Select
           value={scope.regionId ?? ""}
-          onChange={(e) =>
-            onChange({
-              level: "region",
-              regionId: e.target.value || undefined,
-            })
-          }
+          onValueChange={(val) => {
+            setRegionQuery("");
+            setCityQuery("");
+            setDistrict("");
+            setSiteQuery("");
+            onChange({ level: "region", regionId: val || undefined });
+          }}
         >
-          <option value="">All Regions</option>
-          {filteredRegions.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-        <input
-          className="mt-2 w-full rounded-md border bg-background px-3 py-2"
-          placeholder="Search Region"
-          value={regionQuery}
-          onChange={(e) => setRegionQuery(e.target.value)}
-        />
+          <SelectTrigger>
+            <SelectValue placeholder="All Regions" />
+          </SelectTrigger>
+          <SelectContent>
+            <input
+              placeholder="Search Region"
+              autoFocus
+              className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
+              value={regionQuery}
+              onChange={(e) => setRegionQuery(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+            <SelectItem value="">All Regions</SelectItem>
+            {filteredRegions.map((r) => (
+              <SelectItem key={r.id} value={r.id}>
+                {r.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
+      {/* City */}
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">City</label>
-        <select
-          className="w-full rounded-md border bg-background px-3 py-2"
+        <Select
           value={scope.cityId ?? ""}
-          onChange={(e) =>
-            onChange({
-              level: "city",
-              regionId: scope.regionId,
-              cityId: e.target.value || undefined,
-            })
-          }
+          onValueChange={(val) => {
+            setCityQuery("");
+            setDistrict("");
+            setSiteQuery("");
+            onChange({ level: "city", regionId: scope.regionId, cityId: val || undefined });
+          }}
+          disabled={!scope.regionId}
         >
-          <option value="">All Cities</option>
-          {selectedCities.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        {scope.regionId && (
-          <input
-            className="mt-2 w-full rounded-md border bg-background px-3 py-2"
-            placeholder="Search City"
-            value={cityQuery}
-            onChange={(e) => setCityQuery(e.target.value)}
-          />
-        )}
+          <SelectTrigger>
+            <SelectValue placeholder="All Cities" />
+          </SelectTrigger>
+          <SelectContent>
+            <input
+              placeholder="Search City"
+              autoFocus
+              className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
+              value={cityQuery}
+              onChange={(e) => setCityQuery(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+            <SelectItem value="">All Cities</SelectItem>
+            {filteredCities.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
+      {/* District */}
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">District</label>
-        <input
-          className="w-full rounded-md border bg-background px-3 py-2"
-          placeholder="Search District"
-          value={districtQuery}
-          onChange={(e) => setDistrictQuery(e.target.value)}
-        />
+        <Select value={district} onValueChange={(val) => setDistrict(val)} disabled={!scope.cityId}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Districts" />
+          </SelectTrigger>
+          <SelectContent>
+            <input
+              placeholder="Search District"
+              autoFocus
+              className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+            <SelectItem value="">All Districts</SelectItem>
+            {derivedDistricts
+              .filter((d) => d.toLowerCase().includes(district.toLowerCase()))
+              .map((d) => (
+                <SelectItem key={d} value={d}>
+                  {d}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
       </div>
 
+      {/* Site */}
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">Site</label>
-        <select
-          className="w-full rounded-md border bg-background px-3 py-2"
+        <Select
           value={scope.siteId ?? ""}
-          onChange={(e) =>
-            onChange({
-              level: "site",
-              regionId: scope.regionId,
-              cityId: scope.cityId,
-              siteId: e.target.value || undefined,
-            })
+          onValueChange={(val) =>
+            onChange({ level: "site", regionId: scope.regionId, cityId: scope.cityId, siteId: val || undefined })
           }
+          disabled={!scope.cityId}
         >
-          <option value="">All Sites</option>
-          {selectedSites.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        {scope.cityId && (
-          <input
-            className="mt-2 w-full rounded-md border bg-background px-3 py-2"
-            placeholder="Search Site"
-            value={siteQuery}
-            onChange={(e) => setSiteQuery(e.target.value)}
-          />
-        )}
+          <SelectTrigger>
+            <SelectValue placeholder="All Sites" />
+          </SelectTrigger>
+          <SelectContent>
+            <input
+              placeholder="Search Site"
+              autoFocus
+              className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
+              value={siteQuery}
+              onChange={(e) => setSiteQuery(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+            <SelectItem value="">All Sites</SelectItem>
+            {filteredSites.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

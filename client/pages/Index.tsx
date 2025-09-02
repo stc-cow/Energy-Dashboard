@@ -90,7 +90,7 @@ export default function Index() {
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
         <Gauge value={kpis?.kpis.fuelTankLevelPct.value ?? 0} label="Fuel Tank Level" metric="fuel" />
-        <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Generator Load" metric="power" />
+        <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Average Generator Load" metric="power" />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">

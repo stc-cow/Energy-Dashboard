@@ -43,7 +43,7 @@ export default function Gauge({
   const py = cy + (r - 6) * Math.sin(theta);
 
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-[276px] flex flex-col items-center justify-center text-center">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-[315px] flex flex-col items-center justify-center text-center">
       <div className="flex flex-col items-center">
         <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90 mb-2">{label}</div>
         <svg viewBox="0 0 100 100" className="h-40 w-40 sm:h-44 sm:w-44 mx-auto" style={styleColor}>

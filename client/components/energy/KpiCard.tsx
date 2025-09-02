@@ -16,10 +16,8 @@ export default function KpiCard({
       </div>
       <div className="mt-2 flex flex-col items-center justify-center">
         <div className="text-4xl lg:text-5xl font-extrabold tabular-nums text-white">
-          {value.toLocaleString()}{" "}
-          <div className="text-sm font-bold text-white/80">
-            {unit}
-          </div>
+          <span className="tabular-nums">{value.toLocaleString()}</span>
+          <span className="ml-1 text-sm font-bold text-white/80 align-baseline">{unit}</span>
         </div>
       </div>
     </div>

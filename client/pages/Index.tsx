@@ -32,6 +32,15 @@ export default function Index() {
     queryFn: () => fetchTimeSeries(scope, { granularity: "daily" }),
     enabled: !!hierarchy,
   });
+
+  const accumFuelLiters = useMemo(
+    () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.dieselLiters || 0), 0),
+    [tsDaily]
+  );
+  const accumEnergyKwh = useMemo(
+    () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.dieselLiters || 0) * (p.efficiencyKwhPerLiter || 0), 0),
+    [tsDaily]
+  );
   const { data: benchmark } = useQuery({
     queryKey: ["benchmark", scope],
     queryFn: () => fetchBenchmark(scope),

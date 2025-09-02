@@ -41,6 +41,10 @@ export default function Index() {
     () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.dieselLiters || 0) * (p.efficiencyKwhPerLiter || 0), 0),
     [tsDaily]
   );
+  const accumCo2Tons = useMemo(
+    () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.co2Tons || 0), 0),
+    [tsDaily]
+  );
   const { data: benchmark } = useQuery({
     queryKey: ["benchmark", scope],
     queryFn: () => fetchBenchmark(scope),
@@ -83,7 +87,7 @@ export default function Index() {
           unit={kpis?.kpis.powerDemandKw.unit ?? ""}
         />
         <KpiCard
-          title="CO₂ Total Emissions"
+          title="Daily CO₂ Emissions"
           value={kpis?.kpis.co2TonsPerDay.value ?? 0}
           unit="TON/day"
         />
@@ -94,9 +98,10 @@ export default function Index() {
         <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Average Generator Load" metric="power" />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <KpiCard title="Accum. Power Consumption" value={Math.round(accumEnergyKwh / 1000)} unit="MWh" />
         <KpiCard title="Accum. Fuel Consumption" value={Math.round(accumFuelLiters)} unit="L" />
+        <KpiCard title="Accum. CO₂ Emissions" value={accumCo2Tons} unit="TON" />
       </div>
 
     </Layout>

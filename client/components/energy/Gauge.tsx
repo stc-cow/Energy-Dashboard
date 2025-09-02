@@ -11,8 +11,8 @@ export default function Gauge({
   metric,
   colorClass,
 }: GaugeProps) {
-  // Donut meter
-  const r = 44;
+  // Donut meter sized to avoid clipping
+  const r = 42;
   const cx = 50, cy = 50;
   const pct = Math.max(0, Math.min(100, value));
   const circumference = 2 * Math.PI * r;
@@ -37,11 +37,16 @@ export default function Gauge({
     ? undefined
     : ({ color: `hsl(var(${colorVar}))` } as React.CSSProperties);
 
+  // Pointer angle (top = 0%) clockwise
+  const theta = -Math.PI / 2 + (2 * Math.PI * pct) / 100;
+  const px = cx + (r - 6) * Math.cos(theta);
+  const py = cy + (r - 6) * Math.sin(theta);
+
   return (
     <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-[276px] flex flex-col items-center justify-center text-center">
       <div className="flex flex-col items-center">
         <div className="text-lg lg:text-xl uppercase tracking-wider text-white/90 mb-2">{label}</div>
-        <svg viewBox="0 0 100 100" className="h-56 w-56 lg:h-64 lg:w-64 mx-auto" style={styleColor}>
+        <svg viewBox="0 0 100 100" className="h-40 w-40 sm:h-44 sm:w-44 mx-auto" style={styleColor}>
           {/* Track */}
           <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={12} />
           {/* Progress */}
@@ -58,6 +63,18 @@ export default function Gauge({
             strokeDashoffset={offset}
             transform="rotate(-90 50 50)"
           />
+          {/* Center pointer */}
+          <line
+            x1={cx}
+            y1={cy}
+            x2={px}
+            y2={py}
+            stroke={colorClass ? undefined : "currentColor"}
+            className={colorClass}
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
+          <circle cx={cx} cy={cy} r={3} fill="white" stroke="#0b0b0b" strokeWidth={1} />
         </svg>
         <div className="mt-3 text-5xl lg:text-6xl font-extrabold text-white">{pct.toFixed(1)}%</div>
         {metric === "fuel" && (

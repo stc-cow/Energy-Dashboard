@@ -46,12 +46,6 @@ export default function FilterBar({
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">Region</label>
-        <input
-          className="mb-2 w-full rounded-md border bg-background px-3 py-2"
-          placeholder="Search Region"
-          value={regionQuery}
-          onChange={(e) => setRegionQuery(e.target.value)}
-        />
         <select
           className="w-full rounded-md border bg-background px-3 py-2"
           value={scope.regionId ?? ""}
@@ -69,16 +63,16 @@ export default function FilterBar({
             </option>
           ))}
         </select>
+        <input
+          className="mt-2 w-full rounded-md border bg-background px-3 py-2"
+          placeholder="Search Region"
+          value={regionQuery}
+          onChange={(e) => setRegionQuery(e.target.value)}
+        />
       </div>
 
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">City</label>
-        <input
-          className="mb-2 w-full rounded-md border bg-background px-3 py-2"
-          placeholder="Search City"
-          value={cityQuery}
-          onChange={(e) => setCityQuery(e.target.value)}
-        />
         <select
           className="w-full rounded-md border bg-background px-3 py-2"
           value={scope.cityId ?? ""}
@@ -97,6 +91,14 @@ export default function FilterBar({
             </option>
           ))}
         </select>
+        {scope.regionId && (
+          <input
+            className="mt-2 w-full rounded-md border bg-background px-3 py-2"
+            placeholder="Search City"
+            value={cityQuery}
+            onChange={(e) => setCityQuery(e.target.value)}
+          />
+        )}
       </div>
 
       <div>
@@ -111,12 +113,6 @@ export default function FilterBar({
 
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">Site</label>
-        <input
-          className="mb-2 w-full rounded-md border bg-background px-3 py-2"
-          placeholder="Search Site"
-          value={siteQuery}
-          onChange={(e) => setSiteQuery(e.target.value)}
-        />
         <select
           className="w-full rounded-md border bg-background px-3 py-2"
           value={scope.siteId ?? ""}
@@ -136,6 +132,14 @@ export default function FilterBar({
             </option>
           ))}
         </select>
+        {scope.cityId && (
+          <input
+            className="mt-2 w-full rounded-md border bg-background px-3 py-2"
+            placeholder="Search Site"
+            value={siteQuery}
+            onChange={(e) => setSiteQuery(e.target.value)}
+          />
+        )}
       </div>
     </div>
   );

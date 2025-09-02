@@ -58,6 +58,7 @@ export default function Index() {
     <Layout>
       <div className="mb-6 text-center">
         <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">COW Predictive ENERGY Dashboard</h1>
+        <p className="mt-1 text-sm sm:text-base text-white/80 font-bold">As of 02/09/2025</p>
       </div>
 
       {hierarchy && (

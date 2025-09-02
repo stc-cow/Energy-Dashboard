@@ -70,7 +70,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
             setCityQuery("");
             setDistrict("");
             setSiteQuery("");
-            onChange({ level: "region", regionId: val || undefined });
+            onChange({ level: "region", regionId: val === "__ALL__" ? undefined : val });
           }}
         >
           <SelectTrigger>
@@ -86,7 +86,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
             />
-            <SelectItem value="">All Regions</SelectItem>
+            <SelectItem value="__ALL__">All Regions</SelectItem>
             {filteredRegions.map((r) => (
               <SelectItem key={r.id} value={r.id}>
                 {r.name}
@@ -105,7 +105,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
             setCityQuery("");
             setDistrict("");
             setSiteQuery("");
-            onChange({ level: "city", regionId: scope.regionId, cityId: val || undefined });
+            onChange({ level: "city", regionId: scope.regionId, cityId: val === "__ALL__" ? undefined : val });
           }}
           disabled={!scope.regionId}
         >
@@ -122,7 +122,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
             />
-            <SelectItem value="">All Cities</SelectItem>
+            <SelectItem value="__ALL__">All Cities</SelectItem>
             {filteredCities.map((c) => (
               <SelectItem key={c.id} value={c.id}>
                 {c.name}
@@ -135,7 +135,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
       {/* District */}
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">District</label>
-        <Select value={district} onValueChange={(val) => setDistrict(val)} disabled={!scope.cityId}>
+        <Select value={district} onValueChange={(val) => setDistrict(val === "__ALL__" ? "" : val)} disabled={!scope.cityId}>
           <SelectTrigger>
             <SelectValue placeholder="All Districts" />
           </SelectTrigger>
@@ -149,7 +149,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
             />
-            <SelectItem value="">All Districts</SelectItem>
+            <SelectItem value="__ALL__">All Districts</SelectItem>
             {derivedDistricts
               .filter((d) => d.toLowerCase().includes(district.toLowerCase()))
               .map((d) => (
@@ -167,7 +167,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
         <Select
           value={scope.siteId ?? ""}
           onValueChange={(val) =>
-            onChange({ level: "site", regionId: scope.regionId, cityId: scope.cityId, siteId: val || undefined })
+            onChange({ level: "site", regionId: scope.regionId, cityId: scope.cityId, siteId: val === "__ALL__" ? undefined : val })
           }
           disabled={!scope.cityId}
         >
@@ -184,7 +184,7 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
             />
-            <SelectItem value="">All Sites</SelectItem>
+            <SelectItem value="__ALL__">All Sites</SelectItem>
             {filteredSites.map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.name}

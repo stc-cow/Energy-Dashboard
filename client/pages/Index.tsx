@@ -34,16 +34,25 @@ export default function Index() {
   });
 
   const accumFuelLiters = useMemo(
-    () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.dieselLiters || 0), 0),
-    [tsDaily]
+    () =>
+      (tsDaily?.series ?? []).reduce(
+        (sum, p) => sum + (p.dieselLiters || 0),
+        0,
+      ),
+    [tsDaily],
   );
   const accumEnergyKwh = useMemo(
-    () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.dieselLiters || 0) * (p.efficiencyKwhPerLiter || 0), 0),
-    [tsDaily]
+    () =>
+      (tsDaily?.series ?? []).reduce(
+        (sum, p) =>
+          sum + (p.dieselLiters || 0) * (p.efficiencyKwhPerLiter || 0),
+        0,
+      ),
+    [tsDaily],
   );
   const accumCo2Tons = useMemo(
     () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.co2Tons || 0), 0),
-    [tsDaily]
+    [tsDaily],
   );
   const { data: benchmark } = useQuery({
     queryKey: ["benchmark", scope],
@@ -61,8 +70,12 @@ export default function Index() {
   return (
     <Layout>
       <div className="mb-6 text-center">
-        <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">COW Predictive Energy Dashboard</h1>
-        <p className="mt-1 text-sm sm:text-base text-white/80 font-bold">As of 02/09/2025</p>
+        <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">
+          COW Predictive Energy Dashboard
+        </h1>
+        <p className="mt-1 text-sm sm:text-base text-white/80 font-bold">
+          As of 02/09/2025
+        </p>
       </div>
 
       {hierarchy && (
@@ -94,16 +107,31 @@ export default function Index() {
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
-        <Gauge value={kpis?.kpis.fuelTankLevelPct.value ?? 0} label="Fuel Tank Level" metric="fuel" />
-        <Gauge value={kpis?.kpis.generatorLoadFactorPct.value ?? 0} label="Average Generator Load" metric="power" />
+        <Gauge
+          value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
+          label="Fuel Tank Level"
+          metric="fuel"
+        />
+        <Gauge
+          value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
+          label="Average Generator Load"
+          metric="power"
+        />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <KpiCard title="Accum. Power Consumption" value={Math.round(accumEnergyKwh / 1000)} unit="MWh" />
-        <KpiCard title="Accum. Fuel Consumption" value={Math.round(accumFuelLiters)} unit="L" />
+        <KpiCard
+          title="Accum. Power Consumption"
+          value={Math.round(accumEnergyKwh / 1000)}
+          unit="MWh"
+        />
+        <KpiCard
+          title="Accum. Fuel Consumption"
+          value={Math.round(accumFuelLiters)}
+          unit="L"
+        />
         <KpiCard title="Accum. CO₂ Emissions" value={accumCo2Tons} unit="TON" />
       </div>
-
     </Layout>
   );
 }

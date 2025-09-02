@@ -16,7 +16,13 @@ interface Props {
   onChange: (s: HierarchyFilter) => void;
 }
 
-export default function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
+export default function FilterBar({
+  regions,
+  cities,
+  sites,
+  scope,
+  onChange,
+}: Props) {
   const [regionQuery, setRegionQuery] = useState("");
   const [cityQuery, setCityQuery] = useState("");
   const [district, setDistrict] = useState("");
@@ -28,7 +34,9 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
   }, [regions, regionQuery]);
 
   const citiesByRegion = useMemo(() => {
-    return cities.filter((c) => (scope.regionId ? c.regionId === scope.regionId : true));
+    return cities.filter((c) =>
+      scope.regionId ? c.regionId === scope.regionId : true,
+    );
   }, [cities, scope.regionId]);
 
   const filteredCities = useMemo(() => {
@@ -37,7 +45,9 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
   }, [citiesByRegion, cityQuery]);
 
   const sitesByCity = useMemo(() => {
-    return sites.filter((s) => (scope.cityId ? s.cityId === scope.cityId : true));
+    return sites.filter((s) =>
+      scope.cityId ? s.cityId === scope.cityId : true,
+    );
   }, [sites, scope.cityId]);
 
   const derivedDistricts = useMemo(() => {
@@ -62,7 +72,9 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {/* Region */}
       <div>
-        <label className="mb-1 block text-xs text-muted-foreground">Region</label>
+        <label className="mb-1 block text-xs text-muted-foreground">
+          Region
+        </label>
         <Select
           value={scope.regionId ?? ""}
           onValueChange={(val) => {
@@ -70,7 +82,10 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
             setCityQuery("");
             setDistrict("");
             setSiteQuery("");
-            onChange({ level: "region", regionId: val === "__ALL__" ? undefined : val });
+            onChange({
+              level: "region",
+              regionId: val === "__ALL__" ? undefined : val,
+            });
           }}
         >
           <SelectTrigger>
@@ -105,7 +120,11 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
             setCityQuery("");
             setDistrict("");
             setSiteQuery("");
-            onChange({ level: "city", regionId: scope.regionId, cityId: val === "__ALL__" ? undefined : val });
+            onChange({
+              level: "city",
+              regionId: scope.regionId,
+              cityId: val === "__ALL__" ? undefined : val,
+            });
           }}
           disabled={!scope.regionId}
         >
@@ -134,8 +153,14 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
 
       {/* District */}
       <div>
-        <label className="mb-1 block text-xs text-muted-foreground">District</label>
-        <Select value={district} onValueChange={(val) => setDistrict(val === "__ALL__" ? "" : val)} disabled={!scope.cityId}>
+        <label className="mb-1 block text-xs text-muted-foreground">
+          District
+        </label>
+        <Select
+          value={district}
+          onValueChange={(val) => setDistrict(val === "__ALL__" ? "" : val)}
+          disabled={!scope.cityId}
+        >
           <SelectTrigger>
             <SelectValue placeholder="All Districts" />
           </SelectTrigger>
@@ -167,7 +192,12 @@ export default function FilterBar({ regions, cities, sites, scope, onChange }: P
         <Select
           value={scope.siteId ?? ""}
           onValueChange={(val) =>
-            onChange({ level: "site", regionId: scope.regionId, cityId: scope.cityId, siteId: val === "__ALL__" ? undefined : val })
+            onChange({
+              level: "site",
+              regionId: scope.regionId,
+              cityId: scope.cityId,
+              siteId: val === "__ALL__" ? undefined : val,
+            })
           }
           disabled={!scope.cityId}
         >

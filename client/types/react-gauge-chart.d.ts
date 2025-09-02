@@ -1,5 +1,5 @@
-declare module 'react-gauge-chart' {
-  import * as React from 'react';
+declare module "react-gauge-chart" {
+  import * as React from "react";
   export interface GaugeChartProps {
     id?: string;
     nrOfLevels?: number;

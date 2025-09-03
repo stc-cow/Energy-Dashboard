@@ -45,15 +45,11 @@ export default function Index() {
       ),
     [tsDaily],
   );
-  const accumEnergyKwh = useMemo(
-    () =>
-      (tsDaily?.series ?? []).reduce(
-        (sum, p) =>
-          sum + (p.dieselLiters || 0) * (p.efficiencyKwhPerLiter || 0),
-        0,
-      ),
-    [tsDaily],
-  );
+  const { data: accum } = useQuery({
+    queryKey: ["accum", scope],
+    queryFn: () => fetchAccumulations(scope, "2025-01-01"),
+    enabled: !!hierarchy,
+  });
   const accumCo2Tons = useMemo(
     () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.co2Tons || 0), 0),
     [tsDaily],

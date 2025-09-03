@@ -18,7 +18,7 @@ import { HierarchyFilter } from "@shared/api";
 
 export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
-  const asOf = useMemo(() => {
+  const asOf = (() => {
     const d = new Date();
     const dd = String(d.getDate()).padStart(2, "0");
     const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -27,7 +27,7 @@ export default function Index() {
     const MM = String(d.getMinutes()).padStart(2, "0");
     const SS = String(d.getSeconds()).padStart(2, "0");
     return `${dd}/${mm}/${yyyy} ${HH}:${MM}:${SS}`;
-  }, [hierarchy, kpis, tsDaily, accum, benchmark, alerts]);
+  })();
 
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],

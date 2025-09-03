@@ -18,6 +18,13 @@ import { HierarchyFilter } from "@shared/api";
 
 export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
+  const asOf = useMemo(() => {
+    const d = new Date();
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }, []);
 
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],
@@ -65,7 +72,7 @@ export default function Index() {
           COW Predictive Energy Dashboard
         </h1>
         <p className="mt-1 text-sm sm:text-base text-white/80 font-bold">
-          As of 02/09/2025
+          As of {asOf}
         </p>
       </div>
 

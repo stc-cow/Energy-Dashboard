@@ -5,7 +5,7 @@ import { createServer } from "./server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "./",
+  base: "/COW_EnergyDashboard/",
   server: {
     host: "::",
     port: 8080,

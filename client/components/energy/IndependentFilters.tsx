@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 function googleGVizUrl(u: string): string | null {
-  const m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  const m = u.match(
+    /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
+  );
   if (!m) return null;
   const id = m[1];
   return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
@@ -14,7 +16,9 @@ function parseGVizJSON(text: string): any[] {
   try {
     const json = JSON.parse(text.slice(start, end + 1));
     const table = json.table;
-    const headers: string[] = (table.cols || []).map((c: any) => String(c.label || ""));
+    const headers: string[] = (table.cols || []).map((c: any) =>
+      String(c.label || ""),
+    );
     const rows: any[] = [];
     for (const row of table.rows || []) {
       const obj: any = {};
@@ -54,7 +58,8 @@ export default function IndependentFilters({ apiUrl }: { apiUrl: string }) {
           const r = await fetch(apiUrl);
           if (!r.ok) throw new Error("fetch failed");
           const data = await r.json();
-          if (active) setRows(Array.isArray(data) ? data : data.rows || data.data || []);
+          if (active)
+            setRows(Array.isArray(data) ? data : data.rows || data.data || []);
         }
       } catch {
         if (active) setRows([]);
@@ -72,8 +77,8 @@ export default function IndependentFilters({ apiUrl }: { apiUrl: string }) {
     return (field: string) =>
       Array.from(
         new Set(
-          rows.map((r) => ((r as any)[field] ?? (r as any)[field + "Name"]))
-        )
+          rows.map((r) => (r as any)[field] ?? (r as any)[field + "Name"]),
+        ),
       )
         .filter(Boolean)
         .map(String)
@@ -81,11 +86,13 @@ export default function IndependentFilters({ apiUrl }: { apiUrl: string }) {
   }, [rows]);
 
   const filteredRows = useMemo(() => {
-    return rows.filter((r) =>
-      (!region || (r as any).regionName === region) &&
-      (!city || (r as any).cityName === city) &&
-      (!district || (((r as any).district ?? (r as any).districtName) === district)) &&
-      (!site || (r as any).siteName === site)
+    return rows.filter(
+      (r) =>
+        (!region || (r as any).regionName === region) &&
+        (!city || (r as any).cityName === city) &&
+        (!district ||
+          ((r as any).district ?? (r as any).districtName) === district) &&
+        (!site || (r as any).siteName === site),
     );
   }, [rows, region, city, district, site]);
 
@@ -113,7 +120,10 @@ export default function IndependentFilters({ apiUrl }: { apiUrl: string }) {
                 </option>
               ))}
             </select>
-            <select value={district} onChange={(e) => setDistrict(e.target.value)}>
+            <select
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+            >
               <option value="">All Districts</option>
               {unique("district").map((v) => (
                 <option key={v} value={v}>

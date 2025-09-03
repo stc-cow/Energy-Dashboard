@@ -152,7 +152,14 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
   >();
   const siteMap = new Map<
     string,
-    { id: string; name: string; cityId: string; lat: number; lng: number; district?: string }
+    {
+      id: string;
+      name: string;
+      cityId: string;
+      lat: number;
+      lng: number;
+      district?: string;
+    }
   >();
 
   for (const r of rows) {
@@ -181,8 +188,18 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
       const lng = toNumber(
         r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"] ?? 0,
       );
-      const district = String(r["districtName"] ?? r["district"] ?? r["District"] ?? "").trim() || undefined;
-      siteMap.set(siteId, { id: siteId, name: siteName, cityId, lat, lng, district });
+      const district =
+        String(
+          r["districtName"] ?? r["district"] ?? r["District"] ?? "",
+        ).trim() || undefined;
+      siteMap.set(siteId, {
+        id: siteId,
+        name: siteName,
+        cityId,
+        lat,
+        lng,
+        district,
+      });
     }
   }
 
@@ -591,7 +608,8 @@ export async function fetchAccumulations(
       (s, r) =>
         s +
         toNumber(
-          (r as any)["AccumPowerConsumption"] ?? (r as any)["accumPowerConsumption"],
+          (r as any)["AccumPowerConsumption"] ??
+            (r as any)["accumPowerConsumption"],
         ),
       0,
     );
@@ -599,7 +617,8 @@ export async function fetchAccumulations(
       (s, r) =>
         s +
         toNumber(
-          (r as any)["AccumFuelConsumption"] ?? (r as any)["accumFuelConsumption"],
+          (r as any)["AccumFuelConsumption"] ??
+            (r as any)["accumFuelConsumption"],
         ),
       0,
     );

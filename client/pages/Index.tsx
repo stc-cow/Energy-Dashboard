@@ -12,6 +12,7 @@ import {
   fetchHierarchy,
   fetchKPIs,
   fetchTimeSeries,
+  fetchAccumulations,
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 

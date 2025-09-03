@@ -64,6 +64,20 @@ function slug(s: string): string {
     .replace(/\s+/g, "-");
 }
 
+function getCityName(r: any): string {
+  // Column F (index 5) fallback when labels differ
+  return String(
+    r["cityName"] ?? r["City"] ?? r["city"] ?? r["col5"] ?? "",
+  ).trim();
+}
+
+function getDistrictName(r: any): string {
+  // Column G (index 6) fallback when labels differ
+  return String(
+    r["districtName"] ?? r["district"] ?? r["District"] ?? r["col6"] ?? "",
+  ).trim();
+}
+
 function getDateKey(rows: any[]): string | null {
   const keys = rows.length ? Object.keys(rows[0]) : [];
   let bestKey: string | null = null;
@@ -170,9 +184,7 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
     const regionName = String(
       r["regionName"] ?? r["Region"] ?? r["region"] ?? "",
     ).trim();
-    const cityName = String(
-      r["cityName"] ?? r["City"] ?? r["city"] ?? "",
-    ).trim();
+    const cityName = getCityName(r);
     const siteName = String(
       r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
     ).trim();
@@ -192,10 +204,7 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
       const lng = toNumber(
         r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"] ?? 0,
       );
-      const district =
-        String(
-          r["districtName"] ?? r["district"] ?? r["District"] ?? "",
-        ).trim() || undefined;
+      const district = getDistrictName(r) || undefined;
       siteMap.set(siteId, {
         id: siteId,
         name: siteName,
@@ -219,11 +228,9 @@ function rowsInScope(rows: any[], scope: HierarchyFilter) {
     const regionId = slug(
       String(r["regionName"] ?? r["Region"] ?? r["region"] ?? ""),
     );
-    const cityId = slug(String(r["cityName"] ?? r["City"] ?? r["city"] ?? ""));
+    const cityId = slug(getCityName(r));
     const siteId = slug(String(r["siteName"] ?? r["Site"] ?? r["site"] ?? ""));
-    const districtName = String(
-      r["districtName"] ?? r["district"] ?? r["District"] ?? "",
-    ).trim();
+    const districtName = getDistrictName(r);
 
     if (scope.district && districtName && districtName !== scope.district)
       return false;

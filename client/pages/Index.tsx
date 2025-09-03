@@ -38,23 +38,13 @@ export default function Index() {
     enabled: !!hierarchy,
   });
 
-  const accumFuelLiters = useMemo(
-    () =>
-      (tsDaily?.series ?? []).reduce(
-        (sum, p) => sum + (p.dieselLiters || 0),
-        0,
-      ),
-    [tsDaily],
-  );
+  const accumFuelLiters = useMemo(() => accum?.fuelLiters ?? 0, [accum]);
   const { data: accum } = useQuery({
     queryKey: ["accum", scope],
     queryFn: () => fetchAccumulations(scope, "2025-01-01"),
     enabled: !!hierarchy,
   });
-  const accumCo2Tons = useMemo(
-    () => (tsDaily?.series ?? []).reduce((sum, p) => sum + (p.co2Tons || 0), 0),
-    [tsDaily],
-  );
+  const accumCo2Tons = useMemo(() => accum?.co2Tons ?? 0, [accum]);
   const { data: benchmark } = useQuery({
     queryKey: ["benchmark", scope],
     queryFn: () => fetchBenchmark(scope),

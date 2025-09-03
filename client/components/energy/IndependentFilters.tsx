@@ -70,15 +70,22 @@ export default function IndependentFilters({ apiUrl }: { apiUrl: string }) {
 
   const unique = useMemo(() => {
     return (field: string) =>
-      Array.from(new Set(rows.map((r) => r[field]))).filter(Boolean).map(String).sort();
+      Array.from(
+        new Set(
+          rows.map((r) => ((r as any)[field] ?? (r as any)[field + "Name"]))
+        )
+      )
+        .filter(Boolean)
+        .map(String)
+        .sort();
   }, [rows]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((r) =>
-      (!region || r.regionName === region) &&
-      (!city || r.cityName === city) &&
-      (!district || r.district === district) &&
-      (!site || r.siteName === site)
+      (!region || (r as any).regionName === region) &&
+      (!city || (r as any).cityName === city) &&
+      (!district || (((r as any).district ?? (r as any).districtName) === district)) &&
+      (!site || (r as any).siteName === site)
     );
   }, [rows, region, city, district, site]);
 

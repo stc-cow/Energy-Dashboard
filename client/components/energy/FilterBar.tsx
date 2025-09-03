@@ -85,9 +85,8 @@ function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
           onValueChange={(val) => {
             setRegionQuery("");
             setCityQuery("");
-            setDistrict("");
             setSiteQuery("");
-            onChange({ level: "region", regionId: val === "__ALL__" ? undefined : val });
+            onChange({ level: "region", regionId: val === "__ALL__" ? undefined : val, district: undefined, cityId: undefined, siteId: undefined });
           }}
         >
           <SelectTrigger>

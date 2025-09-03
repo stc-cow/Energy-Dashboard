@@ -20,8 +20,18 @@ export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
   const [now, setNow] = useState(new Date());
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
+    // align first tick to the start of next minute, then tick every minute
+    const now = new Date();
+    const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    const timeoutId = setTimeout(() => {
+      setNow(new Date());
+      const id = setInterval(() => setNow(new Date()), 60_000);
+      (window as any).__asof_interval = id;
+    }, Math.max(0, msToNextMinute));
+    return () => {
+      clearTimeout(timeoutId);
+      if ((window as any).__asof_interval) clearInterval((window as any).__asof_interval);
+    };
   }, []);
   const asOf = useMemo(() => {
     const d = now;

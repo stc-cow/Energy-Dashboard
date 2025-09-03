@@ -221,9 +221,12 @@ function rowsInScope(rows: any[], scope: HierarchyFilter) {
     );
     const cityId = slug(String(r["cityName"] ?? r["City"] ?? r["city"] ?? ""));
     const siteId = slug(String(r["siteName"] ?? r["Site"] ?? r["site"] ?? ""));
-    const districtName = String(r["districtName"] ?? r["district"] ?? r["District"] ?? "").trim();
+    const districtName = String(
+      r["districtName"] ?? r["district"] ?? r["District"] ?? "",
+    ).trim();
 
-    if (scope.district && districtName && districtName !== scope.district) return false;
+    if (scope.district && districtName && districtName !== scope.district)
+      return false;
 
     if (scope.level === "national") return true;
     if (scope.level === "region")
@@ -612,7 +615,10 @@ export async function fetchAccumulations(
     }
 
     function normalizeKey(k: string): string {
-      return String(k || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]/g, "");
+      return String(k || "")
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[^a-z0-9]/g, "");
     }
     function pickNumber(row: any, candidates: string[]): number {
       const map = new Map<string, any>();
@@ -627,39 +633,48 @@ export async function fetchAccumulations(
       return 0;
     }
 
-    const powerKwh = rows.reduce((s, r) =>
-      s +
-      pickNumber(r, [
-        "AccumPowerConsumption",
-        "accumPowerConsumption",
-        "Accum Power Consumption",
-        "Accum_Power_Consumption",
-        "PowerKwhAccumulation",
-        "Power Kwh Accumulation",
-        "power_kwh_accumulation",
-      ]), 0);
+    const powerKwh = rows.reduce(
+      (s, r) =>
+        s +
+        pickNumber(r, [
+          "AccumPowerConsumption",
+          "accumPowerConsumption",
+          "Accum Power Consumption",
+          "Accum_Power_Consumption",
+          "PowerKwhAccumulation",
+          "Power Kwh Accumulation",
+          "power_kwh_accumulation",
+        ]),
+      0,
+    );
 
-    const fuelLiters = rows.reduce((s, r) =>
-      s +
-      pickNumber(r, [
-        "AccumFuelConsumption",
-        "accumFuelConsumption",
-        "Accum Fuel Consumption",
-        "Accum_Fuel_Consumption",
-        "FuelLitersAccumulation",
-        "fuel_liters_accumulation",
-      ]), 0);
+    const fuelLiters = rows.reduce(
+      (s, r) =>
+        s +
+        pickNumber(r, [
+          "AccumFuelConsumption",
+          "accumFuelConsumption",
+          "Accum Fuel Consumption",
+          "Accum_Fuel_Consumption",
+          "FuelLitersAccumulation",
+          "fuel_liters_accumulation",
+        ]),
+      0,
+    );
 
-    const co2Tons = rows.reduce((s, r) =>
-      s +
-      pickNumber(r, [
-        "AccumCO2Emissions",
-        "accumCO2Emissions",
-        "accumCo2Tons",
-        "Accum CO2 Emissions",
-        "CO2Accumulation",
-        "co2_accumulation",
-      ]), 0);
+    const co2Tons = rows.reduce(
+      (s, r) =>
+        s +
+        pickNumber(r, [
+          "AccumCO2Emissions",
+          "accumCO2Emissions",
+          "accumCo2Tons",
+          "Accum CO2 Emissions",
+          "CO2Accumulation",
+          "co2_accumulation",
+        ]),
+      0,
+    );
 
     return { powerKwh, fuelLiters, co2Tons };
   } catch {

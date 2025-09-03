@@ -44,12 +44,15 @@ export default function FilterBar({
   const filteredCities = useMemo(() => {
     const q = cityQuery.trim().toLowerCase();
     return cities
-      .filter((c) =>
-        (!scope.regionId ? true : c.regionId === scope.regionId) &&
-        (!q ? true : c.name.toLowerCase().includes(q)) &&
-        (!scope.district
-          ? true
-          : sites.some((s) => s.cityId === c.id && s.district === scope.district)),
+      .filter(
+        (c) =>
+          (!scope.regionId ? true : c.regionId === scope.regionId) &&
+          (!q ? true : c.name.toLowerCase().includes(q)) &&
+          (!scope.district
+            ? true
+            : sites.some(
+                (s) => s.cityId === c.id && s.district === scope.district,
+              )),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [cities, cityQuery, scope.regionId, scope.district, sites]);
@@ -57,13 +60,15 @@ export default function FilterBar({
   const filteredSites = useMemo(() => {
     const q = siteQuery.trim().toLowerCase();
     return sites
-      .filter((s) =>
-        (!scope.regionId
-          ? true
-          : cities.find((c) => c.id === s.cityId)?.regionId === scope.regionId) &&
-        (!scope.cityId ? true : s.cityId === scope.cityId) &&
-        (!scope.district ? true : s.district === scope.district) &&
-        (!q ? true : s.name.toLowerCase().includes(q)),
+      .filter(
+        (s) =>
+          (!scope.regionId
+            ? true
+            : cities.find((c) => c.id === s.cityId)?.regionId ===
+              scope.regionId) &&
+          (!scope.cityId ? true : s.cityId === scope.cityId) &&
+          (!scope.district ? true : s.district === scope.district) &&
+          (!q ? true : s.name.toLowerCase().includes(q)),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [sites, cities, scope.regionId, scope.cityId, scope.district, siteQuery]);
@@ -82,7 +87,9 @@ export default function FilterBar({
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {/* Region */}
       <div>
-        <label className="mb-1 block text-xs text-muted-foreground">Region</label>
+        <label className="mb-1 block text-xs text-muted-foreground">
+          Region
+        </label>
         <Select
           value={scope.regionId ?? ""}
           onValueChange={(val) =>
@@ -121,7 +128,9 @@ export default function FilterBar({
 
       {/* District */}
       <div>
-        <label className="mb-1 block text-xs text-muted-foreground">District</label>
+        <label className="mb-1 block text-xs text-muted-foreground">
+          District
+        </label>
         <Select
           value={scope.district ?? ""}
           onValueChange={(val) =>

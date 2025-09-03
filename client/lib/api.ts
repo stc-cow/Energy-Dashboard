@@ -567,3 +567,42 @@ export async function fetchAlerts(
     return mockAlerts(scope);
   }
 }
+
+export async function fetchAccumulations(
+  scope: HierarchyFilter,
+  from?: string,
+  to?: string,
+): Promise<{ powerKwh: number; fuelLiters: number; co2Tons: number }> {
+  if (isStatic || !SHEET_URL) return { powerKwh: 0, fuelLiters: 0, co2Tons: 0 };
+  try {
+    const rowsAll = await getRows();
+    let rows = rowsInScope(rowsAll, scope);
+    const dateKey = getDateKey(rows) || "";
+    if (dateKey && (from || to)) {
+      const fromTs = from ? new Date(from).getTime() : -Infinity;
+      const toTs = to ? new Date(to).getTime() : Infinity;
+      rows = rows.filter((r) => {
+        const t = new Date(r[dateKey]).getTime();
+        return t >= fromTs && t <= toTs;
+      });
+    }
+
+    const powerKwh = rows.reduce(
+      (s, r) =>
+        s +
+        toNumber(
+          (r as any)["AccumPowerConsumption"] ?? (r as any)["accumPowerConsumption"],
+        ),
+      0,
+    );
+    const fuelLiters = rows.reduce(
+      (s, r) => s + toNumber((r as any)["dieselLitersPerDay"]),
+      0,
+    );
+    const co2Tons = rows.reduce((s, r) => s + toNumber((r as any)["co2Tons"]), 0);
+
+    return { powerKwh, fuelLiters, co2Tons };
+  } catch {
+    return { powerKwh: 0, fuelLiters: 0, co2Tons: 0 };
+  }
+}

@@ -5,7 +5,7 @@ import FilterBar from "@/components/energy/FilterBar";
 import KpiCard from "@/components/energy/KpiCard";
 import Gauge from "@/components/energy/Gauge";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   fetchAlerts,
   fetchBenchmark,
@@ -18,8 +18,13 @@ import { HierarchyFilter } from "@shared/api";
 
 export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
-  const asOf = (() => {
-    const d = new Date();
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const asOf = useMemo(() => {
+    const d = now;
     const dd = String(d.getDate()).padStart(2, "0");
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const yyyy = d.getFullYear();
@@ -27,7 +32,7 @@ export default function Index() {
     const MM = String(d.getMinutes()).padStart(2, "0");
     const SS = String(d.getSeconds()).padStart(2, "0");
     return `${dd}/${mm}/${yyyy} ${HH}:${MM}:${SS}`;
-  })();
+  }, [now]);
 
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],

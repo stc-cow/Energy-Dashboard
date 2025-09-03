@@ -53,8 +53,8 @@ export default function FilterBar({
   const derivedDistricts = useMemo(() => {
     const set = new Set<string>();
     for (const s of sitesByCity) {
-      const token = (s.name.split(/[-,]/)[0] || s.name).trim();
-      if (token.length > 1) set.add(token);
+      const d = (s as any).district as string | undefined;
+      if (d && d.trim().length > 0) set.add(d.trim());
     }
     return Array.from(set).sort();
   }, [sitesByCity]);
@@ -63,7 +63,7 @@ export default function FilterBar({
     const q = siteQuery.toLowerCase();
     return sitesByCity.filter((s) => {
       const matchesText = s.name.toLowerCase().includes(q);
-      const matchesDistrict = district ? s.name.startsWith(district) : true;
+      const matchesDistrict = district ? ((s as any).district === district) : true;
       return matchesText && matchesDistrict;
     });
   }, [sitesByCity, siteQuery, district]);

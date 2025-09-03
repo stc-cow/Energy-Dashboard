@@ -4,8 +4,10 @@ import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";
 import KpiCard from "@/components/energy/KpiCard";
 import Gauge from "@/components/energy/Gauge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import {
   fetchAlerts,
   fetchBenchmark,
@@ -13,11 +15,14 @@ import {
   fetchKPIs,
   fetchTimeSeries,
   fetchAccumulations,
+  clearSheetCache,
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 
 export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
+  const queryClient = useQueryClient();
+  const [asOfTick, setAsOfTick] = useState(0);
   const asOf = useMemo(() => {
     const d = new Date();
     const dd = String(d.getDate()).padStart(2, "0");
@@ -27,7 +32,7 @@ export default function Index() {
     const MM = String(d.getMinutes()).padStart(2, "0");
     const SS = String(d.getSeconds()).padStart(2, "0");
     return `${dd}/${mm}/${yyyy} ${HH}:${MM}:${SS}`;
-  }, []);
+  }, [asOfTick]);
 
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],
@@ -71,9 +76,29 @@ export default function Index() {
   return (
     <Layout>
       <div className="mb-6 text-center">
-        <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">
-          COW Predictive Energy Dashboard
-        </h1>
+        <div className="flex items-center justify-center gap-3">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              clearSheetCache();
+              queryClient.invalidateQueries({ queryKey: ["hierarchy"] });
+              queryClient.invalidateQueries({ queryKey: ["kpis"] });
+              queryClient.invalidateQueries({ queryKey: ["ts"] });
+              queryClient.invalidateQueries({ queryKey: ["accum"] });
+              queryClient.invalidateQueries({ queryKey: ["benchmark"] });
+              queryClient.invalidateQueries({ queryKey: ["alerts"] });
+              setAsOfTick((t) => t + 1);
+            }}
+            aria-label="Refresh data"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Refresh
+          </Button>
+          <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">
+            COW Predictive Energy Dashboard
+          </h1>
+        </div>
         <p className="mt-1 text-sm sm:text-base text-white/80 font-bold">
           As of {asOf}
         </p>

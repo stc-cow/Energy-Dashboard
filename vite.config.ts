@@ -5,7 +5,7 @@ import { createServer } from "./server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/COW_EnergyDashboard/",
+  base: "/builder-orbit-world/",
   server: {
     host: "::",
     port: 8080,

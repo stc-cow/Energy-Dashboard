@@ -35,6 +35,7 @@ export const sites: Site[] = [
     cityId: "riyadh",
     lat: 24.7136,
     lng: 46.6753,
+    district: "Riyadh",
   },
   {
     id: "riy-002",
@@ -42,6 +43,7 @@ export const sites: Site[] = [
     cityId: "riyadh",
     lat: 24.8,
     lng: 46.7,
+    district: "Riyadh",
   },
   {
     id: "jed-001",
@@ -49,6 +51,7 @@ export const sites: Site[] = [
     cityId: "jeddah",
     lat: 21.4858,
     lng: 39.1925,
+    district: "Jeddah",
   },
   {
     id: "mek-001",
@@ -56,6 +59,7 @@ export const sites: Site[] = [
     cityId: "mecca",
     lat: 21.3891,
     lng: 39.8579,
+    district: "Makkah",
   },
   {
     id: "mad-001",
@@ -63,6 +67,7 @@ export const sites: Site[] = [
     cityId: "madinah",
     lat: 24.5247,
     lng: 39.5692,
+    district: "Madinah",
   },
   {
     id: "dam-001",
@@ -70,6 +75,7 @@ export const sites: Site[] = [
     cityId: "dammam",
     lat: 26.3927,
     lng: 49.9777,
+    district: "Dammam",
   },
   {
     id: "abh-001",
@@ -77,6 +83,7 @@ export const sites: Site[] = [
     cityId: "abha",
     lat: 18.2164,
     lng: 42.5053,
+    district: "Abha",
   },
 ];
 

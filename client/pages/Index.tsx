@@ -38,12 +38,12 @@ export default function Index() {
     enabled: !!hierarchy,
   });
 
-  const accumFuelLiters = useMemo(() => accum?.fuelLiters ?? 0, [accum]);
   const { data: accum } = useQuery({
     queryKey: ["accum", scope],
     queryFn: () => fetchAccumulations(scope, "2025-01-01"),
     enabled: !!hierarchy,
   });
+  const accumFuelLiters = useMemo(() => accum?.fuelLiters ?? 0, [accum]);
   const accumCo2Tons = useMemo(() => accum?.co2Tons ?? 0, [accum]);
   const { data: benchmark } = useQuery({
     queryKey: ["benchmark", scope],

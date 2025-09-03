@@ -31,7 +31,7 @@ export default function Gauge({
           <GaugeChart
             id={`gauge-${label}`}
             nrOfLevels={20}
-            arcsLength={[0.6, 0.25, 0.15]}
+            arcsLength={metric === "fuel" ? [0.25, 0.25, 0.5] : [0.6, 0.25, 0.15]}
             colors={colorsArr}
             percent={pct / 100}
             needleColor="#ffffff"

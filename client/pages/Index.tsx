@@ -80,6 +80,7 @@ export default function Index() {
           <Button
             variant="secondary"
             size="sm"
+            className="-ml-0.5"
             onClick={() => {
               clearSheetCache();
               queryClient.invalidateQueries({ queryKey: ["hierarchy"] });
@@ -99,7 +100,7 @@ export default function Index() {
             COW Predictive Energy Dashboard
           </h1>
         </div>
-        <p className="mt-1 text-sm sm:text-base text-white/80 font-bold">
+        <p className="mt-3 text-sm sm:text-base text-white/80 font-bold">
           As of {asOf}
         </p>
       </div>

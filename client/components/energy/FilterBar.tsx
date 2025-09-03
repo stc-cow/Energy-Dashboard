@@ -19,7 +19,7 @@ interface Props {
 function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
   const [regionQuery, setRegionQuery] = useState("");
   const [cityQuery, setCityQuery] = useState("");
-  const [district, setDistrict] = useState("");
+  // District stored in scope to affect dataset queries
   const [siteQuery, setSiteQuery] = useState("");
 
   const filteredRegions = useMemo(() => {

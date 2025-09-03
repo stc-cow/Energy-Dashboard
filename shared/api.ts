@@ -27,6 +27,7 @@ export interface Site {
   cityId: string;
   lat: number;
   lng: number;
+  district?: string;
 }
 
 export interface HierarchyResponse {

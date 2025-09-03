@@ -32,7 +32,7 @@ export default function Gauge({
             id={`gauge-${label}`}
             nrOfLevels={20}
             arcsLength={[0.6, 0.25, 0.15]}
-            colors={[green, yellow, red]}
+            colors={colorsArr}
             percent={pct / 100}
             needleColor="#ffffff"
             textColor="transparent"

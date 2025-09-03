@@ -19,6 +19,7 @@ export default function Gauge({
   const green = "hsl(var(--metric-green))";
   const yellow = "hsl(var(--metric-yellow))";
   const red = "hsl(var(--metric-red))";
+  const colorsArr = metric === "fuel" ? [red, yellow, green] : [green, yellow, red];
 
   return (
     <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-[315px] flex flex-col items-center justify-center text-center">

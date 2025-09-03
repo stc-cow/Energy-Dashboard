@@ -34,10 +34,24 @@ const isStatic =
     window.location.protocol === "file:");
 
 // Sheet data wiring
-const SHEET_URL =
-  (typeof import.meta !== "undefined" &&
-    (import.meta as any).env?.VITE_SHEET_URL) ||
-  "https://docs.google.com/spreadsheets/d/1Y_GvVbzKWb_p1r-xYCjcb4l1EvLwsz47J-7dyyUqh-g/edit?usp=sharing";
+function getSheetUrl(): string | null {
+  const envUrl =
+    (typeof import.meta !== "undefined" &&
+      (import.meta as any).env?.VITE_SHEET_URL) || null;
+  let urlParam: string | null = null;
+  if (typeof window !== "undefined") {
+    const u = new URL(window.location.href.replace(/#\//, "/"));
+    urlParam = u.searchParams.get("sheet") || null;
+    if (!urlParam && window.location.hash.includes("sheet=")) {
+      const hash = window.location.hash.split("?")[1] || "";
+      const sp = new URLSearchParams(hash);
+      urlParam = sp.get("sheet");
+    }
+  }
+  return (urlParam || envUrl ||
+    "https://docs.google.com/spreadsheets/d/1Y_GvVbzKWb_p1r-xYCjcb4l1EvLwsz47J-7dyyUqh-g/edit?usp=sharing");
+}
+const SHEET_URL = getSheetUrl();
 
 let sheetPromise: Promise<any[]> | null = null;
 

@@ -29,7 +29,11 @@ export default function Index() {
   });
   const { data: tsDaily } = useQuery({
     queryKey: ["ts", scope, "daily"],
-    queryFn: () => fetchTimeSeries(scope, { granularity: "daily" }),
+    queryFn: () =>
+      fetchTimeSeries(scope, {
+        granularity: "daily",
+        from: "2025-01-01",
+      }),
     enabled: !!hierarchy,
   });
 

@@ -19,7 +19,8 @@ export default function Gauge({
   const green = "hsl(var(--metric-green))";
   const yellow = "hsl(var(--metric-yellow))";
   const red = "hsl(var(--metric-red))";
-  const colorsArr = metric === "fuel" ? [red, yellow, green] : [green, yellow, red];
+  const colorsArr =
+    metric === "fuel" ? [red, yellow, green] : [green, yellow, red];
 
   return (
     <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-[315px] flex flex-col items-center justify-center text-center">
@@ -31,7 +32,9 @@ export default function Gauge({
           <GaugeChart
             id={`gauge-${label}`}
             nrOfLevels={20}
-            arcsLength={metric === "fuel" ? [0.25, 0.25, 0.5] : [0.6, 0.25, 0.15]}
+            arcsLength={
+              metric === "fuel" ? [0.25, 0.25, 0.5] : [0.6, 0.25, 0.15]
+            }
             colors={colorsArr}
             percent={pct / 100}
             needleColor="#ffffff"

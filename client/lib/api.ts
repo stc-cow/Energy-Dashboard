@@ -607,34 +607,55 @@ export async function fetchAccumulations(
       });
     }
 
-    const powerKwh = rows.reduce(
-      (s, r) =>
-        s +
-        toNumber(
-          (r as any)["AccumPowerConsumption"] ??
-            (r as any)["accumPowerConsumption"],
-        ),
-      0,
-    );
-    const fuelLiters = rows.reduce(
-      (s, r) =>
-        s +
-        toNumber(
-          (r as any)["AccumFuelConsumption"] ??
-            (r as any)["accumFuelConsumption"],
-        ),
-      0,
-    );
-    const co2Tons = rows.reduce(
-      (s, r) =>
-        s +
-        toNumber(
-          (r as any)["AccumCO2Emissions"] ??
-          (r as any)["accumCO2Emissions"] ??
-          (r as any)["accumCo2Tons"],
-        ),
-      0,
-    );
+    function normalizeKey(k: string): string {
+      return String(k || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]/g, "");
+    }
+    function pickNumber(row: any, candidates: string[]): number {
+      const map = new Map<string, any>();
+      for (const [k, v] of Object.entries(row || {})) {
+        const nk = normalizeKey(k);
+        if (!map.has(nk)) map.set(nk, v);
+      }
+      for (const c of candidates) {
+        const nk = normalizeKey(c);
+        if (map.has(nk)) return toNumber(map.get(nk));
+      }
+      return 0;
+    }
+
+    const powerKwh = rows.reduce((s, r) =>
+      s +
+      pickNumber(r, [
+        "AccumPowerConsumption",
+        "accumPowerConsumption",
+        "Accum Power Consumption",
+        "Accum_Power_Consumption",
+        "PowerKwhAccumulation",
+        "Power Kwh Accumulation",
+        "power_kwh_accumulation",
+      ]), 0);
+
+    const fuelLiters = rows.reduce((s, r) =>
+      s +
+      pickNumber(r, [
+        "AccumFuelConsumption",
+        "accumFuelConsumption",
+        "Accum Fuel Consumption",
+        "Accum_Fuel_Consumption",
+        "FuelLitersAccumulation",
+        "fuel_liters_accumulation",
+      ]), 0);
+
+    const co2Tons = rows.reduce((s, r) =>
+      s +
+      pickNumber(r, [
+        "AccumCO2Emissions",
+        "accumCO2Emissions",
+        "accumCo2Tons",
+        "Accum CO2 Emissions",
+        "CO2Accumulation",
+        "co2_accumulation",
+      ]), 0);
 
     return { powerKwh, fuelLiters, co2Tons };
   } catch {

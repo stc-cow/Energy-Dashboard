@@ -133,7 +133,7 @@ function googleGVizUrl(u: string): string | null {
 }
 
 async function getRows(): Promise<any[]> {
-  if (!SHEET_URL || isStatic) return [];
+  if (!SHEET_URL) return [];
   if (!sheetPromise) {
     const gviz = googleGVizUrl(SHEET_URL);
     if (gviz) {
@@ -607,7 +607,7 @@ export async function fetchAccumulations(
   from?: string,
   to?: string,
 ): Promise<{ powerKwh: number; fuelLiters: number; co2Tons: number }> {
-  if (isStatic || !SHEET_URL) return { powerKwh: 0, fuelLiters: 0, co2Tons: 0 };
+  if (!SHEET_URL) return { powerKwh: 0, fuelLiters: 0, co2Tons: 0 };
   try {
     const rowsAll = await getRows();
     let rows = rowsInScope(rowsAll, scope);

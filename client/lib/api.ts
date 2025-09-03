@@ -596,10 +596,21 @@ export async function fetchAccumulations(
       0,
     );
     const fuelLiters = rows.reduce(
-      (s, r) => s + toNumber((r as any)["dieselLitersPerDay"]),
+      (s, r) =>
+        s +
+        toNumber(
+          (r as any)["AccumFuelConsumption"] ?? (r as any)["accumFuelConsumption"],
+        ),
       0,
     );
-    const co2Tons = rows.reduce((s, r) => s + toNumber((r as any)["co2Tons"]), 0);
+    const co2Tons = rows.reduce(
+      (s, r) =>
+        s +
+        toNumber(
+          (r as any)["AccumCO2Emissions"] ?? (r as any)["accumCO2Emissions"],
+        ),
+      0,
+    );
 
     return { powerKwh, fuelLiters, co2Tons };
   } catch {

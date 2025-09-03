@@ -40,7 +40,7 @@ export default function Index() {
 
   const { data: accum } = useQuery({
     queryKey: ["accum", scope],
-    queryFn: () => fetchAccumulations(scope, "2025-01-01"),
+    queryFn: () => fetchAccumulations(scope),
     enabled: !!hierarchy,
   });
   const accumFuelLiters = useMemo(() => accum?.fuelLiters ?? 0, [accum]);

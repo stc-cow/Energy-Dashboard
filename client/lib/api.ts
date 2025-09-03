@@ -144,17 +144,27 @@ function parseGVizJSON(text: string): any[] {
 type SheetEndpoint = { kind: "gviz" | "csv"; url: string } | null;
 function getSheetEndpoint(u: string): SheetEndpoint {
   // Standard edit/view link: /d/<id>
-  let m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  let m = u.match(
+    /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
+  );
   if (m && !/\/e\//.test(u)) {
     const id = m[1];
-    return { kind: "gviz", url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json` };
+    return {
+      kind: "gviz",
+      url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`,
+    };
   }
   // Published link: /d/e/<pubId>/pubhtml or pub?output=...
-  m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/);
+  m = u.match(
+    /https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/,
+  );
   if (m) {
     const pid = m[1];
     // Default to CSV for broad CORS compatibility
-    return { kind: "csv", url: `https://docs.google.com/spreadsheets/d/e/${pid}/pub?output=csv` };
+    return {
+      kind: "csv",
+      url: `https://docs.google.com/spreadsheets/d/e/${pid}/pub?output=csv`,
+    };
   }
   // Direct CSV output links
   if (/output=csv/.test(u)) return { kind: "csv", url: u };
@@ -162,7 +172,10 @@ function getSheetEndpoint(u: string): SheetEndpoint {
 }
 
 function parseCSV(text: string): any[] {
-  const lines = text.replace(/\r\n?/g, "\n").split("\n").filter((l) => l.length);
+  const lines = text
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .filter((l) => l.length);
   if (!lines.length) return [];
   function splitCSV(line: string): string[] {
     const out: string[] = [];
@@ -233,7 +246,8 @@ async function getRows(): Promise<any[]> {
         })
         .then((data) => {
           if (Array.isArray(data)) return data as any[];
-          if (data && Array.isArray((data as any).data)) return (data as any).data;
+          if (data && Array.isArray((data as any).data))
+            return (data as any).data;
           return [] as any[];
         })
         .catch(() => [] as any[]);

@@ -1,5 +1,5 @@
 import Layout from "@/components/layout/Layout";
-import IndependentFiltersDashboard from "@/components/energy/IndependentFiltersDashboard";
+import IndependentFilters from "@/components/energy/IndependentFilters";
 
 const SHEET_URL =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SHEET_URL) ||
@@ -8,7 +8,7 @@ const SHEET_URL =
 export default function Independent() {
   return (
     <Layout>
-      <IndependentFiltersDashboard apiUrl={SHEET_URL} />
+      <IndependentFilters apiUrl={SHEET_URL} />
     </Layout>
   );
 }

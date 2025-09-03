@@ -37,7 +37,8 @@ const isStatic =
 function getSheetUrl(): string | null {
   const envUrl =
     (typeof import.meta !== "undefined" &&
-      (import.meta as any).env?.VITE_SHEET_URL) || null;
+      (import.meta as any).env?.VITE_SHEET_URL) ||
+    null;
   let urlParam: string | null = null;
   if (typeof window !== "undefined") {
     const u = new URL(window.location.href.replace(/#\//, "/"));
@@ -48,8 +49,11 @@ function getSheetUrl(): string | null {
       urlParam = sp.get("sheet");
     }
   }
-  return (urlParam || envUrl ||
-    "https://docs.google.com/spreadsheets/d/1Y_GvVbzKWb_p1r-xYCjcb4l1EvLwsz47J-7dyyUqh-g/edit?usp=sharing");
+  return (
+    urlParam ||
+    envUrl ||
+    "https://docs.google.com/spreadsheets/d/1Y_GvVbzKWb_p1r-xYCjcb4l1EvLwsz47J-7dyyUqh-g/edit?usp=sharing"
+  );
 }
 const SHEET_URL = getSheetUrl();
 

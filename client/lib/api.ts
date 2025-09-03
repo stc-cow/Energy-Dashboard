@@ -629,7 +629,9 @@ export async function fetchAccumulations(
       (s, r) =>
         s +
         toNumber(
-          (r as any)["AccumCO2Emissions"] ?? (r as any)["accumCO2Emissions"],
+          (r as any)["AccumCO2Emissions"] ??
+          (r as any)["accumCO2Emissions"] ??
+          (r as any)["accumCo2Tons"],
         ),
       0,
     );

@@ -217,6 +217,9 @@ function rowsInScope(rows: any[], scope: HierarchyFilter) {
     );
     const cityId = slug(String(r["cityName"] ?? r["City"] ?? r["city"] ?? ""));
     const siteId = slug(String(r["siteName"] ?? r["Site"] ?? r["site"] ?? ""));
+    const districtName = String(r["districtName"] ?? r["district"] ?? r["District"] ?? "").trim();
+
+    if (scope.district && districtName && districtName !== scope.district) return false;
 
     if (scope.level === "national") return true;
     if (scope.level === "region")

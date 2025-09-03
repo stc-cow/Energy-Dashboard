@@ -36,7 +36,7 @@ const isStatic =
 // Sheet data wiring
 const SHEET_URL =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SHEET_URL) ||
-  "https://cdn.builder.io/o/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F29393dc92a1d4726aaa229e0f1e9ceb3?alt=media&token=e3bf6e83-3b56-4bf1-9956-8a673eda23ff&apiKey=bd65b3cd7a86452e803a3d7dc7a3d048";
+  "https://docs.google.com/spreadsheets/d/1Y_GvVbzKWb_p1r-xYCjcb4l1EvLwsz47J-7dyyUqh-g/edit?usp=sharing";
 
 let sheetPromise: Promise<any[]> | null = null;
 
@@ -79,20 +79,61 @@ function getDateKey(rows: any[]): string | null {
   return bestKey;
 }
 
+function parseGVizJSON(text: string): any[] {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1) return [];
+  try {
+    const json = JSON.parse(text.slice(start, end + 1));
+    const table = json.table;
+    const headers: string[] = (table.cols || []).map((c: any) => String(c.label || ""));
+    const rows: any[] = [];
+    for (const row of table.rows || []) {
+      const obj: any = {};
+      (row.c || []).forEach((cell: any, i: number) => {
+        const key = headers[i] || `col${i}`;
+        obj[key] = cell ? cell.v : null;
+      });
+      rows.push(obj);
+    }
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
+function googleGVizUrl(u: string): string | null {
+  const m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (!m) return null;
+  const id = m[1];
+  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+}
+
 async function getRows(): Promise<any[]> {
   if (!SHEET_URL || isStatic) return [];
   if (!sheetPromise) {
-    sheetPromise = fetch(SHEET_URL)
-      .then((r) => {
-        if (!r.ok) throw new Error(`sheet fetch failed: ${r.status}`);
-        return r.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) return data as any[];
-        if (data && Array.isArray((data as any).data)) return (data as any).data;
-        return [] as any[];
-      })
-      .catch(() => [] as any[]);
+    const gviz = googleGVizUrl(SHEET_URL);
+    if (gviz) {
+      sheetPromise = fetch(gviz)
+        .then((r) => {
+          if (!r.ok) throw new Error(`sheet fetch failed: ${r.status}`);
+          return r.text();
+        })
+        .then((text) => parseGVizJSON(text))
+        .catch(() => [] as any[]);
+    } else {
+      sheetPromise = fetch(SHEET_URL)
+        .then((r) => {
+          if (!r.ok) throw new Error(`sheet fetch failed: ${r.status}`);
+          return r.json();
+        })
+        .then((data) => {
+          if (Array.isArray(data)) return data as any[];
+          if (data && Array.isArray((data as any).data)) return (data as any).data;
+          return [] as any[];
+        })
+        .catch(() => [] as any[]);
+    }
   }
   return sheetPromise;
 }

@@ -49,11 +49,14 @@ export default function FilterBar({
     const q = cityQuery.toLowerCase();
     const base = citiesByRegion.filter((c) => c.name.toLowerCase().includes(q));
     if (!district) return base;
+    const regionSites = scope.regionId
+      ? sites.filter((s) => cityIdToRegion.get(s.cityId) === scope.regionId)
+      : sites;
     const allowed = new Set(
-      sitesInScope.filter((s) => (s as any).district === district).map((s) => s.cityId),
+      regionSites.filter((s) => (s as any).district === district).map((s) => s.cityId),
     );
     return base.filter((c) => allowed.has(c.id));
-  }, [citiesByRegion, cityQuery, district, /* deps below defined later */ sitesInScope]);
+  }, [citiesByRegion, cityQuery, district, sites, scope.regionId, cityIdToRegion]);
 
   const sitesInScope = useMemo(() => {
     if (scope.cityId) return sites.filter((s) => s.cityId === scope.cityId);

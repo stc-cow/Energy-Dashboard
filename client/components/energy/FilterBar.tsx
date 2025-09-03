@@ -56,24 +56,24 @@ function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
   const filteredCities = useMemo(() => {
     const q = cityQuery.toLowerCase();
     const base = citiesByRegion.filter((c) => c.name.toLowerCase().includes(q));
-    if (!district) return base;
+    if (!scope.district) return base;
     const regionSites = scope.regionId
       ? sites.filter((s) => cityIdToRegion.get(s.cityId) === scope.regionId)
       : sites;
     const allowed = new Set(
-      regionSites.filter((s) => (s as any).district === district).map((s) => s.cityId),
+      regionSites.filter((s) => (s as any).district === scope.district).map((s) => s.cityId),
     );
     return base.filter((c) => allowed.has(c.id));
-  }, [citiesByRegion, cityQuery, district, sites, scope.regionId, cityIdToRegion]);
+  }, [citiesByRegion, cityQuery, scope.district, sites, scope.regionId, cityIdToRegion]);
 
   const filteredSites = useMemo(() => {
     const q = siteQuery.toLowerCase();
     return sitesInScope.filter((s) => {
       const matchesText = s.name.toLowerCase().includes(q);
-      const matchesDistrict = district ? (s as any).district === district : true;
+      const matchesDistrict = scope.district ? (s as any).district === scope.district : true;
       return matchesText && matchesDistrict;
     });
-  }, [sitesInScope, siteQuery, district]);
+  }, [sitesInScope, siteQuery, scope.district]);
 
   return (
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,8 +116,8 @@ function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
       <div className="order-2">
         <label className="mb-1 block text-xs text-muted-foreground">District</label>
         <Select
-          value={district}
-          onValueChange={(val) => setDistrict(val === "__ALL__" ? "" : val)}
+          value={scope.district ?? ""}
+          onValueChange={(val) => onChange({ ...scope, district: val === "__ALL__" ? undefined : val })}
           disabled={!scope.regionId}
         >
           <SelectTrigger>
@@ -127,14 +127,14 @@ function FilterBar({ regions, cities, sites, scope, onChange }: Props) {
             <input
               placeholder="Search District"
               className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
+              value={scope.district ?? ""}
+              onChange={(e) => onChange({ ...scope, district: e.target.value || undefined })}
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
             />
             <SelectItem value="__ALL__">All Districts</SelectItem>
             {derivedDistricts
-              .filter((d) => d.toLowerCase().includes(district.toLowerCase()))
+              .filter((d) => d.toLowerCase().includes((scope.district ?? "").toLowerCase()))
               .map((d) => (
                 <SelectItem key={d} value={d}>
                   {d}

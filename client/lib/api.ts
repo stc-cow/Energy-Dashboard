@@ -41,6 +41,10 @@ const SHEET_URL =
 
 let sheetPromise: Promise<any[]> | null = null;
 
+export function clearSheetCache() {
+  sheetPromise = null;
+}
+
 function toNumber(v: any): number {
   if (v === null || v === undefined) return 0;
   if (typeof v === "number") return isFinite(v) ? v : 0;

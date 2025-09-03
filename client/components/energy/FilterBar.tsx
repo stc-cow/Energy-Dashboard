@@ -39,39 +39,51 @@ export default function FilterBar({
     );
   }, [cities, scope.regionId]);
 
+  const cityIdToRegion = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of cities) m.set(c.id, c.regionId);
+    return m;
+  }, [cities]);
+
   const filteredCities = useMemo(() => {
     const q = cityQuery.toLowerCase();
-    return citiesByRegion.filter((c) => c.name.toLowerCase().includes(q));
-  }, [citiesByRegion, cityQuery]);
-
-  const sitesByCity = useMemo(() => {
-    return sites.filter((s) =>
-      scope.cityId ? s.cityId === scope.cityId : true,
+    const base = citiesByRegion.filter((c) => c.name.toLowerCase().includes(q));
+    if (!district) return base;
+    const allowed = new Set(
+      sitesInScope.filter((s) => (s as any).district === district).map((s) => s.cityId),
     );
-  }, [sites, scope.cityId]);
+    return base.filter((c) => allowed.has(c.id));
+  }, [citiesByRegion, cityQuery, district, /* deps below defined later */ sitesInScope]);
+
+  const sitesInScope = useMemo(() => {
+    if (scope.cityId) return sites.filter((s) => s.cityId === scope.cityId);
+    if (scope.regionId)
+      return sites.filter((s) => cityIdToRegion.get(s.cityId) === scope.regionId);
+    return sites;
+  }, [sites, scope.cityId, scope.regionId, cityIdToRegion]);
 
   const derivedDistricts = useMemo(() => {
     const set = new Set<string>();
-    for (const s of sitesByCity) {
+    for (const s of sitesInScope) {
       const d = (s as any).district as string | undefined;
       if (d && d.trim().length > 0) set.add(d.trim());
     }
     return Array.from(set).sort();
-  }, [sitesByCity]);
+  }, [sitesInScope]);
 
   const filteredSites = useMemo(() => {
     const q = siteQuery.toLowerCase();
-    return sitesByCity.filter((s) => {
+    return sitesInScope.filter((s) => {
       const matchesText = s.name.toLowerCase().includes(q);
-      const matchesDistrict = district ? ((s as any).district === district) : true;
+      const matchesDistrict = district ? (s as any).district === district : true;
       return matchesText && matchesDistrict;
     });
-  }, [sitesByCity, siteQuery, district]);
+  }, [sitesInScope, siteQuery, district]);
 
   return (
     <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {/* Region */}
-      <div>
+      <div className="order-1">
         <label className="mb-1 block text-xs text-muted-foreground">
           Region
         </label>
@@ -111,14 +123,46 @@ export default function FilterBar({
         </Select>
       </div>
 
+      {/* District */}
+      <div className="order-2">
+        <label className="mb-1 block text-xs text-muted-foreground">District</label>
+        <Select
+          value={district}
+          onValueChange={(val) => setDistrict(val === "__ALL__" ? "" : val)}
+          disabled={!scope.regionId}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="All Districts" />
+          </SelectTrigger>
+          <SelectContent>
+            <input
+              placeholder="Search District"
+              autoFocus
+              className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            />
+            <SelectItem value="__ALL__">All Districts</SelectItem>
+            {derivedDistricts
+              .filter((d) => d.toLowerCase().includes(district.toLowerCase()))
+              .map((d) => (
+                <SelectItem key={d} value={d}>
+                  {d}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* City */}
-      <div>
+      <div className="order-3">
         <label className="mb-1 block text-xs text-muted-foreground">City</label>
         <Select
           value={scope.cityId ?? ""}
           onValueChange={(val) => {
             setCityQuery("");
-            setDistrict("");
             setSiteQuery("");
             onChange({
               level: "city",
@@ -151,43 +195,8 @@ export default function FilterBar({
         </Select>
       </div>
 
-      {/* District */}
-      <div>
-        <label className="mb-1 block text-xs text-muted-foreground">
-          District
-        </label>
-        <Select
-          value={district}
-          onValueChange={(val) => setDistrict(val === "__ALL__" ? "" : val)}
-          disabled={!scope.cityId}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="All Districts" />
-          </SelectTrigger>
-          <SelectContent>
-            <input
-              placeholder="Search District"
-              autoFocus
-              className="mb-1 w-full rounded-md border bg-background px-2 py-1 text-sm"
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => e.stopPropagation()}
-            />
-            <SelectItem value="__ALL__">All Districts</SelectItem>
-            {derivedDistricts
-              .filter((d) => d.toLowerCase().includes(district.toLowerCase()))
-              .map((d) => (
-                <SelectItem key={d} value={d}>
-                  {d}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       {/* Site */}
-      <div>
+      <div className="order-4">
         <label className="mb-1 block text-xs text-muted-foreground">Site</label>
         <Select
           value={scope.siteId ?? ""}
@@ -199,7 +208,7 @@ export default function FilterBar({
               siteId: val === "__ALL__" ? undefined : val,
             })
           }
-          disabled={!scope.cityId}
+          disabled={!scope.regionId}
         >
           <SelectTrigger>
             <SelectValue placeholder="All Sites" />

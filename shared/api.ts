@@ -8,6 +8,7 @@ export interface HierarchyFilter {
   regionId?: string | null;
   cityId?: string | null;
   siteId?: string | null;
+  district?: string | null;
 }
 
 export interface Region {

@@ -123,7 +123,7 @@ export default function Index() {
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <KpiCard
           title="Accum. Power Consumption"
-          value={Math.round(accumEnergyKwh / 1000)}
+          value={Math.round((accum?.powerKwh ?? 0) / 1000)}
           unit="MWh"
         />
         <KpiCard

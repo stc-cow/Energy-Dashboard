@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var l = window.location;
+        // redirect to root of repo (strip file segment)
+        var p = l.pathname.replace(/[^\/]+$/, "");
+        l.replace(p);
+      })();
+    </script>
+  </body>
+</html>

@@ -82,17 +82,29 @@ function slug(s: string): string {
     .replace(/\s+/g, "-");
 }
 
+function getRegionName(r: any): string {
+  return String(
+    r["regionName"] ?? r["Region"] ?? r["region"] ?? r["Region Name"] ?? r["region_name"] ?? "",
+  ).trim();
+}
+
 function getCityName(r: any): string {
   // Column F (index 5) fallback when labels differ
   return String(
-    r["cityName"] ?? r["City"] ?? r["city"] ?? r["col5"] ?? "",
+    r["cityName"] ?? r["City"] ?? r["city"] ?? r["City Name"] ?? r["city_name"] ?? r["col5"] ?? "",
+  ).trim();
+}
+
+function getSiteName(r: any): string {
+  return String(
+    r["siteName"] ?? r["Site"] ?? r["site"] ?? r["Site Name"] ?? r["site_name"] ?? "",
   ).trim();
 }
 
 function getDistrictName(r: any): string {
   // Column G (index 6) fallback when labels differ
   return String(
-    r["districtName"] ?? r["district"] ?? r["District"] ?? r["col6"] ?? "",
+    r["districtName"] ?? r["district"] ?? r["District"] ?? r["District Name"] ?? r["district_name"] ?? r["col6"] ?? "",
   ).trim();
 }
 
@@ -160,10 +172,15 @@ function getSheetEndpoint(u: string): SheetEndpoint {
   );
   if (m) {
     const pid = m[1];
+    // Preserve gid if present
+    let gid: string | null = null;
+    try {
+      gid = new URL(u).searchParams.get("gid");
+    } catch {}
     // Default to CSV for broad CORS compatibility
     return {
       kind: "csv",
-      url: `https://docs.google.com/spreadsheets/d/e/${pid}/pub?output=csv`,
+      url: `https://docs.google.com/spreadsheets/d/e/${pid}/pub?output=csv${gid ? `&gid=${gid}` : ""}`,
     };
   }
   // Direct CSV output links
@@ -275,13 +292,9 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
   >();
 
   for (const r of rows) {
-    const regionName = String(
-      r["regionName"] ?? r["Region"] ?? r["region"] ?? "",
-    ).trim();
+    const regionName = getRegionName(r);
     const cityName = getCityName(r);
-    const siteName = String(
-      r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
-    ).trim();
+    const siteName = getSiteName(r);
 
     const regionId = slug(regionName || "unknown-region");
     const cityId = slug(cityName || `city-${regionId}`);
@@ -319,11 +332,9 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
 
 function rowsInScope(rows: any[], scope: HierarchyFilter) {
   return rows.filter((r) => {
-    const regionId = slug(
-      String(r["regionName"] ?? r["Region"] ?? r["region"] ?? ""),
-    );
+    const regionId = slug(getRegionName(r));
     const cityId = slug(getCityName(r));
-    const siteId = slug(String(r["siteName"] ?? r["Site"] ?? r["site"] ?? ""));
+    const siteId = slug(getSiteName(r));
     const districtName = getDistrictName(r);
 
     if (scope.district && districtName && districtName !== scope.district)

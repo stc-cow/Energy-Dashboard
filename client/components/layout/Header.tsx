@@ -15,7 +15,7 @@ export default function Header() {
           </div>
           <div>
             <div className="text-sm tracking-widest text-muted-foreground font-bold">
-              COW Project 2025
+              ACES COW MS 2025
             </div>
           </div>
         </Link>

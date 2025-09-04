@@ -84,27 +84,49 @@ function slug(s: string): string {
 
 function getRegionName(r: any): string {
   return String(
-    r["regionName"] ?? r["Region"] ?? r["region"] ?? r["Region Name"] ?? r["region_name"] ?? "",
+    r["regionName"] ??
+      r["Region"] ??
+      r["region"] ??
+      r["Region Name"] ??
+      r["region_name"] ??
+      "",
   ).trim();
 }
 
 function getCityName(r: any): string {
   // Column F (index 5) fallback when labels differ
   return String(
-    r["cityName"] ?? r["City"] ?? r["city"] ?? r["City Name"] ?? r["city_name"] ?? r["col5"] ?? "",
+    r["cityName"] ??
+      r["City"] ??
+      r["city"] ??
+      r["City Name"] ??
+      r["city_name"] ??
+      r["col5"] ??
+      "",
   ).trim();
 }
 
 function getSiteName(r: any): string {
   return String(
-    r["siteName"] ?? r["Site"] ?? r["site"] ?? r["Site Name"] ?? r["site_name"] ?? "",
+    r["siteName"] ??
+      r["Site"] ??
+      r["site"] ??
+      r["Site Name"] ??
+      r["site_name"] ??
+      "",
   ).trim();
 }
 
 function getDistrictName(r: any): string {
   // Column G (index 6) fallback when labels differ
   return String(
-    r["districtName"] ?? r["district"] ?? r["District"] ?? r["District Name"] ?? r["district_name"] ?? r["col6"] ?? "",
+    r["districtName"] ??
+      r["district"] ??
+      r["District"] ??
+      r["District Name"] ??
+      r["district_name"] ??
+      r["col6"] ??
+      "",
   ).trim();
 }
 

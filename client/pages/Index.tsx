@@ -13,6 +13,7 @@ import {
   fetchKPIs,
   fetchTimeSeries,
   fetchAccumulations,
+  fetchCowStats,
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 
@@ -81,6 +82,12 @@ export default function Index() {
     enabled: !!hierarchy,
   });
 
+  const { data: cow } = useQuery({
+    queryKey: ["cowstats", scope],
+    queryFn: () => fetchCowStats(scope),
+    enabled: !!hierarchy,
+  });
+
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
 
   return (
@@ -135,6 +142,25 @@ export default function Index() {
           label="Average Generator Load"
           metric="power"
         />
+      </div>
+
+      {/* COW ID status section */}
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <KpiCard title="ON-AIR COWs" value={cow?.onAir ?? 0} unit="COWs" />
+        <KpiCard title="OFF-AIR COWs" value={cow?.offAir ?? 0} unit="COWs" />
+        <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-36 md:h-40 lg:h-44 flex flex-col justify-center">
+          <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-2">Region-wise COW IDs</div>
+          <div className="overflow-y-auto text-sm text-white/80" style={{ maxHeight: "4.5rem" }}>
+            <ul className="grid grid-cols-2 gap-x-4">
+              {(cow?.byRegion ?? []).map((r) => (
+                <li key={r.regionId} className="flex items-center justify-between">
+                  <span className="truncate pr-2">{r.regionName || "Unknown"}</span>
+                  <span className="font-semibold tabular-nums">{r.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">

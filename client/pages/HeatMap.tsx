@@ -6,6 +6,9 @@ import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function HeatLayer({ points }: { points: Array<{ lat: number; lng: number; value: number }> }) {
   const map = useMap();

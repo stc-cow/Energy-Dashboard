@@ -23,15 +23,20 @@ export default function Index() {
   useEffect(() => {
     // align first tick to the start of next minute, then tick every minute
     const now = new Date();
-    const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-    const timeoutId = setTimeout(() => {
-      setNow(new Date());
-      const id = setInterval(() => setNow(new Date()), 60_000);
-      (window as any).__asof_interval = id;
-    }, Math.max(0, msToNextMinute));
+    const msToNextMinute =
+      (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    const timeoutId = setTimeout(
+      () => {
+        setNow(new Date());
+        const id = setInterval(() => setNow(new Date()), 60_000);
+        (window as any).__asof_interval = id;
+      },
+      Math.max(0, msToNextMinute),
+    );
     return () => {
       clearTimeout(timeoutId);
-      if ((window as any).__asof_interval) clearInterval((window as any).__asof_interval);
+      if ((window as any).__asof_interval)
+        clearInterval((window as any).__asof_interval);
     };
   }, []);
   const asOf = useMemo(() => {
@@ -115,25 +120,66 @@ export default function Index() {
 
       {/* COWs Status card */}
       <div className="mt-4 grid grid-cols-1">
-        <div className="rounded-xl border border-white/20 bg-card shadow-none flex flex-col" style={{ padding: "32px 32px 20px", marginBottom: 20 }}>
-          <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">COWs Status (ON-AIR / OFF-AIR)</div>
+        <div
+          className="rounded-xl border border-white/20 bg-card shadow-none flex flex-col"
+          style={{ padding: "32px 32px 20px", marginBottom: 20 }}
+        >
+          <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">
+            COWs Status (ON-AIR / OFF-AIR)
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <div className="rounded-lg" style={{ backgroundColor: "rgba(223, 208, 235, 0.4)", padding: "16px 16px 19px", marginBottom: -2 }}>
-              <div className="text-sm text-white/80 font-semibold">ON-AIR COWs</div>
-              <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">{(cow?.onAir ?? 0).toLocaleString()}</div>
+            <div
+              className="rounded-lg"
+              style={{
+                backgroundColor: "rgba(223, 208, 235, 0.4)",
+                padding: "16px 16px 19px",
+                marginBottom: -2,
+              }}
+            >
+              <div className="text-sm text-white/80 font-semibold">
+                ON-AIR COWs
+              </div>
+              <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
+                {(cow?.onAir ?? 0).toLocaleString()}
+              </div>
             </div>
-            <div className="rounded-lg" style={{ backgroundColor: "rgba(224, 211, 235, 0.4)", padding: "16px 16px 19px" }}>
-              <div className="text-sm text-white/80 font-semibold">OFF-AIR COWs</div>
-              <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">{(cow?.offAir ?? 0).toLocaleString()}</div>
+            <div
+              className="rounded-lg"
+              style={{
+                backgroundColor: "rgba(224, 211, 235, 0.4)",
+                padding: "16px 16px 19px",
+              }}
+            >
+              <div className="text-sm text-white/80 font-semibold">
+                OFF-AIR COWs
+              </div>
+              <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
+                {(cow?.offAir ?? 0).toLocaleString()}
+              </div>
             </div>
-            <div className="rounded-lg p-4" style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}>
-              <div className="text-sm text-white/80 font-semibold mb-1">Regional breakdown</div>
-              <div className="text-sm text-white/80 overflow-auto" style={{ maxHeight: 104 }}>
+            <div
+              className="rounded-lg p-4"
+              style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
+            >
+              <div className="text-sm text-white/80 font-semibold mb-1">
+                Regional breakdown
+              </div>
+              <div
+                className="text-sm text-white/80 overflow-auto"
+                style={{ maxHeight: 104 }}
+              >
                 <ul className="grid grid-cols-2 gap-x-4">
                   {(cow?.byRegion ?? []).map((r) => (
-                    <li key={r.regionId} className="flex items-center justify-between">
-                      <span className="truncate pr-2">{r.regionName || "Unknown"}</span>
-                      <span className="font-semibold tabular-nums">{r.count}</span>
+                    <li
+                      key={r.regionId}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="truncate pr-2">
+                        {r.regionName || "Unknown"}
+                      </span>
+                      <span className="font-semibold tabular-nums">
+                        {r.count}
+                      </span>
                     </li>
                   ))}
                 </ul>

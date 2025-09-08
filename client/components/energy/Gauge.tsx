@@ -25,7 +25,10 @@ export default function Gauge({
     metric === "fuel" ? [red, yellow, green] : [green, yellow, red];
 
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none flex flex-col items-center justify-center text-center" style={{ height }}>
+    <div
+      className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none flex flex-col items-center justify-center text-center"
+      style={{ height }}
+    >
       <div className="flex flex-col items-center">
         <div className="text-lg lg:text-xl tracking-wider text-white/90 mb-2 font-bold">
           {label}

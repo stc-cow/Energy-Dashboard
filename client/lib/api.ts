@@ -330,13 +330,25 @@ function parseCSV(text: string): any[] {
   return rows;
 }
 
-async function fetchTextWithFallback(url: string): Promise<{ ok: boolean; text: string; status: number; contentType?: string }>{
+async function fetchTextWithFallback(
+  url: string,
+): Promise<{
+  ok: boolean;
+  text: string;
+  status: number;
+  contentType?: string;
+}> {
   // try direct fetch first
   try {
     const r = await fetch(url);
     if (r.ok) {
       const text = await r.text();
-      return { ok: true, text, status: r.status, contentType: r.headers.get('content-type') || undefined };
+      return {
+        ok: true,
+        text,
+        status: r.status,
+        contentType: r.headers.get("content-type") || undefined,
+      };
     }
   } catch (e) {
     // continue to proxy fallback
@@ -347,11 +359,16 @@ async function fetchTextWithFallback(url: string): Promise<{ ok: boolean; text: 
     const r2 = await fetch(proxy);
     if (r2.ok) {
       const text = await r2.text();
-      return { ok: true, text, status: r2.status, contentType: r2.headers.get('content-type') || undefined };
+      return {
+        ok: true,
+        text,
+        status: r2.status,
+        contentType: r2.headers.get("content-type") || undefined,
+      };
     }
-    return { ok: false, text: '', status: r2.status };
+    return { ok: false, text: "", status: r2.status };
   } catch (e) {
-    return { ok: false, text: '', status: 0 };
+    return { ok: false, text: "", status: 0 };
   }
 }
 
@@ -378,10 +395,15 @@ async function getRows(): Promise<any[]> {
       sheetPromise = fetchTextWithFallback(SHEET_URL)
         .then(async (res) => {
           if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
-          const ct = res.contentType || '';
+          const ct = res.contentType || "";
           const txt = res.text;
           if (ct.includes("application/json")) {
-            try { const j = JSON.parse(txt); return j; } catch { /* fallthrough */ }
+            try {
+              const j = JSON.parse(txt);
+              return j;
+            } catch {
+              /* fallthrough */
+            }
           }
           const rowsFromGViz = parseGVizJSON(txt);
           if (rowsFromGViz.length) return rowsFromGViz;
@@ -871,9 +893,17 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
     const onAir = uniqueSites.reduce((s, r) => s + r.onAir, 0);
     const offAir = Math.max(0, uniqueSites.length - onAir);
 
-    const by = new Map<string, { regionId: string; regionName: string; count: number }>();
+    const by = new Map<
+      string,
+      { regionId: string; regionName: string; count: number }
+    >();
     for (const s of uniqueSites) {
-      if (!by.has(s.regionId)) by.set(s.regionId, { regionId: s.regionId, regionName: s.regionName, count: 0 });
+      if (!by.has(s.regionId))
+        by.set(s.regionId, {
+          regionId: s.regionId,
+          regionName: s.regionName,
+          count: 0,
+        });
       by.get(s.regionId)!.count += 1; // total COW IDs per region
     }
     const byRegion = Array.from(by.values()).sort((a, b) => b.count - a.count);

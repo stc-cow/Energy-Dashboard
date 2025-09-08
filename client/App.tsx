@@ -9,6 +9,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Reports from "./pages/Reports";
 import Independent from "./pages/Independent";
+import HeatMap from "./pages/HeatMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

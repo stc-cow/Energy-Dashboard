@@ -17,6 +17,7 @@ import {
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import { Button } from "@/components/ui/button";
+import FitToScreen from "@/components/layout/FitToScreen";
 
 export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });

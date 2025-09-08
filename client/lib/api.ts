@@ -87,52 +87,110 @@ function slug(s: string): string {
     .replace(/\s+/g, "-");
 }
 
+function normalizeKey(k: string): string {
+  return String(k || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function getValueByCandidates(
+  row: any,
+  candidates: string[],
+  regexes: RegExp[] = [],
+): any {
+  const map = new Map<string, { key: string; value: any }>();
+  for (const [k, v] of Object.entries(row || {})) {
+    const nk = normalizeKey(k);
+    if (!map.has(nk)) map.set(nk, { key: String(k), value: v });
+  }
+  for (const c of candidates) {
+    const nk = normalizeKey(c);
+    if (map.has(nk)) return map.get(nk)!.value;
+  }
+  // try regexes over original keys
+  if (regexes.length) {
+    for (const [k, v] of Object.entries(row || {})) {
+      const keyStr = String(k);
+      if (regexes.some((re) => re.test(keyStr))) return v as any;
+    }
+  }
+  return undefined;
+}
+
+function pickNumberFromRow(
+  row: any,
+  candidates: string[],
+  regexes: RegExp[] = [],
+): number {
+  const v = getValueByCandidates(row, candidates, regexes);
+  return toNumber(v);
+}
+
+function pickStringFromRow(
+  row: any,
+  candidates: string[],
+  regexes: RegExp[] = [],
+): string {
+  const v = getValueByCandidates(row, candidates, regexes);
+  return v == null ? "" : String(v).trim();
+}
+
 function getRegionName(r: any): string {
-  return String(
-    r["regionName"] ??
-      r["Region"] ??
-      r["region"] ??
-      r["Region Name"] ??
-      r["region_name"] ??
-      "",
-  ).trim();
+  return pickStringFromRow(r, [
+    "regionName",
+    "Region",
+    "region",
+    "Region Name",
+    "region_name",
+    "Province",
+    "province",
+    "Area",
+    "area",
+  ], [/region/i, /province/i, /area/i]);
 }
 
 function getCityName(r: any): string {
-  // Column F (index 5) fallback when labels differ
-  return String(
-    r["cityName"] ??
-      r["City"] ??
-      r["city"] ??
-      r["City Name"] ??
-      r["city_name"] ??
-      r["col5"] ??
-      "",
-  ).trim();
+  return pickStringFromRow(r, [
+    "cityName",
+    "City",
+    "city",
+    "City Name",
+    "city_name",
+    "Municipality",
+    "municipality",
+    "Governorate",
+    "governorate",
+    "col5",
+  ], [/city/i, /municipality/i, /governorate/i]);
 }
 
 function getSiteName(r: any): string {
-  return String(
-    r["siteName"] ??
-      r["Site"] ??
-      r["site"] ??
-      r["Site Name"] ??
-      r["site_name"] ??
-      "",
-  ).trim();
+  return pickStringFromRow(r, [
+    "siteName",
+    "Site",
+    "site",
+    "Site Name",
+    "site_name",
+    "Site ID",
+    "siteId",
+    "site_id",
+  ], [/site/i]);
 }
 
 function getDistrictName(r: any): string {
-  // Column G (index 6) fallback when labels differ
-  return String(
-    r["districtName"] ??
-      r["district"] ??
-      r["District"] ??
-      r["District Name"] ??
-      r["district_name"] ??
-      r["col6"] ??
-      "",
-  ).trim();
+  return pickStringFromRow(r, [
+    "districtName",
+    "district",
+    "District",
+    "District Name",
+    "district_name",
+    "Neighborhood",
+    "neighborhood",
+    "Subdistrict",
+    "subdistrict",
+    "col6",
+  ], [/district/i, /neigh/i, /subdistrict/i]);
 }
 
 function getDateKey(rows: any[]): string | null {
@@ -424,14 +482,40 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
     const co2 = rows.reduce((s, r) => s + toNumber(r["co2Tons"]), 0);
 
     const fuelLevels = rows
-      .map((r) => toNumber(r["fuelTankLevelPct"]))
+      .map((r) =>
+        pickNumberFromRow(
+          r,
+          [
+            "fuelTankLevelPct",
+            "Fuel Tank Level %",
+            "Fuel Level %",
+            "fuel_level_pct",
+            "fuel_tank_level_pct",
+            "fuellevel%",
+          ],
+          [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
+        ),
+      )
       .filter((n) => n > 0 || n === 0);
     const avgFuel = fuelLevels.length
       ? fuelLevels.reduce((a, b) => a + b, 0) / fuelLevels.length
       : 0;
 
     const genLoads = rows
-      .map((r) => toNumber(r["generatorLoadFactorPct"]))
+      .map((r) =>
+        pickNumberFromRow(
+          r,
+          [
+            "generatorLoadFactorPct",
+            "Load Factor %",
+            "Generator Load Factor %",
+            "load_factor_pct",
+            "gen_load_factor_pct",
+            "generator_load_factor",
+          ],
+          [/load.*(factor|%)/i, /gen.*load/i],
+        ),
+      )
       .filter((n) => n > 0 || n === 0);
     const avgLoad = genLoads.length
       ? genLoads.reduce((a, b) => a + b, 0) / genLoads.length
@@ -458,7 +542,17 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
       const siteId = slug(siteName);
       const d = toNumber(r["dieselLitersPerDay"]);
       const c = toNumber(r["co2Tons"]);
-      const f = toNumber(r["fuelTankLevelPct"]);
+      const f = pickNumberFromRow(
+        r,
+        [
+          "fuelTankLevelPct",
+          "Fuel Tank Level %",
+          "Fuel Level %",
+          "fuel_level_pct",
+          "fuel_tank_level_pct",
+        ],
+        [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
+      );
       if (!siteAgg.has(siteId))
         siteAgg.set(siteId, { siteId, siteName, diesel: 0, co2: 0, fuel: [] });
       const a = siteAgg.get(siteId)!;
@@ -762,7 +856,17 @@ export async function fetchLowFuelSites(
       const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
       if (!siteName) continue;
       const siteId = slug(siteName);
-      const f = toNumber(r["fuelTankLevelPct"]);
+      const f = pickNumberFromRow(
+        r,
+        [
+          "fuelTankLevelPct",
+          "Fuel Tank Level %",
+          "Fuel Level %",
+          "fuel_level_pct",
+          "fuel_tank_level_pct",
+        ],
+        [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
+      );
       if (!siteAgg.has(siteId)) siteAgg.set(siteId, { siteId, siteName, fuel: [] });
       if (f || f === 0) siteAgg.get(siteId)!.fuel.push(f);
     }

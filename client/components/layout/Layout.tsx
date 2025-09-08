@@ -39,6 +39,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       <Header />
       <main className="container mx-auto px-4 py-6">{children}</main>
+      <footer className="mt-10 mb-5 border-t py-4 text-xs text-muted-foreground">
+        <div className="container mx-auto px-8">Powered by ACES MS</div>
+      </footer>
     </div>
   );
 }

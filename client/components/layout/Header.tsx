@@ -11,7 +11,7 @@ export default function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
           <img
-            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F7e7768790e7d454e9509aa33812f25bc"
+            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F57a8a3cd81a24a69ad9bd34e4e70feb7"
             alt="stc"
             className="h-8 w-auto object-contain"
           />

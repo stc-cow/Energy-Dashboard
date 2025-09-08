@@ -7,7 +7,10 @@
 [functions]
   external_node_modules = ["express"]
   node_bundler = "esbuild"
-  
+
+[functions."fuel-alert"]
+  schedule = "*/15 * * * *"
+
 [[redirects]]
   force = true
   from = "/api/*"

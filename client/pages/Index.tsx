@@ -99,139 +99,141 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="mb-4">
-        <p className="text-sm sm:text-base text-white/80 font-bold text-left">
-          As of {asOf}
-        </p>
-      </div>
+      <FitToScreen>
+        <div className="mb-4">
+          <p className="text-sm sm:text-base text-white/80 font-bold text-left">
+            As of {asOf}
+          </p>
+        </div>
 
-      {hierarchy && (
-        <FilterBar
-          regions={hierarchy.regions}
-          cities={hierarchy.cities}
-          sites={hierarchy.sites}
-          scope={scope}
-          onChange={setScope}
-        />
-      )}
+        {hierarchy && (
+          <FilterBar
+            regions={hierarchy.regions}
+            cities={hierarchy.cities}
+            sites={hierarchy.sites}
+            scope={scope}
+            onChange={setScope}
+          />
+        )}
 
-      {/* COWs Status card */}
-      <div className="mt-4 grid grid-cols-1">
-        <div
-          className="rounded-xl border border-white/20 bg-card shadow-none flex flex-col"
-          style={{ padding: "32px 32px 20px", marginBottom: 20 }}
-        >
-          <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">
-            COWs Status (ON-AIR / OFF-AIR)
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <div
-              className="rounded-lg"
-              style={{
-                backgroundColor: "rgba(223, 208, 235, 0.4)",
-                padding: "16px 16px 19px",
-                marginBottom: -2,
-              }}
-            >
-              <div className="text-sm text-white/80 font-semibold">
-                ON-AIR COWs
-              </div>
-              <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
-                {(cow?.onAir ?? 0).toLocaleString()}
-              </div>
+        {/* COWs Status card */}
+        <div className="mt-4 grid grid-cols-1">
+          <div
+            className="rounded-xl border border-white/20 bg-card shadow-none flex flex-col"
+            style={{ padding: "32px 32px 20px", marginBottom: 20 }}
+          >
+            <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">
+              COWs Status (ON-AIR / OFF-AIR)
             </div>
-            <div
-              className="rounded-lg"
-              style={{
-                backgroundColor: "rgba(224, 211, 235, 0.4)",
-                padding: "16px 16px 19px",
-              }}
-            >
-              <div className="text-sm text-white/80 font-semibold">
-                OFF-AIR COWs
-              </div>
-              <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
-                {(cow?.offAir ?? 0).toLocaleString()}
-              </div>
-            </div>
-            <div
-              className="rounded-lg p-4"
-              style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
-            >
-              <div className="text-sm text-white/80 font-semibold mb-1">
-                Regional breakdown
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+              <div
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "rgba(223, 208, 235, 0.4)",
+                  padding: "16px 16px 19px",
+                  marginBottom: -2,
+                }}
+              >
+                <div className="text-sm text-white/80 font-semibold">
+                  ON-AIR COWs
+                </div>
+                <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
+                  {(cow?.onAir ?? 0).toLocaleString()}
+                </div>
               </div>
               <div
-                className="text-sm text-white/80 overflow-auto"
-                style={{ maxHeight: 104 }}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "rgba(224, 211, 235, 0.4)",
+                  padding: "16px 16px 19px",
+                }}
               >
-                <ul className="grid grid-cols-2 gap-x-4">
-                  {(cow?.byRegion ?? []).map((r) => (
-                    <li
-                      key={r.regionId}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="truncate pr-2">
-                        {r.regionName || "Unknown"}
-                      </span>
-                      <span className="font-semibold tabular-nums">
-                        {r.count}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="text-sm text-white/80 font-semibold">
+                  OFF-AIR COWs
+                </div>
+                <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
+                  {(cow?.offAir ?? 0).toLocaleString()}
+                </div>
+              </div>
+              <div
+                className="rounded-lg p-4"
+                style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
+              >
+                <div className="text-sm text-white/80 font-semibold mb-1">
+                  Regional breakdown
+                </div>
+                <div
+                  className="text-sm text-white/80 overflow-auto"
+                  style={{ maxHeight: 104 }}
+                >
+                  <ul className="grid grid-cols-2 gap-x-4">
+                    {(cow?.byRegion ?? []).map((r) => (
+                      <li
+                        key={r.regionId}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="truncate pr-2">
+                          {r.regionName || "Unknown"}
+                        </span>
+                        <span className="font-semibold tabular-nums">
+                          {r.count}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 items-center justify-center">
-        <KpiCard
-          title="Diesel Consumption"
-          value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
-          unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""}
-        />
-        <KpiCard
-          title="Power Demand"
-          value={kpis?.kpis.powerDemandKw.value ?? 0}
-          unit={kpis?.kpis.powerDemandKw.unit ?? ""}
-        />
-        <KpiCard
-          title="Daily CO₂ Emissions"
-          value={kpis?.kpis.co2TonsPerDay.value ?? 0}
-          unit="TON/day"
-        />
-      </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 items-center justify-center">
+          <KpiCard
+            title="Diesel Consumption"
+            value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
+            unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""}
+          />
+          <KpiCard
+            title="Power Demand"
+            value={kpis?.kpis.powerDemandKw.value ?? 0}
+            unit={kpis?.kpis.powerDemandKw.unit ?? ""}
+          />
+          <KpiCard
+            title="Daily CO₂ Emissions"
+            value={kpis?.kpis.co2TonsPerDay.value ?? 0}
+            unit="TON/day"
+          />
+        </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
-        <Gauge
-          value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
-          label="Fuel Tank Level"
-          metric="fuel"
-          height={258}
-        />
-        <Gauge
-          value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
-          label="Average Generator Load"
-          metric="power"
-          height={257}
-        />
-      </div>
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
+          <Gauge
+            value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
+            label="Fuel Tank Level"
+            metric="fuel"
+            height={258}
+          />
+          <Gauge
+            value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
+            label="Average Generator Load"
+            metric="power"
+            height={257}
+          />
+        </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <KpiCard
-          title="Accum. Power Consumption"
-          value={Math.round((accum?.powerKwh ?? 0) / 1000)}
-          unit="MWh"
-        />
-        <KpiCard
-          title="Accum. Fuel Consumption"
-          value={Math.round(accumFuelLiters)}
-          unit="L"
-        />
-        <KpiCard title="Accum. CO₂ Emissions" value={Number(accumCo2Tons.toFixed(2))} unit="TON" />
-      </div>
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <KpiCard
+            title="Accum. Power Consumption"
+            value={Math.round((accum?.powerKwh ?? 0) / 1000)}
+            unit="MWh"
+          />
+          <KpiCard
+            title="Accum. Fuel Consumption"
+            value={Math.round(accumFuelLiters)}
+            unit="L"
+          />
+          <KpiCard title="Accum. CO₂ Emissions" value={Number(accumCo2Tons.toFixed(2))} unit="TON" />
+        </div>
+      </FitToScreen>
     </Layout>
   );
 }

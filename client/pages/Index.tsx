@@ -118,19 +118,17 @@ export default function Index() {
         <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none flex flex-col">
           <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">COWs Status (ON-AIR / OFF-AIR)</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <div className="rounded-lg bg-background/40 p-4">
+            <div className="rounded-lg p-4" style={{ backgroundColor: "rgba(223, 208, 235, 0.4)" }}>
               <div className="text-sm text-white/80 font-semibold">ON-AIR COWs</div>
               <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">{(cow?.onAir ?? 0).toLocaleString()}</div>
-              <div className="text-xs text-white/60">dieselLitersPerDay &gt; 0</div>
             </div>
-            <div className="rounded-lg bg-background/40 p-4">
+            <div className="rounded-lg p-4" style={{ backgroundColor: "rgba(224, 211, 235, 0.4)" }}>
               <div className="text-sm text-white/80 font-semibold">OFF-AIR COWs</div>
               <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">{(cow?.offAir ?? 0).toLocaleString()}</div>
-              <div className="text-xs text-white/60">dieselLitersPerDay = 0</div>
             </div>
-            <div className="rounded-lg bg-background/40 p-4">
+            <div className="rounded-lg p-4" style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}>
               <div className="text-sm text-white/80 font-semibold mb-1">Regional breakdown</div>
-              <div className="overflow-y-auto text-sm text-white/80" style={{ maxHeight: "6.5rem" }}>
+              <div className="text-sm text-white/80 overflow-auto" style={{ maxHeight: 104 }}>
                 <ul className="grid grid-cols-2 gap-x-4">
                   {(cow?.byRegion ?? []).map((r) => (
                     <li key={r.regionId} className="flex items-center justify-between">

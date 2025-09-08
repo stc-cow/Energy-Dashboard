@@ -7,6 +7,7 @@ declare module "react-gauge-chart" {
     colors?: string[];
     percent?: number; // 0..1
     arcWidth?: number; // 0..1
+    arcPadding?: number; // 0..1, spacing between colored sections
     cornerRadius?: number;
     needleColor?: string;
     needleBaseColor?: string;

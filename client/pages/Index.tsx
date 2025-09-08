@@ -115,14 +115,14 @@ export default function Index() {
 
       {/* COWs Status card */}
       <div className="mt-4 grid grid-cols-1">
-        <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none flex flex-col">
+        <div className="rounded-xl border border-white/20 bg-card shadow-none flex flex-col" style={{ padding: "32px 32px 20px", marginBottom: 20 }}>
           <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">COWs Status (ON-AIR / OFF-AIR)</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <div className="rounded-lg p-4" style={{ backgroundColor: "rgba(223, 208, 235, 0.4)" }}>
+            <div className="rounded-lg" style={{ backgroundColor: "rgba(223, 208, 235, 0.4)", padding: "16px 16px 19px", marginBottom: -2 }}>
               <div className="text-sm text-white/80 font-semibold">ON-AIR COWs</div>
               <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">{(cow?.onAir ?? 0).toLocaleString()}</div>
             </div>
-            <div className="rounded-lg p-4" style={{ backgroundColor: "rgba(224, 211, 235, 0.4)" }}>
+            <div className="rounded-lg" style={{ backgroundColor: "rgba(224, 211, 235, 0.4)", padding: "16px 16px 19px" }}>
               <div className="text-sm text-white/80 font-semibold">OFF-AIR COWs</div>
               <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">{(cow?.offAir ?? 0).toLocaleString()}</div>
             </div>
@@ -166,11 +166,13 @@ export default function Index() {
           value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
           label="Fuel Tank Level"
           metric="fuel"
+          height={258}
         />
         <Gauge
           value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
           label="Average Generator Load"
           metric="power"
+          height={257}
         />
       </div>
 

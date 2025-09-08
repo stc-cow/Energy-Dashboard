@@ -71,7 +71,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 pt-0 pb-6">{children}</main>
+      <main
+        className="container mx-auto"
+        style={{ fontWeight: 400, maxWidth: 1400, width: "100%", margin: "0 auto", padding: "0 16px 24px" }}
+      >
+        {children}
+      </main>
 
       {/* Screen footer */}
       <footer

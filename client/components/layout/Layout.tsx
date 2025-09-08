@@ -51,7 +51,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               style={{ height: 40, objectFit: "contain" }}
             />
             <div className="text-center">
-              <div className="font-extrabold text-xl">COW Predictive Energy Dashboard</div>
+              <div className="font-extrabold text-xl">
+                COW Predictive Energy Dashboard
+              </div>
             </div>
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F57a8a3cd81a24a69ad9bd34e4e70feb7?format=webp&width=400"

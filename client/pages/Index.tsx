@@ -104,7 +104,9 @@ export default function Index() {
             COW Predictive Energy Dashboard
           </h1>
           <div className="print:hidden">
-            <Button variant="secondary" onClick={() => window.print()}>Report</Button>
+            <Button variant="secondary" onClick={() => window.print()}>
+              Report
+            </Button>
           </div>
         </div>
         <p className="mt-3 text-sm sm:text-base text-white/80 font-bold text-center sm:text-left">

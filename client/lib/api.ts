@@ -824,11 +824,7 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       const siteId = slug(siteName);
       const regionName = getRegionName(r) || "Unknown";
       const regionId = slug(regionName) || "unknown";
-      const valL = pickNumberFromRow(
-        r,
-        ["col11", "Column L", "OnAir", "ON AIR", "on_air", "cow"],
-        [/^col?11$/i, /on.?air/i, /cow/i],
-      );
+      const diesel = toNumber(r["dieselLitersPerDay"]);
       let ts = Date.now();
       if (dateKey) {
         const d = new Date(r[dateKey]);
@@ -839,7 +835,7 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
         siteName,
         regionId,
         regionName,
-        onAir: valL > 0 ? 1 : 0,
+        onAir: diesel > 0 ? 1 : 0,
         ts,
       };
       const prev = sites.get(siteId);

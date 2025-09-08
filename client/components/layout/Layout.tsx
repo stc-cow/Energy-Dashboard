@@ -80,10 +80,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Screen footer */}
       <footer
-        className="mt-10 mb-5 border-t py-4 text-xs text-muted-foreground print:hidden"
-        style={{ borderTop: "1px solid rgb(129, 73, 171)" }}
+        className="print:hidden"
+        style={{ borderColor: "rgb(129, 73, 171) rgb(129, 73, 171) rgb(129, 73, 171)", borderTopWidth: "1px", borderWidth: "1px 0px 0px", color: "rgb(235, 235, 235)", fontSize: 12, fontWeight: 400, lineHeight: "16px", margin: "40px 0 20px", padding: "16px 0" }}
       >
-        <div className="container mx-auto px-8">
+        <div style={{ fontWeight: 400, maxWidth: 1400, width: "100%", margin: "0 auto", padding: "0 32px" }}>
           <p>
             <strong>Powered by ACES MS</strong>
           </p>

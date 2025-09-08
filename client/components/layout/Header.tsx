@@ -15,6 +15,11 @@ export default function Header() {
             alt="stc"
             className="h-8 w-auto object-contain"
           />
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F1d632f43770b4dc9b1111ec6a5024279?format=webp&width=800"
+            alt="COW"
+            className="h-8 w-auto object-contain"
+          />
         </Link>
         <div className="flex-1 text-center hidden sm:block">
           <div className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">

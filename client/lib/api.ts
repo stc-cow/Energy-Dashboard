@@ -181,19 +181,29 @@ function parseCSV(text: string): any[] {
 
 type SheetEndpoint = { kind: "gviz" | "csv"; url: string } | null;
 function getSheetEndpoint(u: string): SheetEndpoint {
-  let m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  let m = u.match(
+    /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
+  );
   if (m && !/\/e\//.test(u)) {
     const id = m[1];
-    return { kind: "gviz", url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json` };
+    return {
+      kind: "gviz",
+      url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`,
+    };
   }
-  m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/);
+  m = u.match(
+    /https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/,
+  );
   if (m) {
     const pid = m[1];
     let gid: string | null = null;
     try {
       gid = new URL(u).searchParams.get("gid");
     } catch {}
-    return { kind: "csv", url: `https://docs.google.com/spreadsheets/d/e/${pid}/pub?output=csv${gid ? `&gid=${gid}` : ""}` };
+    return {
+      kind: "csv",
+      url: `https://docs.google.com/spreadsheets/d/e/${pid}/pub?output=csv${gid ? `&gid=${gid}` : ""}`,
+    };
   }
   if (/output=csv/.test(u)) return { kind: "csv", url: u };
   return null;
@@ -201,13 +211,22 @@ function getSheetEndpoint(u: string): SheetEndpoint {
 
 async function fetchTextWithFallback(
   url: string,
-): Promise<{ ok: boolean; text: string; status: number; contentType?: string }>
-{
+): Promise<{
+  ok: boolean;
+  text: string;
+  status: number;
+  contentType?: string;
+}> {
   try {
     const r = await fetch(url);
     if (r.ok) {
       const text = await r.text();
-      return { ok: true, text, status: r.status, contentType: r.headers.get("content-type") || undefined };
+      return {
+        ok: true,
+        text,
+        status: r.status,
+        contentType: r.headers.get("content-type") || undefined,
+      };
     }
   } catch {}
   try {
@@ -215,7 +234,12 @@ async function fetchTextWithFallback(
     const r2 = await fetch(proxy);
     if (r2.ok) {
       const text = await r2.text();
-      return { ok: true, text, status: r2.status, contentType: r2.headers.get("content-type") || undefined };
+      return {
+        ok: true,
+        text,
+        status: r2.status,
+        contentType: r2.headers.get("content-type") || undefined,
+      };
     }
     return { ok: false, text: "", status: r2.status };
   } catch {
@@ -229,7 +253,9 @@ async function getRows(): Promise<any[]> {
   // If we're running in a browser, prefer the server proxy first to avoid CORS errors
   if (typeof window !== "undefined") {
     try {
-      const resp = await fetch(`/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`);
+      const resp = await fetch(
+        `/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`,
+      );
       if (resp.ok) {
         const data = await resp.json();
         if (Array.isArray(data) && data.length) {
@@ -286,7 +312,8 @@ async function getRows(): Promise<any[]> {
         })
         .then((data) => {
           if (Array.isArray(data)) return data as any[];
-          if (data && Array.isArray((data as any).data)) return (data as any).data;
+          if (data && Array.isArray((data as any).data))
+            return (data as any).data;
           return [] as any[];
         })
         .catch((err) => {
@@ -393,8 +420,21 @@ function getDateKey(rows: any[]): string | null {
 // Build hierarchy from rows
 function buildHierarchy(rows: any[]): HierarchyResponse {
   const regionMap = new Map<string, { id: string; name: string }>();
-  const cityMap = new Map<string, { id: string; name: string; regionId: string }>();
-  const siteMap = new Map<string, { id: string; name: string; cityId: string; lat: number; lng: number; district?: string }>();
+  const cityMap = new Map<
+    string,
+    { id: string; name: string; regionId: string }
+  >();
+  const siteMap = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      cityId: string;
+      lat: number;
+      lng: number;
+      district?: string;
+    }
+  >();
 
   function latFromRow(r: any): number {
     const keys = Object.keys(r || {});
@@ -403,8 +443,16 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
     if (!lat || !lng) {
       // try to infer from numeric columns range
       const nums = keys.map((k) => ({ k, v: toNumber((r as any)[k]) }));
-      const candLat = nums.find((x) => Math.abs(x.v) > 0 && x.v >= -90 && x.v <= 90);
-      const candLng = nums.find((x) => Math.abs(x.v) > 0 && x.v >= -180 && x.v <= 180 && Math.abs(x.v) > Math.abs(candLat?.v ?? 0));
+      const candLat = nums.find(
+        (x) => Math.abs(x.v) > 0 && x.v >= -90 && x.v <= 90,
+      );
+      const candLng = nums.find(
+        (x) =>
+          Math.abs(x.v) > 0 &&
+          x.v >= -180 &&
+          x.v <= 180 &&
+          Math.abs(x.v) > Math.abs(candLat?.v ?? 0),
+      );
       if (candLat) lat = candLat.v;
       if (candLng) lng = candLng.v;
     }
@@ -422,13 +470,22 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
     const cityId = slug(cityName || `city-${regionId}`);
     const siteId = slug(siteName || `site-${cityId}`);
 
-    if (regionName && !regionMap.has(regionId)) regionMap.set(regionId, { id: regionId, name: regionName });
-    if (cityName && !cityMap.has(cityId)) cityMap.set(cityId, { id: cityId, name: cityName, regionId });
+    if (regionName && !regionMap.has(regionId))
+      regionMap.set(regionId, { id: regionId, name: regionName });
+    if (cityName && !cityMap.has(cityId))
+      cityMap.set(cityId, { id: cityId, name: cityName, regionId });
     if (siteName && !siteMap.has(siteId)) {
       const lat = (r as any).__lat ?? latFromRow(r) ?? 0;
       const lng = (r as any).__lng ?? 0;
       const district = getDistrictName(r) || undefined;
-      siteMap.set(siteId, { id: siteId, name: siteName, cityId, lat, lng, district });
+      siteMap.set(siteId, {
+        id: siteId,
+        name: siteName,
+        cityId,
+        lat,
+        lng,
+        district,
+      });
     }
   }
 
@@ -446,10 +503,12 @@ function rowsInScope(rows: any[], scope: HierarchyFilter) {
     const siteId = slug(getSiteName(r));
     const districtName = getDistrictName(r);
 
-    if (scope.district && districtName && districtName !== scope.district) return false;
+    if (scope.district && districtName && districtName !== scope.district)
+      return false;
 
     if (scope.level === "national") return true;
-    if (scope.level === "region") return scope.regionId ? regionId === scope.regionId : true;
+    if (scope.level === "region")
+      return scope.regionId ? regionId === scope.regionId : true;
     if (scope.level === "city") {
       if (scope.cityId) return cityId === scope.cityId;
       return scope.regionId ? regionId === scope.regionId : true;
@@ -481,7 +540,10 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
 
-    const diesel = rows.reduce((s, r) => s + toNumber(r["dieselLitersPerDay"]), 0);
+    const diesel = rows.reduce(
+      (s, r) => s + toNumber(r["dieselLitersPerDay"]),
+      0,
+    );
     const powerKw = rows.reduce((s, r) => s + toNumber(r["powerDemandKw"]), 0);
     const co2 = rows.reduce((s, r) => s + toNumber(r["co2Tons"]), 0);
 
@@ -501,7 +563,9 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
         ),
       )
       .filter((n) => n > 0 || n === 0);
-    const avgFuel = fuelLevels.length ? fuelLevels.reduce((a, b) => a + b, 0) / fuelLevels.length : 0;
+    const avgFuel = fuelLevels.length
+      ? fuelLevels.reduce((a, b) => a + b, 0) / fuelLevels.length
+      : 0;
 
     const genLoads = rows
       .map((r) =>
@@ -519,13 +583,26 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
         ),
       )
       .filter((n) => n > 0 || n === 0);
-    const avgLoad = genLoads.length ? genLoads.reduce((a, b) => a + b, 0) / genLoads.length : 0;
+    const avgLoad = genLoads.length
+      ? genLoads.reduce((a, b) => a + b, 0) / genLoads.length
+      : 0;
 
     const eff = diesel > 0 ? (powerKw * 24) / diesel : 0;
 
-    const siteAgg = new Map<string, { siteId: string; siteName: string; diesel: number; co2: number; fuel: number[] }>();
+    const siteAgg = new Map<
+      string,
+      {
+        siteId: string;
+        siteName: string;
+        diesel: number;
+        co2: number;
+        fuel: number[];
+      }
+    >();
     for (const r of rows) {
-      const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+      const siteName = String(
+        r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
+      ).trim();
       if (!siteName) continue;
       const siteId = slug(siteName);
       const d = toNumber(r["dieselLitersPerDay"]);
@@ -541,7 +618,8 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
         ],
         [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
       );
-      if (!siteAgg.has(siteId)) siteAgg.set(siteId, { siteId, siteName, diesel: 0, co2: 0, fuel: [] });
+      if (!siteAgg.has(siteId))
+        siteAgg.set(siteId, { siteId, siteName, diesel: 0, co2: 0, fuel: [] });
       const a = siteAgg.get(siteId)!;
       a.diesel += d;
       a.co2 += c;
@@ -549,12 +627,25 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
     }
 
     const topSites = Array.from(siteAgg.values())
-      .map((x) => ({ siteId: x.siteId, siteName: x.siteName, dieselLitersPerDay: Math.round(x.diesel), co2TonsPerDay: Math.round(x.co2 * 100) / 100 }))
+      .map((x) => ({
+        siteId: x.siteId,
+        siteName: x.siteName,
+        dieselLitersPerDay: Math.round(x.diesel),
+        co2TonsPerDay: Math.round(x.co2 * 100) / 100,
+      }))
       .sort((a, b) => b.dieselLitersPerDay - a.dieselLitersPerDay)
       .slice(0, 10);
 
     const lowFuelWarnings = Array.from(siteAgg.values())
-      .map((x) => ({ siteId: x.siteId, siteName: x.siteName, fuelTankLevelPct: x.fuel.length ? Math.round((x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10) / 10 : 0 }))
+      .map((x) => ({
+        siteId: x.siteId,
+        siteName: x.siteName,
+        fuelTankLevelPct: x.fuel.length
+          ? Math.round(
+              (x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10,
+            ) / 10
+          : 0,
+      }))
       .filter((x) => x.fuelTankLevelPct <= 20)
       .slice(0, 20);
 
@@ -562,14 +653,41 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
       asOf: new Date().toISOString(),
       scope,
       kpis: {
-        dieselLitersPerDay: { label: "Diesel", value: Math.round(diesel), unit: "L/day" },
-        powerDemandKw: { label: "Power Demand", value: Math.round(powerKw), unit: "kW" },
-        co2TonsPerDay: { label: "CO₂ Emissions", value: Math.round(co2 * 100) / 100, unit: "t/day" },
-        fuelTankLevelPct: { label: "Fuel Tank", value: Math.round(avgFuel * 10) / 10, unit: "%" },
+        dieselLitersPerDay: {
+          label: "Diesel",
+          value: Math.round(diesel),
+          unit: "L/day",
+        },
+        powerDemandKw: {
+          label: "Power Demand",
+          value: Math.round(powerKw),
+          unit: "kW",
+        },
+        co2TonsPerDay: {
+          label: "CO₂ Emissions",
+          value: Math.round(co2 * 100) / 100,
+          unit: "t/day",
+        },
+        fuelTankLevelPct: {
+          label: "Fuel Tank",
+          value: Math.round(avgFuel * 10) / 10,
+          unit: "%",
+        },
         co2ReductionYoYPct: { label: "CO₂ YoY", value: 0, unit: "%" },
-        energyEfficiencyKwhPerLiter: { label: "Efficiency", value: Math.round(eff * 100) / 100, unit: "kWh/L" },
-        generatorLoadFactorPct: { label: "Load Factor", value: Math.round(avgLoad * 10) / 10, unit: "%" },
-        runningVsStandbyHours: { runningHours: { label: "Running", value: 0, unit: "h/day" }, standbyHours: { label: "Standby", value: 0, unit: "h/day" } },
+        energyEfficiencyKwhPerLiter: {
+          label: "Efficiency",
+          value: Math.round(eff * 100) / 100,
+          unit: "kWh/L",
+        },
+        generatorLoadFactorPct: {
+          label: "Load Factor",
+          value: Math.round(avgLoad * 10) / 10,
+          unit: "%",
+        },
+        runningVsStandbyHours: {
+          runningHours: { label: "Running", value: 0, unit: "h/day" },
+          standbyHours: { label: "Standby", value: 0, unit: "h/day" },
+        },
       },
       topSites,
       lowFuelWarnings,
@@ -593,9 +711,15 @@ export async function fetchTimeSeries(
     const buckets = new Map<string, Bucket>();
 
     function bucketKey(d: Date): string {
-      if (q.granularity === "yearly") return new Date(Date.UTC(d.getUTCFullYear(), 0, 1)).toISOString();
-      if (q.granularity === "monthly") return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString();
-      return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())).toISOString();
+      if (q.granularity === "yearly")
+        return new Date(Date.UTC(d.getUTCFullYear(), 0, 1)).toISOString();
+      if (q.granularity === "monthly")
+        return new Date(
+          Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1),
+        ).toISOString();
+      return new Date(
+        Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
+      ).toISOString();
     }
 
     for (const r of rows) {
@@ -605,7 +729,8 @@ export async function fetchTimeSeries(
         if (!isNaN(cand.getTime())) d = cand;
       }
       const key = bucketKey(d);
-      if (!buckets.has(key)) buckets.set(key, { diesel: 0, co2: 0, powerKw: 0 });
+      if (!buckets.has(key))
+        buckets.set(key, { diesel: 0, co2: 0, powerKw: 0 });
       const b = buckets.get(key)!;
       b.diesel += toNumber(r["dieselLitersPerDay"]);
       b.co2 += toNumber(r["co2Tons"]);
@@ -616,7 +741,12 @@ export async function fetchTimeSeries(
     const to = q.to ? new Date(q.to) : null;
 
     const series = Array.from(buckets.entries())
-      .map(([t, b]) => ({ t, dieselLiters: b.diesel, co2Tons: b.co2, efficiencyKwhPerLiter: b.diesel > 0 ? (b.powerKw * 24) / b.diesel : 0 }))
+      .map(([t, b]) => ({
+        t,
+        dieselLiters: b.diesel,
+        co2Tons: b.co2,
+        efficiencyKwhPerLiter: b.diesel > 0 ? (b.powerKw * 24) / b.diesel : 0,
+      }))
       .filter((p) => {
         const dt = new Date(p.t).getTime();
         if (from && dt < from.getTime()) return false;
@@ -641,32 +771,62 @@ export async function fetchBreakdown(
     const rows = rowsInScope(rowsAll, scope);
 
     if (by === "region") {
-      const map = new Map<string, { name: string; diesel: number; energy: number }>();
+      const map = new Map<
+        string,
+        { name: string; diesel: number; energy: number }
+      >();
       for (const r of rows) {
-        const regionName = String(r["regionName"] ?? r["Region"] ?? r["region"] ?? "").trim();
+        const regionName = String(
+          r["regionName"] ?? r["Region"] ?? r["region"] ?? "",
+        ).trim();
         const key = slug(regionName);
-        if (!map.has(key)) map.set(key, { name: regionName || "Unknown", diesel: 0, energy: 0 });
+        if (!map.has(key))
+          map.set(key, { name: regionName || "Unknown", diesel: 0, energy: 0 });
         const m = map.get(key)!;
         const d = toNumber(r["dieselLitersPerDay"]);
         const p = toNumber(r["powerDemandKw"]);
         m.diesel += d;
         m.energy += p * 24;
       }
-      return { scope, by, data: Array.from(map.entries()).map(([key, v]) => ({ key, name: v.name, dieselLiters: Math.round(v.diesel), energyKwh: Math.round(v.energy) })) };
+      return {
+        scope,
+        by,
+        data: Array.from(map.entries()).map(([key, v]) => ({
+          key,
+          name: v.name,
+          dieselLiters: Math.round(v.diesel),
+          energyKwh: Math.round(v.energy),
+        })),
+      };
     }
 
-    const siteMap = new Map<string, { name: string; diesel: number; energy: number }>();
+    const siteMap = new Map<
+      string,
+      { name: string; diesel: number; energy: number }
+    >();
     for (const r of rows) {
-      const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+      const siteName = String(
+        r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
+      ).trim();
       const key = slug(siteName);
-      if (!siteMap.has(key)) siteMap.set(key, { name: siteName || "Unknown", diesel: 0, energy: 0 });
+      if (!siteMap.has(key))
+        siteMap.set(key, { name: siteName || "Unknown", diesel: 0, energy: 0 });
       const m = siteMap.get(key)!;
       const d = toNumber(r["dieselLitersPerDay"]);
       const p = toNumber(r["powerDemandKw"]);
       m.diesel += d;
       m.energy += p * 24;
     }
-    return { scope, by, data: Array.from(siteMap.entries()).map(([key, v]) => ({ key, name: v.name, dieselLiters: Math.round(v.diesel), energyKwh: Math.round(v.energy) })) };
+    return {
+      scope,
+      by,
+      data: Array.from(siteMap.entries()).map(([key, v]) => ({
+        key,
+        name: v.name,
+        dieselLiters: Math.round(v.diesel),
+        energyKwh: Math.round(v.energy),
+      })),
+    };
   } catch {
     return mockBreakdown(scope, by);
   }
@@ -684,7 +844,14 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
     const rows = rowsInScope(rowsAll, scope);
     const dateKey = getDateKey(rows) || "";
 
-    type SiteRec = { siteId: string; siteName: string; regionId: string; regionName: string; onAir: number; ts: number };
+    type SiteRec = {
+      siteId: string;
+      siteName: string;
+      regionId: string;
+      regionName: string;
+      onAir: number;
+      ts: number;
+    };
     const sites = new Map<string, SiteRec>();
 
     for (const r of rows) {
@@ -699,7 +866,14 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
         const d = new Date(r[dateKey]);
         if (!isNaN(d.getTime())) ts = d.getTime();
       }
-      const rec: SiteRec = { siteId, siteName, regionId, regionName, onAir: diesel > 0 ? 1 : 0, ts };
+      const rec: SiteRec = {
+        siteId,
+        siteName,
+        regionId,
+        regionName,
+        onAir: diesel > 0 ? 1 : 0,
+        ts,
+      };
       const prev = sites.get(siteId);
       if (!prev || rec.ts >= prev.ts) sites.set(siteId, rec);
     }
@@ -708,9 +882,17 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
     const onAir = uniqueSites.reduce((s, r) => s + r.onAir, 0);
     const offAir = Math.max(0, uniqueSites.length - onAir);
 
-    const by = new Map<string, { regionId: string; regionName: string; count: number }>();
+    const by = new Map<
+      string,
+      { regionId: string; regionName: string; count: number }
+    >();
     for (const s of uniqueSites) {
-      if (!by.has(s.regionId)) by.set(s.regionId, { regionId: s.regionId, regionName: s.regionName, count: 0 });
+      if (!by.has(s.regionId))
+        by.set(s.regionId, {
+          regionId: s.regionId,
+          regionName: s.regionName,
+          count: 0,
+        });
       by.get(s.regionId)!.count += 1;
     }
     const byRegion = Array.from(by.values()).sort((a, b) => b.count - a.count);
@@ -727,12 +909,18 @@ export async function fetchBenchmark(
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
-    const map = new Map<string, { name: string; diesel: number; power: number; co2: number }>();
+    const map = new Map<
+      string,
+      { name: string; diesel: number; power: number; co2: number }
+    >();
     for (const r of rows) {
-      const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+      const siteName = String(
+        r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
+      ).trim();
       if (!siteName) continue;
       const key = slug(siteName);
-      if (!map.has(key)) map.set(key, { name: siteName, diesel: 0, power: 0, co2: 0 });
+      if (!map.has(key))
+        map.set(key, { name: siteName, diesel: 0, power: 0, co2: 0 });
       const m = map.get(key)!;
       m.diesel += toNumber(r["dieselLitersPerDay"]);
       m.power += toNumber(r["powerDemandKw"]);
@@ -740,7 +928,13 @@ export async function fetchBenchmark(
     }
     return {
       scope,
-      points: Array.from(map.entries()).map(([siteId, v]) => ({ siteId, siteName: v.name, dieselLiters: Math.round(v.diesel), powerKw: Math.round(v.power), co2Tons: Math.round(v.co2 * 100) / 100 })),
+      points: Array.from(map.entries()).map(([siteId, v]) => ({
+        siteId,
+        siteName: v.name,
+        dieselLiters: Math.round(v.diesel),
+        powerKw: Math.round(v.power),
+        co2Tons: Math.round(v.co2 * 100) / 100,
+      })),
     };
   } catch {
     return mockBenchmark(scope);
@@ -755,7 +949,9 @@ export async function fetchAlerts(
     const rows = rowsInScope(await getRows(), scope);
     const items = rows
       .map((r, idx) => {
-        const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+        const siteName = String(
+          r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
+        ).trim();
         const siteId = slug(siteName);
         const fuel = pickNumberFromRow(
           r,
@@ -790,13 +986,20 @@ export async function fetchAlerts(
 export async function fetchLowFuelSites(
   thresholdPct: number,
   scope: HierarchyFilter = { level: "national" },
-): Promise<Array<{ siteId: string; siteName: string; fuelTankLevelPct: number }>> {
+): Promise<
+  Array<{ siteId: string; siteName: string; fuelTankLevelPct: number }>
+> {
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
-    const siteAgg = new Map<string, { siteId: string; siteName: string; fuel: number[] }>();
+    const siteAgg = new Map<
+      string,
+      { siteId: string; siteName: string; fuel: number[] }
+    >();
     for (const r of rows) {
-      const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+      const siteName = String(
+        r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
+      ).trim();
       if (!siteName) continue;
       const siteId = slug(siteName);
       const f = pickNumberFromRow(
@@ -810,11 +1013,20 @@ export async function fetchLowFuelSites(
         ],
         [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
       );
-      if (!siteAgg.has(siteId)) siteAgg.set(siteId, { siteId, siteName, fuel: [] });
+      if (!siteAgg.has(siteId))
+        siteAgg.set(siteId, { siteId, siteName, fuel: [] });
       if (f || f === 0) siteAgg.get(siteId)!.fuel.push(f);
     }
     return Array.from(siteAgg.values())
-      .map((x) => ({ siteId: x.siteId, siteName: x.siteName, fuelTankLevelPct: x.fuel.length ? Math.round((x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10) / 10 : 0 }))
+      .map((x) => ({
+        siteId: x.siteId,
+        siteName: x.siteName,
+        fuelTankLevelPct: x.fuel.length
+          ? Math.round(
+              (x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10,
+            ) / 10
+          : 0,
+      }))
       .filter((x) => x.fuelTankLevelPct < thresholdPct)
       .sort((a, b) => a.fuelTankLevelPct - b.fuelTankLevelPct);
   } catch {
@@ -854,33 +1066,48 @@ export async function fetchAccumulations(
       return 0;
     }
 
-    const powerKwh = rows.reduce((s, r) => s + pickNumber(r, [
-      "AccumPowerConsumption",
-      "accumPowerConsumption",
-      "Accum Power Consumption",
-      "Accum_Power_Consumption",
-      "PowerKwhAccumulation",
-      "Power Kwh Accumulation",
-      "power_kwh_accumulation",
-    ]), 0);
+    const powerKwh = rows.reduce(
+      (s, r) =>
+        s +
+        pickNumber(r, [
+          "AccumPowerConsumption",
+          "accumPowerConsumption",
+          "Accum Power Consumption",
+          "Accum_Power_Consumption",
+          "PowerKwhAccumulation",
+          "Power Kwh Accumulation",
+          "power_kwh_accumulation",
+        ]),
+      0,
+    );
 
-    const fuelLiters = rows.reduce((s, r) => s + pickNumber(r, [
-      "AccumFuelConsumption",
-      "accumFuelConsumption",
-      "Accum Fuel Consumption",
-      "Accum_Fuel_Consumption",
-      "FuelLitersAccumulation",
-      "fuel_liters_accumulation",
-    ]), 0);
+    const fuelLiters = rows.reduce(
+      (s, r) =>
+        s +
+        pickNumber(r, [
+          "AccumFuelConsumption",
+          "accumFuelConsumption",
+          "Accum Fuel Consumption",
+          "Accum_Fuel_Consumption",
+          "FuelLitersAccumulation",
+          "fuel_liters_accumulation",
+        ]),
+      0,
+    );
 
-    const co2Tons = rows.reduce((s, r) => s + pickNumber(r, [
-      "AccumCO2Emissions",
-      "accumCO2Emissions",
-      "accumCo2Tons",
-      "Accum CO2 Emissions",
-      "CO2Accumulation",
-      "co2_accumulation",
-    ]), 0);
+    const co2Tons = rows.reduce(
+      (s, r) =>
+        s +
+        pickNumber(r, [
+          "AccumCO2Emissions",
+          "accumCO2Emissions",
+          "accumCo2Tons",
+          "Accum CO2 Emissions",
+          "CO2Accumulation",
+          "co2_accumulation",
+        ]),
+      0,
+    );
 
     return { powerKwh, fuelLiters, co2Tons };
   } catch {
@@ -889,13 +1116,16 @@ export async function fetchAccumulations(
 }
 
 // Heatmap: lat/lng + fuel value
-export async function fetchFuelGeoPoints(scope: HierarchyFilter = { level: "national" }): Promise<Array<{ lat: number; lng: number; value: number }>> {
+export async function fetchFuelGeoPoints(
+  scope: HierarchyFilter = { level: "national" },
+): Promise<Array<{ lat: number; lng: number; value: number }>> {
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
     const out: Array<{ lat: number; lng: number; value: number }> = [];
 
-    const inKSA = (la: number, ln: number) => la >= 16 && la <= 33 && ln >= 34 && ln <= 56;
+    const inKSA = (la: number, ln: number) =>
+      la >= 16 && la <= 33 && ln >= 34 && ln <= 56;
 
     for (const r of rows) {
       // fuel %
@@ -937,23 +1167,39 @@ export async function fetchFuelGeoPoints(scope: HierarchyFilter = { level: "nati
         }
       }
       if ((!lat || !lng) && r) {
-        const entries = Object.entries(r).filter(([, v]) => typeof v === "number" || (typeof v === "string" && v.trim() !== ""));
+        const entries = Object.entries(r).filter(
+          ([, v]) =>
+            typeof v === "number" || (typeof v === "string" && v.trim() !== ""),
+        );
         const nums = entries.map(([k, v]) => ({ k, v: toNumber(v) }));
         const latCandidates = nums.filter((x) => x.v >= -90 && x.v <= 90);
         const lngCandidates = nums.filter((x) => x.v >= -180 && x.v <= 180);
         if (!lat && latCandidates.length) lat = latCandidates[0].v;
         if (!lng && lngCandidates.length)
-          lng = (lngCandidates.find((x) => Math.abs(x.v) >= 34 && Math.abs(x.v) <= 56)?.v) || lngCandidates[0].v;
+          lng =
+            lngCandidates.find(
+              (x) => Math.abs(x.v) >= 34 && Math.abs(x.v) <= 56,
+            )?.v || lngCandidates[0].v;
       }
 
       // final KSA swap check
-      if (Number.isFinite(lat) && Number.isFinite(lng) && !inKSA(lat, lng) && inKSA(lng, lat)) {
+      if (
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        !inKSA(lat, lng) &&
+        inKSA(lng, lat)
+      ) {
         const t = lat;
         lat = lng;
         lng = t;
       }
 
-      if (Number.isFinite(lat) && Number.isFinite(lng) && (fuel || fuel === 0) && inKSA(lat, lng)) {
+      if (
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        (fuel || fuel === 0) &&
+        inKSA(lat, lng)
+      ) {
         out.push({ lat, lng, value: fuel });
       }
     }

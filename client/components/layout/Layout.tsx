@@ -73,7 +73,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main
         className="container mx-auto"
-        style={{ fontWeight: 400, maxWidth: 1400, width: "100%", margin: "0 auto", padding: "0 16px 24px" }}
+        style={{
+          fontWeight: 400,
+          maxWidth: 1400,
+          width: "100%",
+          margin: "0 auto",
+          padding: "0 16px 24px",
+        }}
       >
         {children}
       </main>
@@ -81,9 +87,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Screen footer */}
       <footer
         className="print:hidden"
-        style={{ borderColor: "rgb(129, 73, 171) rgb(129, 73, 171) rgb(129, 73, 171)", borderTopWidth: "1px", borderWidth: "1px 0px 0px", color: "rgb(235, 235, 235)", fontSize: 12, fontWeight: 400, lineHeight: "16px", margin: "40px 0 20px", padding: "16px 0" }}
+        style={{
+          borderColor: "rgb(129, 73, 171) rgb(129, 73, 171) rgb(129, 73, 171)",
+          borderTopWidth: "1px",
+          borderWidth: "1px 0px 0px",
+          color: "rgb(235, 235, 235)",
+          fontSize: 12,
+          fontWeight: 400,
+          lineHeight: "16px",
+          margin: "40px 0 20px",
+          padding: "16px 0",
+        }}
       >
-        <div style={{ fontWeight: 400, maxWidth: 1400, width: "100%", margin: "0 auto", padding: "0 32px" }}>
+        <div
+          style={{
+            fontWeight: 400,
+            maxWidth: 1400,
+            width: "100%",
+            margin: "0 auto",
+            padding: "0 32px",
+          }}
+        >
           <p>
             <strong>Powered by ACES MS</strong>
           </p>

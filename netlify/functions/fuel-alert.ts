@@ -2,8 +2,6 @@ import type { Handler } from "@netlify/functions";
 import { fetchLowFuelSites } from "../../client/lib/api";
 
 const SUBJECT = "Generator Fuel Alert";
-const BODY =
-  "Attention: One of the generators has a fuel level below 25%. Please take action.";
 
 export const handler: Handler = async () => {
   try {
@@ -18,19 +16,24 @@ export const handler: Handler = async () => {
       return { statusCode: 200, body: "webhook not configured" };
     }
 
-    await fetch(webhook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: "bannaga.altieb@aces-co.com",
-        subject: SUBJECT,
-        body: BODY,
-        sites: low,
-        generatedAt: new Date().toISOString(),
-      }),
-    });
+    // Send one email per affected site with tailored body
+    for (const s of low) {
+      const body =
+        `Dear Team,  This is an automated notification. The fuel level for Site ID: ${s.siteId} has dropped below 25%.  Please arrange for immediate refueling to avoid downtime.  Regards, Monitoring Dashboard ACES Co.`;
+      await fetch(webhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: "bannaga.altieb@aces-co.com",
+          subject: SUBJECT,
+          body,
+          site: s,
+          generatedAt: new Date().toISOString(),
+        }),
+      });
+    }
 
-    return { statusCode: 200, body: "alert sent" };
+    return { statusCode: 200, body: `sent ${low.length} alerts` };
   } catch (err: any) {
     console.error("fuel-alert error", err);
     return { statusCode: 500, body: "error" };

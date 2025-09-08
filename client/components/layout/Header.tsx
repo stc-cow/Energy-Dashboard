@@ -11,15 +11,10 @@ export default function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
           <img
-            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2Ffa4500f967504f578708710e63aab894?format=webp&width=800"
+            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F7e7768790e7d454e9509aa33812f25bc"
             alt="stc"
             className="h-8 w-auto object-contain"
           />
-          <div>
-            <div className="text-sm tracking-widest text-muted-foreground font-bold">
-              ACES COW MS 2025
-            </div>
-          </div>
         </Link>
         <div className="flex items-center gap-6">
           <nav className="flex items-center gap-6 text-sm">

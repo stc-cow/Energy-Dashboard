@@ -824,7 +824,17 @@ export async function fetchAlerts(
           r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
         ).trim();
         const siteId = slug(siteName);
-        const fuel = toNumber(r["fuelTankLevelPct"]);
+        const fuel = pickNumberFromRow(
+          r,
+          [
+            "fuelTankLevelPct",
+            "Fuel Tank Level %",
+            "Fuel Level %",
+            "fuel_level_pct",
+            "fuel_tank_level_pct",
+          ],
+          [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
+        );
         if (fuel <= 20) {
           return {
             id: `${siteId}-fuel-low-${idx}`,

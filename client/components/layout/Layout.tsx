@@ -95,8 +95,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           fontSize: 12,
           fontWeight: 400,
           lineHeight: "16px",
-          marginTop: 40,
-          padding: "16px 0 10px",
+          marginTop: 16,
+          padding: "6px 0 0",
+          textAlign: "center",
         }}
       >
         <div
@@ -105,7 +106,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             maxWidth: 1400,
             width: "100%",
             margin: "0 auto",
-            padding: "0 32px",
+            padding: 0,
+            display: "flex",
+            justifyContent: "center",
           }}
         >
           <p>

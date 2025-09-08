@@ -42,18 +42,12 @@ export default function HeatMap() {
   return (
     <Layout>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Fuel Level Heat Map</h1>
-          <div className="text-sm text-muted-foreground">
-            Showing {points.length} points{hierarchy ? ` across ${hierarchy.sites.length} sites` : ""}
-          </div>
-        </div>
-        <div className="relative rounded-xl border bg-card overflow-hidden">
+        <div className="relative rounded-xl border overflow-hidden" style={{ backgroundColor: "rgb(92, 11, 162)", borderColor: "rgb(129, 73, 171)", borderWidth: 1, borderRadius: 12, marginTop: 16, overflowX: "hidden", overflowY: "hidden", position: "relative" }}>
           <div className="absolute right-2 top-2 z-[1000]">
             <Button asChild variant="secondary" size="icon" aria-label="Close heat map">
-              <Link to="/">
+              <a href="#/">
                 <X />
-              </Link>
+              </a>
             </Button>
           </div>
           <MapContainer style={{ height: 600, width: "100%" }} bounds={bounds} scrollWheelZoom={true}>

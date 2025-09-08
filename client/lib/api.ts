@@ -297,7 +297,23 @@ async function getRows(): Promise<any[]> {
         .catch(() => [] as any[]);
     }
   }
-  return sheetPromise;
+  const rows = await sheetPromise;
+  // If direct client-side fetch returned empty or blocked, try server proxy to avoid CORS
+  if ((Array.isArray(rows) && rows.length === 0) && typeof window !== "undefined") {
+    try {
+      const resp = await fetch(`/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data) && data.length) {
+          sheetPromise = Promise.resolve(data as any[]);
+          return data as any[];
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  return rows;
 }
 
 function buildHierarchy(rows: any[]): HierarchyResponse {

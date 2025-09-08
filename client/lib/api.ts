@@ -182,7 +182,7 @@ function parseCSV(text: string): any[] {
 type SheetEndpoint = { kind: "gviz" | "csv"; url: string } | null;
 function getSheetEndpoint(u: string): SheetEndpoint {
   let m = u.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  if (m && !\/\/e\//.test(u)) {
+  if (m && !/\/e\//.test(u)) {
     const id = m[1];
     return { kind: "gviz", url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json` };
   }
@@ -547,7 +547,7 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
         powerDemandKw: { label: "Power Demand", value: Math.round(powerKw), unit: "kW" },
         co2TonsPerDay: { label: "CO₂ Emissions", value: Math.round(co2 * 100) / 100, unit: "t/day" },
         fuelTankLevelPct: { label: "Fuel Tank", value: Math.round(avgFuel * 10) / 10, unit: "%" },
-        co2ReductionYoYPct: { label: "CO₂ YoY", value: 0, unit: "%" },
+        co2ReductionYoYPct: { label: "CO�� YoY", value: 0, unit: "%" },
         energyEfficiencyKwhPerLiter: { label: "Efficiency", value: Math.round(eff * 100) / 100, unit: "kWh/L" },
         generatorLoadFactorPct: { label: "Load Factor", value: Math.round(avgLoad * 10) / 10, unit: "%" },
         runningVsStandbyHours: { runningHours: { label: "Running", value: 0, unit: "h/day" }, standbyHours: { label: "Standby", value: 0, unit: "h/day" } },
@@ -909,7 +909,7 @@ export async function fetchFuelGeoPoints(scope: HierarchyFilter = { level: "nati
           lng = asLatLng.lng;
         } else {
           if (!lat && latCandidates.length) lat = latCandidates[0].v;
-          if (!lng && lngCandidates.length) lng = lngCandidates.find((x) => Math.abs(x.v) > 40) ?.v || lngCandidates[0].v;
+          if (!lng && lngCandidates.length) lng = (lngCandidates.find((x) => Math.abs(x.v) > 40)?.v) || lngCandidates[0].v;
         }
       }
       if (Number.isFinite(lat) && Number.isFinite(lng) && (fuel || fuel === 0)) {

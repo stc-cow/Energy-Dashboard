@@ -330,34 +330,59 @@ function parseCSV(text: string): any[] {
   return rows;
 }
 
+async function fetchTextWithFallback(url: string): Promise<{ ok: boolean; text: string; status: number; contentType?: string }>{
+  // try direct fetch first
+  try {
+    const r = await fetch(url);
+    if (r.ok) {
+      const text = await r.text();
+      return { ok: true, text, status: r.status, contentType: r.headers.get('content-type') || undefined };
+    }
+  } catch (e) {
+    // continue to proxy fallback
+  }
+  // try public CORS proxy
+  try {
+    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const r2 = await fetch(proxy);
+    if (r2.ok) {
+      const text = await r2.text();
+      return { ok: true, text, status: r2.status, contentType: r2.headers.get('content-type') || undefined };
+    }
+    return { ok: false, text: '', status: r2.status };
+  } catch (e) {
+    return { ok: false, text: '', status: 0 };
+  }
+}
+
 async function getRows(): Promise<any[]> {
   if (!SHEET_URL) return [];
   if (!sheetPromise) {
     const ep = getSheetEndpoint(SHEET_URL);
     if (ep?.kind === "gviz") {
-      sheetPromise = fetch(ep.url)
-        .then((r) => {
-          if (!r.ok) throw new Error(`sheet fetch failed: ${r.status}`);
-          return r.text();
+      sheetPromise = fetchTextWithFallback(ep.url)
+        .then((res) => {
+          if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
+          return parseGVizJSON(res.text);
         })
-        .then((text) => parseGVizJSON(text))
         .catch(() => [] as any[]);
     } else if (ep?.kind === "csv") {
-      sheetPromise = fetch(ep.url)
-        .then((r) => {
-          if (!r.ok) throw new Error(`sheet fetch failed: ${r.status}`);
-          return r.text();
+      sheetPromise = fetchTextWithFallback(ep.url)
+        .then((res) => {
+          if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
+          return parseCSV(res.text);
         })
-        .then((text) => parseCSV(text))
         .catch(() => [] as any[]);
     } else {
       // Fallback: try as JSON first, then as text->GViz
-      sheetPromise = fetch(SHEET_URL)
-        .then(async (r) => {
-          if (!r.ok) throw new Error(`sheet fetch failed: ${r.status}`);
-          const ct = r.headers.get("content-type") || "";
-          if (ct.includes("application/json")) return r.json();
-          const txt = await r.text();
+      sheetPromise = fetchTextWithFallback(SHEET_URL)
+        .then(async (res) => {
+          if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
+          const ct = res.contentType || '';
+          const txt = res.text;
+          if (ct.includes("application/json")) {
+            try { const j = JSON.parse(txt); return j; } catch { /* fallthrough */ }
+          }
           const rowsFromGViz = parseGVizJSON(txt);
           if (rowsFromGViz.length) return rowsFromGViz;
           return parseCSV(txt);

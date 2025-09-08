@@ -27,7 +27,8 @@ if (typeof window !== "undefined" && !(window as any).__safe_fetch_installed) {
         console.warn("Network fetch failed (suppressed):", err?.message || err);
       } catch {}
       // Return a Response-like object with ok=false to keep callers working
-      return new Response("", { status: 0, statusText: "network error" }) as any;
+      // Return a Response with a valid HTTP status code so callers can handle it
+      return new Response("", { status: 502, statusText: "network error" }) as any;
     }
   };
 }

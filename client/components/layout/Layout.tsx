@@ -45,7 +45,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="hidden print:block">
         <div className="container mx-auto px-8 py-4">
           <div className="flex items-center justify-between">
-            <a href="https://aces-co.com/" target="_blank" rel="noopener noreferrer" aria-label="ACES website">
+            <a
+              href="https://aces-co.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="ACES website"
+            >
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F49b74b93ac974c858232234345139aee?format=webp&width=400"
                 alt="ACES"

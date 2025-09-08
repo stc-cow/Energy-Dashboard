@@ -37,10 +37,36 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
-      <Header />
+      <div className="print:hidden">
+        <Header />
+      </div>
+
+      {/* Print-only header */}
+      <div className="hidden print:block">
+        <div className="container mx-auto px-8 py-4">
+          <div className="flex items-center justify-between">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F49b74b93ac974c858232234345139aee?format=webp&width=400"
+              alt="ACES"
+              style={{ height: 40, objectFit: "contain" }}
+            />
+            <div className="text-center">
+              <div className="font-extrabold text-xl">COW Predictive Energy Dashboard</div>
+            </div>
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F57a8a3cd81a24a69ad9bd34e4e70feb7?format=webp&width=400"
+              alt="stc"
+              style={{ height: 40, objectFit: "contain" }}
+            />
+          </div>
+        </div>
+      </div>
+
       <main className="container mx-auto px-4 py-6">{children}</main>
+
+      {/* Screen footer */}
       <footer
-        className="mt-10 mb-5 border-t py-4 text-xs text-muted-foreground"
+        className="mt-10 mb-5 border-t py-4 text-xs text-muted-foreground print:hidden"
         style={{ borderTop: "1px solid rgb(129, 73, 171)" }}
       >
         <div className="container mx-auto px-8">
@@ -49,6 +75,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </p>
         </div>
       </footer>
+
+      {/* Print-only footer with timestamp */}
+      <div className="hidden print:block">
+        <div className="container mx-auto px-8 py-2 text-xs text-muted-foreground">
+          Generated on {new Date().toLocaleString()}
+        </div>
+      </div>
     </div>
   );
 }

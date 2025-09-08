@@ -16,6 +16,11 @@ export default function Header() {
             className="h-8 w-auto object-contain"
           />
         </Link>
+        <div className="flex-1 text-center hidden sm:block">
+          <div className="text-xs sm:text-sm font-semibold tracking-wide text-muted-foreground">
+            COW Predictive Energy Dashboard
+          </div>
+        </div>
         <div className="flex items-center gap-6">
           <nav className="flex items-center gap-6 text-sm" />
           <img

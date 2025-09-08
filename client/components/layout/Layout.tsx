@@ -18,12 +18,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
     };
     const now = new Date();
-    const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-    const timeoutId = setTimeout(() => {
-      refresh();
-      const id = setInterval(refresh, 60_000);
-      (window as any).__auto_refresh_interval = id;
-    }, Math.max(0, msToNextMinute));
+    const msToNextMinute =
+      (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    const timeoutId = setTimeout(
+      () => {
+        refresh();
+        const id = setInterval(refresh, 60_000);
+        (window as any).__auto_refresh_interval = id;
+      },
+      Math.max(0, msToNextMinute),
+    );
     return () => {
       clearTimeout(timeoutId);
       if ((window as any).__auto_refresh_interval)

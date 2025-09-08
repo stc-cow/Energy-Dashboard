@@ -137,60 +137,76 @@ function pickStringFromRow(
 }
 
 function getRegionName(r: any): string {
-  return pickStringFromRow(r, [
-    "regionName",
-    "Region",
-    "region",
-    "Region Name",
-    "region_name",
-    "Province",
-    "province",
-    "Area",
-    "area",
-  ], [/region/i, /province/i, /area/i]);
+  return pickStringFromRow(
+    r,
+    [
+      "regionName",
+      "Region",
+      "region",
+      "Region Name",
+      "region_name",
+      "Province",
+      "province",
+      "Area",
+      "area",
+    ],
+    [/region/i, /province/i, /area/i],
+  );
 }
 
 function getCityName(r: any): string {
-  return pickStringFromRow(r, [
-    "cityName",
-    "City",
-    "city",
-    "City Name",
-    "city_name",
-    "Municipality",
-    "municipality",
-    "Governorate",
-    "governorate",
-    "col5",
-  ], [/city/i, /municipality/i, /governorate/i]);
+  return pickStringFromRow(
+    r,
+    [
+      "cityName",
+      "City",
+      "city",
+      "City Name",
+      "city_name",
+      "Municipality",
+      "municipality",
+      "Governorate",
+      "governorate",
+      "col5",
+    ],
+    [/city/i, /municipality/i, /governorate/i],
+  );
 }
 
 function getSiteName(r: any): string {
-  return pickStringFromRow(r, [
-    "siteName",
-    "Site",
-    "site",
-    "Site Name",
-    "site_name",
-    "Site ID",
-    "siteId",
-    "site_id",
-  ], [/site/i]);
+  return pickStringFromRow(
+    r,
+    [
+      "siteName",
+      "Site",
+      "site",
+      "Site Name",
+      "site_name",
+      "Site ID",
+      "siteId",
+      "site_id",
+    ],
+    [/site/i],
+  );
 }
 
 function getDistrictName(r: any): string {
-  return pickStringFromRow(r, [
-    "districtName",
-    "district",
-    "District",
-    "District Name",
-    "district_name",
-    "Neighborhood",
-    "neighborhood",
-    "Subdistrict",
-    "subdistrict",
-    "col6",
-  ], [/district/i, /neigh/i, /subdistrict/i]);
+  return pickStringFromRow(
+    r,
+    [
+      "districtName",
+      "district",
+      "District",
+      "District Name",
+      "district_name",
+      "Neighborhood",
+      "neighborhood",
+      "Subdistrict",
+      "subdistrict",
+      "col6",
+    ],
+    [/district/i, /neigh/i, /subdistrict/i],
+  );
 }
 
 function getDateKey(rows: any[]): string | null {
@@ -357,9 +373,15 @@ async function getRows(): Promise<any[]> {
   }
   const rows = await sheetPromise;
   // If direct client-side fetch returned empty or blocked, try server proxy to avoid CORS
-  if ((Array.isArray(rows) && rows.length === 0) && typeof window !== "undefined") {
+  if (
+    Array.isArray(rows) &&
+    rows.length === 0 &&
+    typeof window !== "undefined"
+  ) {
     try {
-      const resp = await fetch(`/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`);
+      const resp = await fetch(
+        `/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`,
+      );
       if (resp.ok) {
         const data = await resp.json();
         if (Array.isArray(data) && data.length) {
@@ -857,13 +879,20 @@ export async function fetchAlerts(
 export async function fetchLowFuelSites(
   thresholdPct: number,
   scope: HierarchyFilter = { level: "national" },
-): Promise<Array<{ siteId: string; siteName: string; fuelTankLevelPct: number }>> {
+): Promise<
+  Array<{ siteId: string; siteName: string; fuelTankLevelPct: number }>
+> {
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
-    const siteAgg = new Map<string, { siteId: string; siteName: string; fuel: number[] }>();
+    const siteAgg = new Map<
+      string,
+      { siteId: string; siteName: string; fuel: number[] }
+    >();
     for (const r of rows) {
-      const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+      const siteName = String(
+        r["siteName"] ?? r["Site"] ?? r["site"] ?? "",
+      ).trim();
       if (!siteName) continue;
       const siteId = slug(siteName);
       const f = pickNumberFromRow(
@@ -877,7 +906,8 @@ export async function fetchLowFuelSites(
         ],
         [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
       );
-      if (!siteAgg.has(siteId)) siteAgg.set(siteId, { siteId, siteName, fuel: [] });
+      if (!siteAgg.has(siteId))
+        siteAgg.set(siteId, { siteId, siteName, fuel: [] });
       if (f || f === 0) siteAgg.get(siteId)!.fuel.push(f);
     }
     return Array.from(siteAgg.values())
@@ -885,7 +915,9 @@ export async function fetchLowFuelSites(
         siteId: x.siteId,
         siteName: x.siteName,
         fuelTankLevelPct: x.fuel.length
-          ? Math.round((x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10) / 10
+          ? Math.round(
+              (x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10,
+            ) / 10
           : 0,
       }))
       .filter((x) => x.fuelTankLevelPct < thresholdPct)

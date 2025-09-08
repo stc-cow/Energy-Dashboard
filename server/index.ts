@@ -41,7 +41,10 @@ export function createServer() {
   app.post("/api/test-fuel-email", async (req, res) => {
     try {
       const webhook = process.env.ZAPIER_WEBHOOK_URL;
-      if (!webhook) return res.status(200).json({ ok: true, note: "webhook not configured" });
+      if (!webhook)
+        return res
+          .status(200)
+          .json({ ok: true, note: "webhook not configured" });
 
       const to = (req.body?.to as string) || "bannaga.altieb@aces-co.com";
       const siteId = (req.body?.siteId as string) || "test-site";
@@ -51,7 +54,13 @@ export function createServer() {
       const resp = await fetch(webhook, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to, subject, body, site: { siteId }, generatedAt: new Date().toISOString() }),
+        body: JSON.stringify({
+          to,
+          subject,
+          body,
+          site: { siteId },
+          generatedAt: new Date().toISOString(),
+        }),
       });
 
       return res.json({ ok: true, status: resp.status });

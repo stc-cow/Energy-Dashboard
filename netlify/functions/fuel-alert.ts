@@ -18,8 +18,7 @@ export const handler: Handler = async () => {
 
     // Send one email per affected site with tailored body
     for (const s of low) {
-      const body =
-        `Dear Team,  This is an automated notification. The fuel level for Site ID: ${s.siteId} has dropped below 25%.  Please arrange for immediate refueling to avoid downtime.  Regards, Monitoring Dashboard ACES Co.`;
+      const body = `Dear Team,  This is an automated notification. The fuel level for Site ID: ${s.siteId} has dropped below 25%.  Please arrange for immediate refueling to avoid downtime.  Regards, Monitoring Dashboard ACES Co.`;
       await fetch(webhook, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

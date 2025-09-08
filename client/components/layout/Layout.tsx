@@ -78,7 +78,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           maxWidth: 1400,
           width: "100%",
           margin: "0 auto",
-          padding: "0 16px 24px",
+          padding: "0 16px",
         }}
       >
         {children}
@@ -88,15 +88,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <footer
         className="print:hidden"
         style={{
-          borderColor: "rgb(129, 73, 171) rgb(129, 73, 171) rgb(129, 73, 171)",
+          borderColor: "rgb(129, 73, 171)",
           borderTopWidth: "1px",
           borderWidth: "1px 0px 0px",
           color: "rgb(235, 235, 235)",
           fontSize: 12,
           fontWeight: 400,
           lineHeight: "16px",
-          margin: "40px 0 20px",
-          padding: "16px 0",
+          marginTop: 40,
+          padding: "16px 0 10px",
         }}
       >
         <div

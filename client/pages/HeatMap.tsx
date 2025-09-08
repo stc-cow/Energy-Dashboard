@@ -48,7 +48,14 @@ export default function HeatMap() {
             Showing {points.length} points{hierarchy ? ` across ${hierarchy.sites.length} sites` : ""}
           </div>
         </div>
-        <div className="rounded-xl border bg-card overflow-hidden">
+        <div className="relative rounded-xl border bg-card overflow-hidden">
+          <div className="absolute right-2 top-2 z-[1000]">
+            <Button asChild variant="secondary" size="icon" aria-label="Close heat map">
+              <Link to="/">
+                <X />
+              </Link>
+            </Button>
+          </div>
           <MapContainer style={{ height: 600, width: "100%" }} bounds={bounds} scrollWheelZoom={true}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

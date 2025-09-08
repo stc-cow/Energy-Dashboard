@@ -16,6 +16,7 @@ import {
   fetchCowStats,
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
+import { Button } from "@/components/ui/button";
 
 export default function Index() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });

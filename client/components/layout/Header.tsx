@@ -28,11 +28,13 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-6">
           <nav className="flex items-center gap-6 text-sm" />
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F49b74b93ac974c858232234345139aee?format=webp&width=800"
-            alt="ACES"
-            className="h-8 min-h-[60px] w-auto object-contain bg-transparent"
-          />
+          <a href="https://aces-co.com/" target="_blank" rel="noopener noreferrer" aria-label="ACES website">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F49b74b93ac974c858232234345139aee?format=webp&width=800"
+              alt="ACES"
+              className="h-8 min-h-[60px] w-auto object-contain bg-transparent"
+            />
+          </a>
         </div>
       </div>
     </header>

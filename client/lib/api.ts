@@ -734,6 +734,37 @@ export async function fetchAlerts(
   }
 }
 
+export async function fetchLowFuelSites(
+  thresholdPct: number,
+  scope: HierarchyFilter = { level: "national" },
+): Promise<Array<{ siteId: string; siteName: string; fuelTankLevelPct: number }>> {
+  try {
+    const rowsAll = await getRows();
+    const rows = rowsInScope(rowsAll, scope);
+    const siteAgg = new Map<string, { siteId: string; siteName: string; fuel: number[] }>();
+    for (const r of rows) {
+      const siteName = String(r["siteName"] ?? r["Site"] ?? r["site"] ?? "").trim();
+      if (!siteName) continue;
+      const siteId = slug(siteName);
+      const f = toNumber(r["fuelTankLevelPct"]);
+      if (!siteAgg.has(siteId)) siteAgg.set(siteId, { siteId, siteName, fuel: [] });
+      if (f || f === 0) siteAgg.get(siteId)!.fuel.push(f);
+    }
+    return Array.from(siteAgg.values())
+      .map((x) => ({
+        siteId: x.siteId,
+        siteName: x.siteName,
+        fuelTankLevelPct: x.fuel.length
+          ? Math.round((x.fuel.reduce((a, b) => a + b, 0) / x.fuel.length) * 10) / 10
+          : 0,
+      }))
+      .filter((x) => x.fuelTankLevelPct < thresholdPct)
+      .sort((a, b) => a.fuelTankLevelPct - b.fuelTankLevelPct);
+  } catch {
+    return [];
+  }
+}
+
 export async function fetchAccumulations(
   scope: HierarchyFilter,
   from?: string,

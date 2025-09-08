@@ -60,5 +60,10 @@ export function createServer() {
     }
   });
 
+  // Proxy route to fetch Google Sheet server-side to avoid CORS
+  import("./routes/sheet").then((m) => {
+    app.get("/api/sheet", m.proxySheet as any);
+  });
+
   return app;
 }

@@ -35,6 +35,10 @@ const isStatic =
 
 // Sheet data wiring
 function getSheetUrl(): string | null {
+  const serverEnvUrl =
+    typeof process !== "undefined" && (process as any).env?.SHEET_URL
+      ? String((process as any).env.SHEET_URL)
+      : null;
   const envUrl =
     (typeof import.meta !== "undefined" &&
       (import.meta as any).env?.VITE_SHEET_URL) ||
@@ -51,6 +55,7 @@ function getSheetUrl(): string | null {
   }
   return (
     urlParam ||
+    serverEnvUrl ||
     envUrl ||
     "https://docs.google.com/spreadsheets/d/1Y_GvVbzKWb_p1r-xYCjcb4l1EvLwsz47J-7dyyUqh-g/edit?usp=sharing"
   );

@@ -17,8 +17,8 @@ export default function Header() {
           />
         </Link>
         <div className="flex-1 text-center hidden sm:block">
-          <div className="text-xs sm:text-sm font-semibold tracking-wide text-muted-foreground">
-            COW Predictive Energy Dashboard
+          <div className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+            <strong>COW Predictive Energy Dashboard</strong>
           </div>
         </div>
         <div className="flex items-center gap-6">

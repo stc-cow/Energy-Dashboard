@@ -274,57 +274,58 @@ async function getRows(): Promise<any[]> {
 
   if (!sheetPromise) {
     const ep = getSheetEndpoint(SHEET_URL);
-    if (ep?.kind === "gviz") {
-      sheetPromise = fetchTextWithFallback(ep.url)
-        .then((res) => {
-          if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
-          return parseGVizJSON(res.text);
-        })
-        .catch((err) => {
-          console.warn("gviz fetch failed", err);
-          return [] as any[];
-        });
-    } else if (ep?.kind === "csv") {
-      sheetPromise = fetchTextWithFallback(ep.url)
-        .then((res) => {
-          if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
-          return parseCSV(res.text);
-        })
-        .catch((err) => {
-          console.warn("csv fetch failed", err);
-          return [] as any[];
-        });
-    } else {
-      sheetPromise = fetchTextWithFallback(SHEET_URL)
-        .then(async (res) => {
-          if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
-          const ct = res.contentType || "";
-          const txt = res.text;
-          if (ct.includes("application/json")) {
-            try {
-              const j = JSON.parse(txt);
-              return j;
-            } catch {}
+    // use an explicit async/await flow so any fetch exceptions are caught here
+    sheetPromise = (async () => {
+      try {
+        if (ep?.kind === "gviz") {
+          const res = await fetchTextWithFallback(ep.url);
+          if (!res.ok) {
+            console.warn("gviz fetch returned not ok", res.status);
+            return [] as any[];
           }
-          const rowsFromGViz = parseGVizJSON(txt);
-          if (rowsFromGViz.length) return rowsFromGViz;
-          return parseCSV(txt);
-        })
-        .then((data) => {
-          if (Array.isArray(data)) return data as any[];
-          if (data && Array.isArray((data as any).data))
-            return (data as any).data;
+          return parseGVizJSON(res.text);
+        }
+        if (ep?.kind === "csv") {
+          const res = await fetchTextWithFallback(ep.url);
+          if (!res.ok) {
+            console.warn("csv fetch returned not ok", res.status);
+            return [] as any[];
+          }
+          return parseCSV(res.text);
+        }
+        // generic
+        const res = await fetchTextWithFallback(SHEET_URL);
+        if (!res.ok) {
+          console.warn("generic fetch returned not ok", res.status);
           return [] as any[];
-        })
-        .catch((err) => {
-          console.warn("generic fetch failed", err);
-          return [] as any[];
-        });
-    }
+        }
+        const ct = res.contentType || "";
+        const txt = res.text;
+        if (ct.includes("application/json")) {
+          try {
+            const j = JSON.parse(txt);
+            if (Array.isArray(j)) return j as any[];
+          } catch (e) {
+            /* ignore */
+          }
+        }
+        const rowsFromGViz = parseGVizJSON(txt);
+        if (rowsFromGViz.length) return rowsFromGViz;
+        return parseCSV(txt);
+      } catch (err) {
+        console.warn("sheet fetch error", err);
+        return [] as any[];
+      }
+    })();
   }
 
-  const rows = await sheetPromise;
-  return rows;
+  try {
+    const rows = await sheetPromise;
+    return rows;
+  } catch (err) {
+    console.warn("sheetPromise rejected", err);
+    return [];
+  }
 }
 
 // Accessors

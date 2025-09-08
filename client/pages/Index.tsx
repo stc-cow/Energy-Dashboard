@@ -97,13 +97,16 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="mb-6 text-center">
-        <div className="flex items-center justify-center gap-3">
-          <h1 className="font-extrabold tracking-tight text-white text-4xl sm:text-5xl lg:text-6xl">
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-extrabold tracking-tight text-white text-2xl sm:text-4xl lg:text-5xl">
             COW Predictive Energy Dashboard
           </h1>
+          <div className="print:hidden">
+            <Button variant="secondary" onClick={() => window.print()}>Report</Button>
+          </div>
         </div>
-        <p className="mt-3 text-sm sm:text-base text-white/80 font-bold">
+        <p className="mt-3 text-sm sm:text-base text-white/80 font-bold text-center sm:text-left">
           As of {asOf}
         </p>
       </div>

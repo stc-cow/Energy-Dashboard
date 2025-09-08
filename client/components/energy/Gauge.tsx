@@ -21,7 +21,7 @@ export default function Gauge({
   const green = "hsl(var(--metric-green))";
   const yellow = "hsl(var(--metric-yellow))";
   const red = "hsl(var(--metric-red))";
-  const colorsArr = [red, yellow, green];
+  const colorsArr = metric === "power" ? [green, yellow, red] : [red, yellow, green];
   const arcs = [0.25, 0.25, 0.5];
 
   return (

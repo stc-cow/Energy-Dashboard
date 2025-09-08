@@ -28,7 +28,10 @@ if (typeof window !== "undefined" && !(window as any).__safe_fetch_installed) {
       } catch {}
       // Return a Response-like object with ok=false to keep callers working
       // Return a Response with a valid HTTP status code so callers can handle it
-      return new Response("", { status: 502, statusText: "network error" }) as any;
+      return new Response("", {
+        status: 502,
+        statusText: "network error",
+      }) as any;
     }
   };
 }

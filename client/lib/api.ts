@@ -209,9 +209,7 @@ function getSheetEndpoint(u: string): SheetEndpoint {
   return null;
 }
 
-async function fetchTextWithFallback(
-  url: string,
-): Promise<{
+async function fetchTextWithFallback(url: string): Promise<{
   ok: boolean;
   text: string;
   status: number;

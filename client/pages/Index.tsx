@@ -231,7 +231,11 @@ export default function Index() {
             value={Math.round(accumFuelLiters)}
             unit="L"
           />
-          <KpiCard title="Accum. CO₂ Emissions" value={Number(accumCo2Tons.toFixed(2))} unit="TON" />
+          <KpiCard
+            title="Accum. CO₂ Emissions"
+            value={Number(accumCo2Tons.toFixed(2))}
+            unit="TON"
+          />
         </div>
       </FitToScreen>
     </Layout>

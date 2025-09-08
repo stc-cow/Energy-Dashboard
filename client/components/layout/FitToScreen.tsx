@@ -22,7 +22,8 @@ export default function FitToScreen({
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState<number>(1);
 
-  const enabled = typeof window !== "undefined" && window.innerWidth >= enableAtWidth;
+  const enabled =
+    typeof window !== "undefined" && window.innerWidth >= enableAtWidth;
 
   function recalc() {
     const el = wrapRef.current;

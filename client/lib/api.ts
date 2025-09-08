@@ -795,6 +795,74 @@ export async function fetchBreakdown(
   }
 }
 
+export interface CowStats {
+  onAir: number;
+  offAir: number;
+  byRegion: { regionId: string; regionName: string; count: number }[];
+}
+
+export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
+  if (!SHEET_URL) return { onAir: 0, offAir: 0, byRegion: [] };
+  try {
+    const rowsAll = await getRows();
+    const rows = rowsInScope(rowsAll, scope);
+    const dateKey = getDateKey(rows) || "";
+
+    type SiteRec = {
+      siteId: string;
+      siteName: string;
+      regionId: string;
+      regionName: string;
+      onAir: number; // 1 if Column L > 0 else 0
+      ts: number; // timestamp for latest row tracking
+    };
+    const sites = new Map<string, SiteRec>();
+
+    for (const r of rows) {
+      const siteName = getSiteName(r);
+      if (!siteName) continue;
+      const siteId = slug(siteName);
+      const regionName = getRegionName(r) || "Unknown";
+      const regionId = slug(regionName) || "unknown";
+      const valL = pickNumberFromRow(
+        r,
+        ["col11", "Column L", "OnAir", "ON AIR", "on_air", "cow"],
+        [/^col?11$/i, /on.?air/i, /cow/i],
+      );
+      let ts = Date.now();
+      if (dateKey) {
+        const d = new Date(r[dateKey]);
+        if (!isNaN(d.getTime())) ts = d.getTime();
+      }
+      const rec: SiteRec = {
+        siteId,
+        siteName,
+        regionId,
+        regionName,
+        onAir: valL > 0 ? 1 : 0,
+        ts,
+      };
+      const prev = sites.get(siteId);
+      if (!prev || rec.ts >= prev.ts) sites.set(siteId, rec);
+    }
+
+    const uniqueSites = Array.from(sites.values());
+    const onAir = uniqueSites.reduce((s, r) => s + r.onAir, 0);
+    const offAir = Math.max(0, uniqueSites.length - onAir);
+
+    const by = new Map<string, { regionId: string; regionName: string; count: number }>();
+    for (const s of uniqueSites) {
+      if (!by.has(s.regionId)) by.set(s.regionId, { regionId: s.regionId, regionName: s.regionName, count: 0 });
+      by.get(s.regionId)!.count += 1; // total COW IDs per region
+    }
+    const byRegion = Array.from(by.values()).sort((a, b) => b.count - a.count);
+
+    return { onAir, offAir, byRegion };
+  } catch {
+    return { onAir: 0, offAir: 0, byRegion: [] };
+  }
+}
+
 export async function fetchBenchmark(
   scope: HierarchyFilter,
 ): Promise<BenchmarkResponse> {

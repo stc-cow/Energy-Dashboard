@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary" style={{ marginBottom: 1 }}>
       <div className="print:hidden">
         <Header />
       </div>

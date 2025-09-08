@@ -113,37 +113,6 @@ export default function Index() {
         />
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 items-center justify-center">
-        <KpiCard
-          title="Diesel Consumption"
-          value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
-          unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""}
-        />
-        <KpiCard
-          title="Power Demand"
-          value={kpis?.kpis.powerDemandKw.value ?? 0}
-          unit={kpis?.kpis.powerDemandKw.unit ?? ""}
-        />
-        <KpiCard
-          title="Daily CO₂ Emissions"
-          value={kpis?.kpis.co2TonsPerDay.value ?? 0}
-          unit="TON/day"
-        />
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
-        <Gauge
-          value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
-          label="Fuel Tank Level"
-          metric="fuel"
-        />
-        <Gauge
-          value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
-          label="Average Generator Load"
-          metric="power"
-        />
-      </div>
-
       {/* COWs Status card */}
       <div className="mt-4 grid grid-cols-1">
         <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none flex flex-col">
@@ -174,6 +143,37 @@ export default function Index() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 items-center justify-center">
+        <KpiCard
+          title="Diesel Consumption"
+          value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
+          unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""}
+        />
+        <KpiCard
+          title="Power Demand"
+          value={kpis?.kpis.powerDemandKw.value ?? 0}
+          unit={kpis?.kpis.powerDemandKw.unit ?? ""}
+        />
+        <KpiCard
+          title="Daily CO₂ Emissions"
+          value={kpis?.kpis.co2TonsPerDay.value ?? 0}
+          unit="TON/day"
+        />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
+        <Gauge
+          value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
+          label="Fuel Tank Level"
+          metric="fuel"
+        />
+        <Gauge
+          value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
+          label="Average Generator Load"
+          metric="power"
+        />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">

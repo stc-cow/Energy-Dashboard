@@ -54,6 +54,9 @@ export default function HeatMap() {
             <HeatLayer points={points} />
           </MapContainer>
         </div>
+        {points.length === 0 && (
+          <div className="text-sm text-amber-300">No coordinates found in columns H & I. Please ensure the sheet has Lat in H and Lng in I for each row within KSA.</div>
+        )}
         <p className="text-xs text-muted-foreground">
           Note: Hotter areas indicate lower fuel levels (redder = lower %).
         </p>

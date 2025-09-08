@@ -17,30 +17,7 @@ export default function Header() {
           />
         </Link>
         <div className="flex items-center gap-6">
-          <nav className="flex items-center gap-6 text-sm">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                cn(
-                  "hover:text-primary",
-                  isActive && "text-primary font-semibold",
-                )
-              }
-            >
-              Dashboard
-            </NavLink>
-            <NavLink
-              to="/reports"
-              className={({ isActive }) =>
-                cn(
-                  "hover:text-primary",
-                  isActive && "text-primary font-semibold",
-                )
-              }
-            >
-              Reports
-            </NavLink>
-          </nav>
+          <nav className="flex items-center gap-6 text-sm" />
           <img
             src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F49b74b93ac974c858232234345139aee?format=webp&width=800"
             alt="ACES"

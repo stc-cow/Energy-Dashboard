@@ -27,7 +27,11 @@ export default function Header() {
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <nav className="flex items-center gap-6 text-sm" />
+          <nav className="flex items-center gap-6 text-sm">
+            <NavLink to="/heatmap" className={({ isActive }) => isActive ? "font-semibold text-white" : "text-white/80 hover:text-white"}>
+              Heat Map
+            </NavLink>
+          </nav>
           <a
             href="https://aces-co.com/"
             target="_blank"

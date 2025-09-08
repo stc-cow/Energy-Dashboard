@@ -384,7 +384,7 @@ function rowsInScope(rows: any[], scope: HierarchyFilter) {
 }
 
 export async function fetchHierarchy(): Promise<HierarchyResponse> {
-  if (isStatic || !SHEET_URL) return mockHierarchy();
+  if (!SHEET_URL) return mockHierarchy();
   try {
     const rows = await getRows();
     if (!rows.length) return mockHierarchy();
@@ -395,7 +395,7 @@ export async function fetchHierarchy(): Promise<HierarchyResponse> {
 }
 
 export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
-  if (isStatic || !SHEET_URL) return mockKPIs(scope);
+  if (!SHEET_URL) return mockKPIs(scope);
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
@@ -532,7 +532,7 @@ export async function fetchTimeSeries(
   scope: HierarchyFilter,
   q: TimeSeriesQuery,
 ): Promise<TimeSeriesResponse> {
-  if (isStatic || !SHEET_URL) return mockTimeSeries(scope, q.granularity);
+  if (!SHEET_URL) return mockTimeSeries(scope, q.granularity);
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
@@ -596,7 +596,7 @@ export async function fetchBreakdown(
   scope: HierarchyFilter,
   by: "region" | "site",
 ): Promise<BreakdownResponse> {
-  if (isStatic || !SHEET_URL) return mockBreakdown(scope, by);
+  if (!SHEET_URL) return mockBreakdown(scope, by);
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
@@ -666,7 +666,7 @@ export async function fetchBreakdown(
 export async function fetchBenchmark(
   scope: HierarchyFilter,
 ): Promise<BenchmarkResponse> {
-  if (isStatic || !SHEET_URL) return mockBenchmark(scope);
+  if (!SHEET_URL) return mockBenchmark(scope);
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
@@ -705,7 +705,7 @@ export async function fetchBenchmark(
 export async function fetchAlerts(
   scope: HierarchyFilter,
 ): Promise<AlertsResponse> {
-  if (isStatic || !SHEET_URL) return mockAlerts(scope);
+  if (!SHEET_URL) return mockAlerts(scope);
   try {
     const rows = rowsInScope(await getRows(), scope);
     const items = rows

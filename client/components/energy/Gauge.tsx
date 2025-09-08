@@ -17,12 +17,12 @@ export default function Gauge({
 }: GaugeProps) {
   const pct = Math.max(0, Math.min(100, value));
 
-  // Colors by thresholds
+  // Colors: Red 0–25%, Yellow 25–50%, Green 50–100%
   const green = "hsl(var(--metric-green))";
   const yellow = "hsl(var(--metric-yellow))";
   const red = "hsl(var(--metric-red))";
-  const colorsArr =
-    metric === "fuel" ? [red, yellow, green] : [green, yellow, red];
+  const colorsArr = [red, yellow, green];
+  const arcs = [0.25, 0.25, 0.5];
 
   return (
     <div
@@ -36,16 +36,17 @@ export default function Gauge({
         <div className="w-72">
           <GaugeChart
             id={`gauge-${label}`}
-            nrOfLevels={20}
-            arcsLength={
-              metric === "fuel" ? [0.25, 0.25, 0.5] : [0.6, 0.25, 0.15]
-            }
+            nrOfLevels={3}
+            arcsLength={arcs}
             colors={colorsArr}
             percent={pct / 100}
             needleColor="#ffffff"
             textColor="transparent"
             formatTextValue={() => ""}
             arcWidth={0.3}
+            cornerRadius={0}
+            // @ts-ignore: arcPadding is supported by library but not in our d.ts
+            arcPadding={0}
             style={{ width: "100%" }}
           />
         </div>

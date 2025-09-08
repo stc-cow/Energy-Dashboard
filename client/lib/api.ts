@@ -225,6 +225,27 @@ async function fetchTextWithFallback(
 
 async function getRows(): Promise<any[]> {
   if (!SHEET_URL) return [];
+
+  // If we're running in a browser, prefer the server proxy first to avoid CORS errors
+  if (typeof window !== "undefined") {
+    try {
+      const resp = await fetch(`/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data) && data.length) {
+          sheetPromise = Promise.resolve(data as any[]);
+          return data as any[];
+        }
+      } else {
+        // log non-ok status for debugging
+        console.warn("/api/sheet proxy returned", resp.status);
+      }
+    } catch (e: any) {
+      // server proxy not available (static preview), continue with client-side fetch fallback
+      console.warn("/api/sheet proxy unavailable:", e?.message || e);
+    }
+  }
+
   if (!sheetPromise) {
     const ep = getSheetEndpoint(SHEET_URL);
     if (ep?.kind === "gviz") {
@@ -233,14 +254,20 @@ async function getRows(): Promise<any[]> {
           if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
           return parseGVizJSON(res.text);
         })
-        .catch(() => [] as any[]);
+        .catch((err) => {
+          console.warn("gviz fetch failed", err);
+          return [] as any[];
+        });
     } else if (ep?.kind === "csv") {
       sheetPromise = fetchTextWithFallback(ep.url)
         .then((res) => {
           if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
           return parseCSV(res.text);
         })
-        .catch(() => [] as any[]);
+        .catch((err) => {
+          console.warn("csv fetch failed", err);
+          return [] as any[];
+        });
     } else {
       sheetPromise = fetchTextWithFallback(SHEET_URL)
         .then(async (res) => {
@@ -262,22 +289,14 @@ async function getRows(): Promise<any[]> {
           if (data && Array.isArray((data as any).data)) return (data as any).data;
           return [] as any[];
         })
-        .catch(() => [] as any[]);
+        .catch((err) => {
+          console.warn("generic fetch failed", err);
+          return [] as any[];
+        });
     }
   }
+
   const rows = await sheetPromise;
-  if (Array.isArray(rows) && rows.length === 0 && typeof window !== "undefined") {
-    try {
-      const resp = await fetch(`/api/sheet?sheet=${encodeURIComponent(SHEET_URL || "")}`);
-      if (resp.ok) {
-        const data = await resp.json();
-        if (Array.isArray(data) && data.length) {
-          sheetPromise = Promise.resolve(data as any[]);
-          return data as any[];
-        }
-      }
-    } catch {}
-  }
   return rows;
 }
 

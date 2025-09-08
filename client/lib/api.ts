@@ -547,7 +547,7 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
         powerDemandKw: { label: "Power Demand", value: Math.round(powerKw), unit: "kW" },
         co2TonsPerDay: { label: "CO₂ Emissions", value: Math.round(co2 * 100) / 100, unit: "t/day" },
         fuelTankLevelPct: { label: "Fuel Tank", value: Math.round(avgFuel * 10) / 10, unit: "%" },
-        co2ReductionYoYPct: { label: "CO�� YoY", value: 0, unit: "%" },
+        co2ReductionYoYPct: { label: "CO₂ YoY", value: 0, unit: "%" },
         energyEfficiencyKwhPerLiter: { label: "Efficiency", value: Math.round(eff * 100) / 100, unit: "kWh/L" },
         generatorLoadFactorPct: { label: "Load Factor", value: Math.round(avgLoad * 10) / 10, unit: "%" },
         runningVsStandbyHours: { runningHours: { label: "Running", value: 0, unit: "h/day" }, standbyHours: { label: "Standby", value: 0, unit: "h/day" } },
@@ -875,6 +875,9 @@ export async function fetchFuelGeoPoints(scope: HierarchyFilter = { level: "nati
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
     const out: Array<{ lat: number; lng: number; value: number }> = [];
+
+    const inKSA = (la: number, ln: number) => la >= 16 && la <= 33 && ln >= 34 && ln <= 56;
+
     for (const r of rows) {
       // fuel %
       const fuel = pickNumberFromRow(
@@ -889,30 +892,49 @@ export async function fetchFuelGeoPoints(scope: HierarchyFilter = { level: "nati
         ],
         [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
       );
-      // lat/lng with inference fallback
+
+      // lat/lng with inference + H/I fallback + KSA bounds swap
       let lat = toNumber(r["lat"] ?? r["latitude"] ?? r["Lat"]);
       let lng = toNumber(r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"]);
+
+      // prefer specific columns (H/I) if headers were blank and parser used col indices
+      const hNum = toNumber((r as any)["col7"] ?? (r as any)["H"]);
+      const iNum = toNumber((r as any)["col8"] ?? (r as any)["I"]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || (!lat && !lng)) {
+        if (hNum || iNum) {
+          // try both assignments to satisfy KSA bounds
+          const a1 = { lat: hNum, lng: iNum };
+          const a2 = { lat: iNum, lng: hNum };
+          if (inKSA(a1.lat, a1.lng)) {
+            lat = a1.lat;
+            lng = a1.lng;
+          } else if (inKSA(a2.lat, a2.lng)) {
+            lat = a2.lat;
+            lng = a2.lng;
+          } else {
+            lat = hNum;
+            lng = iNum;
+          }
+        }
+      }
       if ((!lat || !lng) && r) {
         const entries = Object.entries(r).filter(([, v]) => typeof v === "number" || (typeof v === "string" && v.trim() !== ""));
         const nums = entries.map(([k, v]) => ({ k, v: toNumber(v) }));
         const latCandidates = nums.filter((x) => x.v >= -90 && x.v <= 90);
         const lngCandidates = nums.filter((x) => x.v >= -180 && x.v <= 180);
-        // prefer columns named like col7/col8 etc (H & I) if present
-        const h = r["col7"]; // 0-indexed? our parser labels start at col0, so H -> col7
-        const i = r["col8"]; // I -> col8
-        const hNum = toNumber(h);
-        const iNum = toNumber(i);
-        if (hNum && iNum) {
-          // assume H=lat, I=lng (or vice-versa). Pick assignment that yields plausible KSA bounds
-          const asLatLng = Math.abs(hNum) <= 90 && Math.abs(iNum) <= 180 ? { lat: hNum, lng: iNum } : { lat: iNum, lng: hNum };
-          lat = asLatLng.lat;
-          lng = asLatLng.lng;
-        } else {
-          if (!lat && latCandidates.length) lat = latCandidates[0].v;
-          if (!lng && lngCandidates.length) lng = (lngCandidates.find((x) => Math.abs(x.v) > 40)?.v) || lngCandidates[0].v;
-        }
+        if (!lat && latCandidates.length) lat = latCandidates[0].v;
+        if (!lng && lngCandidates.length)
+          lng = (lngCandidates.find((x) => Math.abs(x.v) >= 34 && Math.abs(x.v) <= 56)?.v) || lngCandidates[0].v;
       }
-      if (Number.isFinite(lat) && Number.isFinite(lng) && (fuel || fuel === 0)) {
+
+      // final KSA swap check
+      if (Number.isFinite(lat) && Number.isFinite(lng) && !inKSA(lat, lng) && inKSA(lng, lat)) {
+        const t = lat;
+        lat = lng;
+        lng = t;
+      }
+
+      if (Number.isFinite(lat) && Number.isFinite(lng) && (fuel || fuel === 0) && inKSA(lat, lng)) {
         out.push({ lat, lng, value: fuel });
       }
     }

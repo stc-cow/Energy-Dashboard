@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const KSA_BOUNDS = L.latLngBounds(L.latLng(16, 34), L.latLng(33, 56));
+
 function HeatLayer({
   points,
 }: {
@@ -48,12 +50,7 @@ export default function HeatMap() {
     enabled: true,
   });
 
-  const bounds = useMemo(() => {
-    if (!points.length)
-      return L.latLngBounds(L.latLng(16, 34), L.latLng(32, 56)); // KSA approx
-    const b = L.latLngBounds(points.map((p) => [p.lat, p.lng]) as any);
-    return b.pad(0.2);
-  }, [points]);
+  const bounds = useMemo(() => KSA_BOUNDS, []);
 
   return (
     <Layout>
@@ -86,11 +83,15 @@ export default function HeatMap() {
           <MapContainer
             style={{ height: 600, width: "100%", background: "#ffffff" }}
             bounds={bounds}
+            maxBounds={KSA_BOUNDS}
+            maxBoundsViscosity={1.0}
             scrollWheelZoom={true}
+            worldCopyJump={false}
           >
             <TileLayer
               attribution='&copy; OpenStreetMap contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+              noWrap={true}
             />
             <HeatLayer points={points} />
           </MapContainer>

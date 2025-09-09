@@ -855,8 +855,8 @@ export async function fetchBreakdown(
       if (!siteMap.has(key))
         siteMap.set(key, { name: siteName || "Unknown", diesel: 0, energy: 0 });
       const m = siteMap.get(key)!;
-      const d = toNumber(r["dieselLitersPerDay"]);
-      const p = toNumber(r["powerDemandKw"]);
+      const d = getDieselLitersPerDay(r);
+      const p = getPowerDemandKw(r);
       m.diesel += d;
       m.energy += p * 24;
     }

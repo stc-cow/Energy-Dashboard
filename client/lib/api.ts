@@ -1191,14 +1191,14 @@ export async function fetchFuelGeoPoints(
       let lat = toNumber(r["lat"] ?? r["latitude"] ?? r["Lat"]);
       let lng = toNumber(r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"]);
 
-      // prefer specific columns (H/I) if headers were blank and parser used col indices
-      const hNum = toNumber((r as any)["col7"] ?? (r as any)["H"]);
-      const iNum = toNumber((r as any)["col8"] ?? (r as any)["I"]);
+      // prefer specific columns (L/M) if headers were blank and parser used col indices
+      const lNum = toNumber((r as any)["col11"] ?? (r as any)["L"]);
+      const mNum = toNumber((r as any)["col12"] ?? (r as any)["M"]);
       if (!Number.isFinite(lat) || !Number.isFinite(lng) || (!lat && !lng)) {
-        if (hNum || iNum) {
+        if (lNum || mNum) {
           // try both assignments to satisfy KSA bounds
-          const a1 = { lat: hNum, lng: iNum };
-          const a2 = { lat: iNum, lng: hNum };
+          const a1 = { lat: lNum, lng: mNum };
+          const a2 = { lat: mNum, lng: lNum };
           if (inKSA(a1.lat, a1.lng)) {
             lat = a1.lat;
             lng = a1.lng;
@@ -1206,8 +1206,8 @@ export async function fetchFuelGeoPoints(
             lat = a2.lat;
             lng = a2.lng;
           } else {
-            lat = hNum;
-            lng = iNum;
+            lat = lNum;
+            lng = mNum;
           }
         }
       }

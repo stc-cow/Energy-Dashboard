@@ -392,7 +392,7 @@ function getDistrictName(r: any): string {
       "neighborhood",
       "Subdistrict",
       "subdistrict",
-      "col6",
+      "col4",
     ],
     [/district/i, /neigh/i, /subdistrict/i],
   );

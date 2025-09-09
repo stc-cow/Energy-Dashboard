@@ -1152,6 +1152,7 @@ export async function fetchAccumulations(
           "Accum CO2 Emissions",
           "CO2Accumulation",
           "co2_accumulation",
+          "col28",
         ]),
       0,
     );

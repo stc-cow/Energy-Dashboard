@@ -622,12 +622,9 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
 
-    const diesel = rows.reduce(
-      (s, r) => s + toNumber(r["dieselLitersPerDay"]),
-      0,
-    );
-    const powerKw = rows.reduce((s, r) => s + toNumber(r["powerDemandKw"]), 0);
-    const co2 = rows.reduce((s, r) => s + toNumber(r["co2Tons"]), 0);
+    const diesel = rows.reduce((s, r) => s + getDieselLitersPerDay(r), 0);
+    const powerKw = rows.reduce((s, r) => s + getPowerDemandKw(r), 0);
+    const co2 = rows.reduce((s, r) => s + getCo2TonsPerDay(r), 0);
 
     const fuelLevels = rows
       .map((r) =>

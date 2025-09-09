@@ -436,13 +436,7 @@ function getDieselLitersPerDay(r: any): number {
 function getPowerDemandKw(r: any): number {
   return pickNumberFromRow(
     r,
-    [
-      "powerDemandKw",
-      "Power Demand",
-      "Power",
-      "powerdemandkw",
-      "col22",
-    ],
+    ["powerDemandKw", "Power Demand", "Power", "powerdemandkw", "col22"],
     [/power.*(demand|kw)/i],
   );
 }
@@ -494,14 +488,7 @@ function getGeneratorLoadFactorPct(r: any): number {
 function getCowStatus(r: any): string {
   return pickStringFromRow(
     r,
-    [
-      "COWSTATUS",
-      "CowStatus",
-      "COW Status",
-      "Status",
-      "StatusCOW",
-      "col9",
-    ],
+    ["COWSTATUS", "CowStatus", "COW Status", "Status", "StatusCOW", "col9"],
     [/cow.*status/i, /^status$/i],
   );
 }

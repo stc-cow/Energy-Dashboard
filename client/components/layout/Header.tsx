@@ -36,7 +36,7 @@ export default function Header() {
                   : "text-white/80 hover:text-white"
               }
             >
-              Heat Map
+              COW Distribution Heat Map
             </NavLink>
           </nav>
           <a

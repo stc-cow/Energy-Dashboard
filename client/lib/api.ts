@@ -903,7 +903,7 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       const siteId = slug(siteName);
       const regionName = getRegionName(r) || "Unknown";
       const regionId = slug(regionName) || "unknown";
-      const diesel = toNumber(r["dieselLitersPerDay"]);
+      const diesel = getDieselLitersPerDay(r);
       let ts = Date.now();
       if (dateKey) {
         const d = new Date(r[dateKey]);

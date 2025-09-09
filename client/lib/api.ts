@@ -1004,6 +1004,7 @@ export async function fetchAlerts(
             "Fuel Level %",
             "fuel_level_pct",
             "fuel_tank_level_pct",
+            "col24",
           ],
           [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
         );

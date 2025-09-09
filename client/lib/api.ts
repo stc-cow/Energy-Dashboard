@@ -514,6 +514,15 @@ function buildHierarchy(rows: any[]): HierarchyResponse {
     let lat = toNumber(r["lat"] ?? r["latitude"] ?? r["Lat"]);
     let lng = toNumber(r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"]);
     if (!lat || !lng) {
+      // prefer explicit L/M column positions if headers were blank
+      const lNum = toNumber((r as any)["col11"] ?? (r as any)["L"]);
+      const mNum = toNumber((r as any)["col12"] ?? (r as any)["M"]);
+      if (lNum || mNum) {
+        lat = lNum || lat;
+        lng = mNum || lng;
+      }
+    }
+    if (!lat || !lng) {
       // try to infer from numeric columns range
       const nums = keys.map((k) => ({ k, v: toNumber((r as any)[k]) }));
       const candLat = nums.find(

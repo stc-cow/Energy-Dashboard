@@ -965,9 +965,9 @@ export async function fetchBenchmark(
       if (!map.has(key))
         map.set(key, { name: siteName, diesel: 0, power: 0, co2: 0 });
       const m = map.get(key)!;
-      m.diesel += toNumber(r["dieselLitersPerDay"]);
-      m.power += toNumber(r["powerDemandKw"]);
-      m.co2 += toNumber(r["co2Tons"]);
+      m.diesel += getDieselLitersPerDay(r);
+      m.power += getPowerDemandKw(r);
+      m.co2 += getCo2TonsPerDay(r);
     }
     return {
       scope,

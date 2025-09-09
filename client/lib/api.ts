@@ -627,20 +627,7 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
     const co2 = rows.reduce((s, r) => s + getCo2TonsPerDay(r), 0);
 
     const fuelLevels = rows
-      .map((r) =>
-        pickNumberFromRow(
-          r,
-          [
-            "fuelTankLevelPct",
-            "Fuel Tank Level %",
-            "Fuel Level %",
-            "fuel_level_pct",
-            "fuel_tank_level_pct",
-            "fuellevel%",
-          ],
-          [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
-        ),
-      )
+      .map((r) => getFuelTankLevelPct(r))
       .filter((n) => n > 0 || n === 0);
     const avgFuel = fuelLevels.length
       ? fuelLevels.reduce((a, b) => a + b, 0) / fuelLevels.length

@@ -419,6 +419,78 @@ function getDateKey(rows: any[]): string | null {
 }
 
 // Build hierarchy from rows
+// KPI helpers to resolve values from various headers and explicit column positions
+function getDieselLitersPerDay(r: any): number {
+  return pickNumberFromRow(
+    r,
+    [
+      "dieselLitersPerDay",
+      "Diesel Consumption",
+      "Diesel",
+      "diesellitersperday",
+      "col21",
+    ],
+    [/diesel/i],
+  );
+}
+function getPowerDemandKw(r: any): number {
+  return pickNumberFromRow(
+    r,
+    [
+      "powerDemandKw",
+      "Power Demand",
+      "Power",
+      "powerdemandkw",
+      "col22",
+    ],
+    [/power.*(demand|kw)/i],
+  );
+}
+function getCo2TonsPerDay(r: any): number {
+  return pickNumberFromRow(
+    r,
+    [
+      "co2Tons",
+      "Daily CO₂ Emissions",
+      "Daily CO2 Emissions",
+      "CO2 Emissions",
+      "co2tonsperday",
+      "col23",
+    ],
+    [/co2|carbon/i],
+  );
+}
+function getFuelTankLevelPct(r: any): number {
+  return pickNumberFromRow(
+    r,
+    [
+      "fuelTankLevelPct",
+      "Fuel Tank Level %",
+      "Fuel Level %",
+      "fuel_level_pct",
+      "fuel_tank_level_pct",
+      "fuellevel%",
+      "col24",
+    ],
+    [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
+  );
+}
+function getGeneratorLoadFactorPct(r: any): number {
+  return pickNumberFromRow(
+    r,
+    [
+      "generatorLoadFactorPct",
+      "Load Factor %",
+      "Generator Load Factor %",
+      "load_factor_pct",
+      "gen_load_factor_pct",
+      "generator_load_factor",
+      "col25",
+    ],
+    [/load.*(factor|%)/i, /gen.*load/i],
+  );
+}
+
 function buildHierarchy(rows: any[]): HierarchyResponse {
   const regionMap = new Map<string, { id: string; name: string }>();
   const cityMap = new Map<

@@ -1187,7 +1187,7 @@ export async function fetchFuelGeoPoints(
         [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
       );
 
-      // lat/lng with inference + H/I fallback + KSA bounds swap
+      // lat/lng with inference + L/M fallback + KSA bounds swap
       let lat = toNumber(r["lat"] ?? r["latitude"] ?? r["Lat"]);
       let lng = toNumber(r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"]);
 

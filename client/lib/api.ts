@@ -707,7 +707,7 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
           unit: "kW",
         },
         co2TonsPerDay: {
-          label: "CO₂ Emissions",
+          label: "CO�� Emissions",
           value: Math.round(co2 * 100) / 100,
           unit: "t/day",
         },
@@ -1186,6 +1186,7 @@ export async function fetchFuelGeoPoints(
           "fuel_level_pct",
           "fuel_tank_level_pct",
           "fuellevel%",
+          "col24",
         ],
         [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
       );

@@ -634,20 +634,7 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
       : 0;
 
     const genLoads = rows
-      .map((r) =>
-        pickNumberFromRow(
-          r,
-          [
-            "generatorLoadFactorPct",
-            "Load Factor %",
-            "Generator Load Factor %",
-            "load_factor_pct",
-            "gen_load_factor_pct",
-            "generator_load_factor",
-          ],
-          [/load.*(factor|%)/i, /gen.*load/i],
-        ),
-      )
+      .map((r) => getGeneratorLoadFactorPct(r))
       .filter((n) => n > 0 || n === 0);
     const avgLoad = genLoads.length
       ? genLoads.reduce((a, b) => a + b, 0) / genLoads.length

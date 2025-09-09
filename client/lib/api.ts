@@ -826,8 +826,8 @@ export async function fetchBreakdown(
         if (!map.has(key))
           map.set(key, { name: regionName || "Unknown", diesel: 0, energy: 0 });
         const m = map.get(key)!;
-        const d = toNumber(r["dieselLitersPerDay"]);
-        const p = toNumber(r["powerDemandKw"]);
+        const d = getDieselLitersPerDay(r);
+        const p = getPowerDemandKw(r);
         m.diesel += d;
         m.energy += p * 24;
       }

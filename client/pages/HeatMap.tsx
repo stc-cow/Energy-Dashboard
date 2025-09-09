@@ -97,8 +97,8 @@ export default function HeatMap() {
         </div>
         {points.length === 0 && (
           <div className="text-sm text-amber-300">
-            No coordinates found in columns H & I. Please ensure the sheet has
-            Lat in H and Lng in I for each row within KSA.
+            No coordinates found in columns L & M. Please ensure the sheet has
+            Lat in L and Lng in M for each row within KSA.
           </div>
         )}
       </div>

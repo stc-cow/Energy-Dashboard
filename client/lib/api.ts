@@ -658,19 +658,9 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
       ).trim();
       if (!siteName) continue;
       const siteId = slug(siteName);
-      const d = toNumber(r["dieselLitersPerDay"]);
-      const c = toNumber(r["co2Tons"]);
-      const f = pickNumberFromRow(
-        r,
-        [
-          "fuelTankLevelPct",
-          "Fuel Tank Level %",
-          "Fuel Level %",
-          "fuel_level_pct",
-          "fuel_tank_level_pct",
-        ],
-        [/fuel.*(level|%)/i, /tank.*(fuel|level)/i],
-      );
+      const d = getDieselLitersPerDay(r);
+      const c = getCo2TonsPerDay(r);
+      const f = getFuelTankLevelPct(r);
       if (!siteAgg.has(siteId))
         siteAgg.set(siteId, { siteId, siteName, diesel: 0, co2: 0, fuel: [] });
       const a = siteAgg.get(siteId)!;

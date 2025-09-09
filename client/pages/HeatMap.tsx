@@ -84,13 +84,13 @@ export default function HeatMap() {
             </Button>
           </div>
           <MapContainer
-            style={{ height: 600, width: "100%" }}
+            style={{ height: 600, width: "100%", background: "#ffffff" }}
             bounds={bounds}
             scrollWheelZoom={true}
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; OpenStreetMap contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             />
             <HeatLayer points={points} />
           </MapContainer>

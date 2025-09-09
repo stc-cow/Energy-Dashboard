@@ -1137,6 +1137,7 @@ export async function fetchAccumulations(
           "Accum_Fuel_Consumption",
           "FuelLitersAccumulation",
           "fuel_liters_accumulation",
+          "col27",
         ]),
       0,
     );

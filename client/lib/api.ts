@@ -491,6 +491,21 @@ function getGeneratorLoadFactorPct(r: any): number {
   );
 }
 
+function getCowStatus(r: any): string {
+  return pickStringFromRow(
+    r,
+    [
+      "COWSTATUS",
+      "CowStatus",
+      "COW Status",
+      "Status",
+      "StatusCOW",
+      "col9",
+    ],
+    [/cow.*status/i, /^status$/i],
+  );
+}
+
 function buildHierarchy(rows: any[]): HierarchyResponse {
   const regionMap = new Map<string, { id: string; name: string }>();
   const cityMap = new Map<

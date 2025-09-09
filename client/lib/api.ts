@@ -775,9 +775,9 @@ export async function fetchTimeSeries(
       if (!buckets.has(key))
         buckets.set(key, { diesel: 0, co2: 0, powerKw: 0 });
       const b = buckets.get(key)!;
-      b.diesel += toNumber(r["dieselLitersPerDay"]);
-      b.co2 += toNumber(r["co2Tons"]);
-      b.powerKw += toNumber(r["powerDemandKw"]);
+      b.diesel += getDieselLitersPerDay(r);
+      b.co2 += getCo2TonsPerDay(r);
+      b.powerKw += getPowerDemandKw(r);
     }
 
     const from = q.from ? new Date(q.from) : null;

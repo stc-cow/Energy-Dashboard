@@ -375,6 +375,7 @@ function getSiteName(r: any): string {
       "Site ID",
       "siteId",
       "site_id",
+      "col1",
     ],
     [/site/i],
   );

@@ -340,6 +340,7 @@ function getRegionName(r: any): string {
       "province",
       "Area",
       "area",
+      "col3",
     ],
     [/region/i, /province/i, /area/i],
   );

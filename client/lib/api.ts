@@ -918,18 +918,23 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       const siteId = slug(siteName);
       const regionName = getRegionName(r) || "Unknown";
       const regionId = slug(regionName) || "unknown";
+      const status = getCowStatus(r);
       const diesel = getDieselLitersPerDay(r);
       let ts = Date.now();
       if (dateKey) {
         const d = new Date(r[dateKey]);
         if (!isNaN(d.getTime())) ts = d.getTime();
       }
+      const s = status.trim().toUpperCase();
+      const isOn = /\bON[-\s]?AIR\b/.test(s) || s === "ON";
+      const isOff = /\bOFF[-\s]?AIR\b/.test(s) || s === "OFF";
+      const onAirFlag = s ? (isOn ? 1 : 0) : diesel > 0 ? 1 : 0;
       const rec: SiteRec = {
         siteId,
         siteName,
         regionId,
         regionName,
-        onAir: diesel > 0 ? 1 : 0,
+        onAir: onAirFlag,
         ts,
       };
       const prev = sites.get(siteId);

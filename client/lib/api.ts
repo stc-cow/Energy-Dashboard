@@ -927,7 +927,6 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       }
       const s = status.trim().toUpperCase();
       const isOn = /\bON[-\s]?AIR\b/.test(s) || s === "ON";
-      const isOff = /\bOFF[-\s]?AIR\b/.test(s) || s === "OFF";
       const onAirFlag = s ? (isOn ? 1 : 0) : diesel > 0 ? 1 : 0;
       const rec: SiteRec = {
         siteId,

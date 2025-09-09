@@ -1122,6 +1122,7 @@ export async function fetchAccumulations(
           "PowerKwhAccumulation",
           "Power Kwh Accumulation",
           "power_kwh_accumulation",
+          "col26",
         ]),
       0,
     );

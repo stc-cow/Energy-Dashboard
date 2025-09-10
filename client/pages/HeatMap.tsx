@@ -14,28 +14,29 @@ const KSA_BOUNDS = L.latLngBounds(L.latLng(16, 34), L.latLng(33, 56));
 
 function HeatLayer({
   points,
+  gradient,
+  intensity = 0.8,
 }: {
-  points: Array<{ lat: number; lng: number; value: number }>;
+  points: Array<{ lat: number; lng: number; value?: number }>;
+  gradient: Record<number, string>;
+  intensity?: number;
 }) {
   const map = useMap();
   useEffect(() => {
     if (!points.length) return;
-    const heatPoints: any[] = points.map((p) => [
-      p.lat,
-      p.lng,
-      Math.max(0.01, (100 - p.value) / 100),
-    ]);
+    const heatPoints: any[] = points.map((p) => [p.lat, p.lng, p.value ?? intensity]);
     const layer = (L as any).heatLayer(heatPoints, {
       radius: 20,
       blur: 25,
       maxZoom: 11,
       minOpacity: 0.3,
+      gradient,
     });
     layer.addTo(map);
     return () => {
       layer.remove();
     };
-  }, [map, points]);
+  }, [map, points, gradient, intensity]);
   return null;
 }
 

@@ -1276,18 +1276,35 @@ export async function fetchCowStatusGeoPoints(
     const onAir: Array<{ lat: number; lng: number; value: number }> = [];
     const offAir: Array<{ lat: number; lng: number; value: number }> = [];
 
-    const inKSA = (la: number, ln: number) => la >= 16 && la <= 33 && ln >= 34 && ln <= 56;
+    const inKSA = (la: number, ln: number) =>
+      la >= 16 && la <= 33 && ln >= 34 && ln <= 56;
 
     for (const r of rows) {
       const status = getCowStatus(r).trim().toUpperCase();
       const isOn = /\bON[-\s]?AIR\b/.test(status) || status === "ON";
       const isOff = /\bOFF[-\s]?AIR\b/.test(status) || status === "OFF";
 
-      let lat = toNumber((r as any)["col11"] ?? (r as any)["L"] ?? r["lat"] ?? r["latitude"] ?? r["Lat"]);
-      let lng = toNumber((r as any)["col12"] ?? (r as any)["M"] ?? r["lng"] ?? r["longitude"] ?? r["Lon"] ?? r["long"]);
+      let lat = toNumber(
+        (r as any)["col11"] ??
+          (r as any)["L"] ??
+          r["lat"] ??
+          r["latitude"] ??
+          r["Lat"],
+      );
+      let lng = toNumber(
+        (r as any)["col12"] ??
+          (r as any)["M"] ??
+          r["lng"] ??
+          r["longitude"] ??
+          r["Lon"] ??
+          r["long"],
+      );
 
       if ((!lat || !lng) && r) {
-        const entries = Object.entries(r).filter(([, v]) => typeof v === "number" || (typeof v === "string" && v.trim() !== ""));
+        const entries = Object.entries(r).filter(
+          ([, v]) =>
+            typeof v === "number" || (typeof v === "string" && v.trim() !== ""),
+        );
         const nums = entries.map(([k, v]) => ({ k, v: toNumber(v) }));
         const latCandidates = nums.filter((x) => x.v >= -90 && x.v <= 90);
         const lngCandidates = nums.filter((x) => x.v >= -180 && x.v <= 180);
@@ -1295,7 +1312,12 @@ export async function fetchCowStatusGeoPoints(
         if (!lng && lngCandidates.length) lng = lngCandidates[0].v;
       }
 
-      if (Number.isFinite(lat) && Number.isFinite(lng) && !inKSA(lat, lng) && inKSA(lng, lat)) {
+      if (
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        !inKSA(lat, lng) &&
+        inKSA(lng, lat)
+      ) {
         const t = lat;
         lat = lng;
         lng = t;

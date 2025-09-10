@@ -24,7 +24,11 @@ function HeatLayer({
   const map = useMap();
   useEffect(() => {
     if (!points.length) return;
-    const heatPoints: any[] = points.map((p) => [p.lat, p.lng, p.value ?? intensity]);
+    const heatPoints: any[] = points.map((p) => [
+      p.lat,
+      p.lng,
+      p.value ?? intensity,
+    ]);
     const layer = (L as any).heatLayer(heatPoints, {
       radius: 20,
       blur: 25,
@@ -106,7 +110,7 @@ export default function HeatMap() {
             />
           </MapContainer>
         </div>
-        {(statusPoints.onAir.length + statusPoints.offAir.length === 0) && (
+        {statusPoints.onAir.length + statusPoints.offAir.length === 0 && (
           <div className="text-sm text-amber-300">
             No coordinates found in columns L & M. Please ensure the sheet has
             Lat in L and Lng in M, and COWSTATUS (ON-AIR/OFF-AIR) is present.

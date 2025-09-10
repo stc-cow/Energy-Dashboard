@@ -45,9 +45,9 @@ export default function HeatMap() {
     queryKey: ["hierarchy"],
     queryFn: fetchHierarchy,
   });
-  const { data: points = [] } = useQuery({
-    queryKey: ["fuel-geo"],
-    queryFn: () => fetchFuelGeoPoints({ level: "national" }),
+  const { data: statusPoints = { onAir: [], offAir: [] } } = useQuery({
+    queryKey: ["cow-status-geo"],
+    queryFn: () => fetchCowStatusGeoPoints({ level: "national" }),
     enabled: true,
   });
 

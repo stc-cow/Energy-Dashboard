@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFuelGeoPoints, fetchHierarchy } from "@/lib/api";
+import { fetchCowStatusGeoPoints, fetchHierarchy } from "@/lib/api";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";

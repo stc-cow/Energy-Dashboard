@@ -112,19 +112,21 @@ export default function Index() {
           aria-label="COW status ticker"
         >
           <div className="ticker">
-            <span>
-              {(() => {
-                const map = new Map<string, number>();
-                for (const s of cow?.byStatus ?? []) map.set(s.status, s.count);
-                const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
-                const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
-                const parts = [
-                  `Total COWs: ${total}`,
-                  ...entries.map(([k, v]) => `${k}: ${v}`),
-                ];
-                return parts.join("   |   ");
-              })()}
-            </span>
+            {(() => {
+              const map = new Map<string, number>();
+              for (const s of cow?.byStatus ?? []) map.set(s.status, s.count);
+              const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
+              const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+              const text = [`Total COWs: ${total}`, ...entries.map(([k, v]) => `${k}: ${v}`)].join("   |   ");
+              return (
+                <>
+                  <span className="ticker__item">{text}</span>
+                  <span className="ticker__item" aria-hidden>
+                    {text}
+                  </span>
+                </>
+              );
+            })()}
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFuelGeoPoints, fetchHierarchy } from "@/lib/api";
+import { fetchCowStatusGeoPoints, fetchHierarchy } from "@/lib/api";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -14,8 +14,12 @@ const KSA_BOUNDS = L.latLngBounds(L.latLng(16, 34), L.latLng(33, 56));
 
 function HeatLayer({
   points,
+  gradient,
+  intensity = 0.8,
 }: {
-  points: Array<{ lat: number; lng: number; value: number }>;
+  points: Array<{ lat: number; lng: number; value?: number }>;
+  gradient: Record<number, string>;
+  intensity?: number;
 }) {
   const map = useMap();
   useEffect(() => {
@@ -23,19 +27,20 @@ function HeatLayer({
     const heatPoints: any[] = points.map((p) => [
       p.lat,
       p.lng,
-      Math.max(0.01, (100 - p.value) / 100),
+      p.value ?? intensity,
     ]);
     const layer = (L as any).heatLayer(heatPoints, {
       radius: 20,
       blur: 25,
       maxZoom: 11,
       minOpacity: 0.3,
+      gradient,
     });
     layer.addTo(map);
     return () => {
       layer.remove();
     };
-  }, [map, points]);
+  }, [map, points, gradient, intensity]);
   return null;
 }
 
@@ -44,9 +49,9 @@ export default function HeatMap() {
     queryKey: ["hierarchy"],
     queryFn: fetchHierarchy,
   });
-  const { data: points = [] } = useQuery({
-    queryKey: ["fuel-geo"],
-    queryFn: () => fetchFuelGeoPoints({ level: "national" }),
+  const { data: statusPoints = { onAir: [], offAir: [] } } = useQuery({
+    queryKey: ["cow-status-geo"],
+    queryFn: () => fetchCowStatusGeoPoints({ level: "national" }),
     enabled: true,
   });
 
@@ -93,13 +98,22 @@ export default function HeatMap() {
               url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
               noWrap={true}
             />
-            <HeatLayer points={points} />
+            <HeatLayer
+              points={statusPoints.onAir}
+              gradient={{ 0.4: "#a7f3d0", 0.7: "#10b981", 1: "#065f46" }}
+              intensity={0.8}
+            />
+            <HeatLayer
+              points={statusPoints.offAir}
+              gradient={{ 0.4: "#fecaca", 0.7: "#ef4444", 1: "#7f1d1d" }}
+              intensity={0.8}
+            />
           </MapContainer>
         </div>
-        {points.length === 0 && (
+        {statusPoints.onAir.length + statusPoints.offAir.length === 0 && (
           <div className="text-sm text-amber-300">
             No coordinates found in columns L & M. Please ensure the sheet has
-            Lat in L and Lng in M for each row within KSA.
+            Lat in L and Lng in M, and COWSTATUS (ON-AIR/OFF-AIR) is present.
           </div>
         )}
       </div>

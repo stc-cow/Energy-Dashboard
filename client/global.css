@@ -47,6 +47,12 @@
   }
 }
 
+.top-bar {
+  padding: 6px 16px;
+  letter-spacing: 1.2px;
+  word-spacing: 8px;
+}
+
 @layer base {
   /**
    * Tailwind CSS theme

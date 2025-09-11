@@ -119,9 +119,12 @@ export default function Index() {
                 const map = new Map<string, number>();
                 for (const s of cow?.byStatus ?? []) map.set(s.status, s.count);
                 const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
-                const onAir = map.get("ON-AIR") ?? 0;
-                const inProg = map.get("In Progress") ?? 0;
-                return `Total COWs: ${total} | ON-AIR: ${onAir} | In Progress: ${inProg}`;
+                const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+                const parts = [
+                  `Total COWs: ${total}`,
+                  ...entries.map(([k, v]) => `${k}: ${v}`),
+                ];
+                return parts.join("   |   ");
               })()}
             </span>
           </div>

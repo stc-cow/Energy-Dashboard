@@ -134,12 +134,33 @@ export default function Index() {
                   marginBottom: -2,
                 }}
               >
-                <div className="text-sm text-white/80 font-semibold">
+                <div className="text-sm text-white/80 font-semibold mb-2">
                   ON-AIR COWs
                 </div>
-                <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
-                  {(cow?.onAir ?? 0).toLocaleString()}
-                </div>
+                {(() => {
+                  const on = cow?.onAir ?? 0;
+                  const off = cow?.offAir ?? 0;
+                  const total = Math.max(1, on + off);
+                  const pct = Math.round((on / total) * 100);
+                  return (
+                    <div className="w-full h-8 rounded-md overflow-hidden border border-white/10 bg-white/10 relative">
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${pct}%`,
+                          backgroundImage:
+                            "linear-gradient(45deg, rgba(255,255,255,.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 75%, transparent 75%, transparent), linear-gradient(to right, #16a34a, #22c55e)",
+                          backgroundSize: "20px 20px, 100% 100%",
+                          animation: "bar-move 1.5s linear infinite",
+                          transition: "width 600ms ease",
+                        }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
+                        {on.toLocaleString()}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               <div
                 className="rounded-lg"
@@ -148,12 +169,33 @@ export default function Index() {
                   padding: "16px 16px 19px",
                 }}
               >
-                <div className="text-sm text-white/80 font-semibold">
+                <div className="text-sm text-white/80 font-semibold mb-2">
                   OFF-AIR COWs
                 </div>
-                <div className="mt-1 text-3xl font-extrabold tabular-nums text-white">
-                  {(cow?.offAir ?? 0).toLocaleString()}
-                </div>
+                {(() => {
+                  const on = cow?.onAir ?? 0;
+                  const off = cow?.offAir ?? 0;
+                  const total = Math.max(1, on + off);
+                  const pct = Math.round((off / total) * 100);
+                  return (
+                    <div className="w-full h-8 rounded-md overflow-hidden border border-white/10 bg-white/10 relative">
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${pct}%`,
+                          backgroundImage:
+                            "linear-gradient(45deg, rgba(255,255,255,.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 75%, transparent 75%, transparent), linear-gradient(to right, #dc2626, #ef4444)",
+                          backgroundSize: "20px 20px, 100% 100%",
+                          animation: "bar-move 1.5s linear infinite",
+                          transition: "width 600ms ease",
+                        }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
+                        {off.toLocaleString()}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               <div
                 className="rounded-lg p-4"

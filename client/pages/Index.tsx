@@ -116,8 +116,13 @@ export default function Index() {
               const map = new Map<string, number>();
               for (const s of cow?.byStatus ?? []) map.set(s.status, s.count);
               const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
-              const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
-              const text = [`Total COWs: ${total}`, ...entries.map(([k, v]) => `${k}: ${v}`)].join("   |   ");
+              const entries = Array.from(map.entries()).sort(
+                (a, b) => b[1] - a[1],
+              );
+              const text = [
+                `Total COWs: ${total}`,
+                ...entries.map(([k, v]) => `${k}: ${v}`),
+              ].join("   |   ");
               return (
                 <>
                   <span className="ticker__item">{text}</span>

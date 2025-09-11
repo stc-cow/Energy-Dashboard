@@ -38,10 +38,16 @@
   color: #00ff00;
   display: inline-block;
 }
-.ticker__item { padding-right: 4rem; }
+.ticker__item {
+  padding-right: 4rem;
+}
 @keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .top-bar {

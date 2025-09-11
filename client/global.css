@@ -27,7 +27,8 @@
   border-bottom: 2px solid #00ff00;
 }
 .ticker {
-  display: inline-block;
+  display: flex;
+  width: max-content;
   white-space: nowrap;
   animation: ticker-scroll 18s linear infinite;
 }
@@ -35,16 +36,12 @@
   font-size: 16px;
   font-weight: 700;
   color: #00ff00;
-  padding-left: 100%;
   display: inline-block;
 }
+.ticker__item { padding-right: 4rem; }
 @keyframes ticker-scroll {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(-100%);
-  }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 .top-bar {

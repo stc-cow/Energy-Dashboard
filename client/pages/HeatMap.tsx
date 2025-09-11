@@ -53,13 +53,17 @@ export default function HeatMap() {
     enabled: true,
   });
 
+  const combinedPoints = useMemo(
+    () => [...(statusPoints.onAir || []), ...(statusPoints.offAir || [])],
+    [statusPoints],
+  );
   const bounds = useMemo(() => {
-    const pts = [...(statusPoints.onAir || []), ...(statusPoints.offAir || [])];
+    const pts = combinedPoints;
     if (!pts.length)
       return L.latLngBounds(L.latLng(16, 34), L.latLng(32, 56));
     const b = L.latLngBounds(pts.map((p) => [p.lat, p.lng]) as any);
     return b.pad(0.2);
-  }, [statusPoints]);
+  }, [combinedPoints]);
 
   return (
     <Layout>
@@ -99,21 +103,16 @@ export default function HeatMap() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <HeatLayer
-              points={statusPoints.onAir}
-              gradient={{ 0.4: "#a7f3d0", 0.7: "#10b981", 1: "#065f46" }}
-              intensity={0.8}
-            />
-            <HeatLayer
-              points={statusPoints.offAir}
-              gradient={{ 0.4: "#fecaca", 0.7: "#ef4444", 1: "#7f1d1d" }}
-              intensity={0.8}
+              points={combinedPoints}
+              gradient={{ 0.2: "#ffffb2", 0.4: "#ffe08a", 0.6: "#ffb347", 0.8: "#ff7043", 1: "#ffffff" }}
+              intensity={1}
             />
           </MapContainer>
         </div>
-        {statusPoints.onAir.length + statusPoints.offAir.length === 0 && (
+        {combinedPoints.length === 0 && (
           <div className="text-sm text-amber-300">
-            No coordinates found in columns H & I. Please ensure the sheet has
-            Lat in H and Lng in I for each row within KSA.
+            No coordinates found in columns L & M. Please ensure the sheet has
+            Lat in L and Lng in M for each row within KSA.
           </div>
         )}
       </div>

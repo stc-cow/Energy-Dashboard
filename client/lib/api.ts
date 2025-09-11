@@ -104,7 +104,7 @@ function getSheetUrl(): string | null {
     urlParam ||
     serverEnvUrl ||
     envUrl ||
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVK9dJbNIvs70hRs9wlCQHoqLoD-VXVv2IgmgszmcOg7Yc0knG0iVYPtbxL2vPEQ/pub?gid=1149576218&single=true&output=csv"
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv"
   );
 }
 const SHEET_URL = getSheetUrl();

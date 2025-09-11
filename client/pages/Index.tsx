@@ -155,16 +155,15 @@ export default function Index() {
             style={{ padding: "32px 32px 20px", marginBottom: 20 }}
           >
             <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">
-              COWs Status (ON-AIR / OFF-AIR)
+              <p>
+                <strong>Regional breakdown</strong>
+              </p>
             </div>
             <div className="grid grid-cols-1 items-start">
               <div
                 className="rounded-lg p-4"
                 style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
               >
-                <div className="text-sm text-white/80 font-semibold mb-1">
-                  Regional breakdown
-                </div>
                 <div
                   className="text-sm text-white/80 overflow-auto"
                   style={{ maxHeight: 140 }}

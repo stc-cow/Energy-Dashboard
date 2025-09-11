@@ -93,6 +93,8 @@ export default function Index() {
     queryKey: ["cowstats", scope],
     queryFn: () => fetchCowStats(scope),
     enabled: !!hierarchy,
+    refetchInterval: 60000,
+    refetchIntervalInBackground: true,
   });
 
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);

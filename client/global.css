@@ -10,6 +10,31 @@
   100% { background-position: 20px 0, 0 0; }
 }
 
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  background: #000000;
+  padding: 8px 0;
+  border-top: 2px solid #00ff00;
+  border-bottom: 2px solid #00ff00;
+}
+.ticker {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker-scroll 18s linear infinite;
+}
+.ticker span {
+  font-size: 16px;
+  font-weight: 700;
+  color: #00ff00;
+  padding-left: 100%;
+  display: inline-block;
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
+}
+
 @layer base {
   /**
    * Tailwind CSS theme

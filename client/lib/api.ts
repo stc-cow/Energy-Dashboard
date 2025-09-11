@@ -939,7 +939,7 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       if (/\bOFF[-\s]?AIR\b/.test(s) || s === "OFF") return "OFF-AIR";
       if (/BURN/.test(s)) return "Burned";
       if (/DAMAG/.test(s)) return "Damage";
-      if (/IN\s*PROG|IN\s*PRE/.test(s)) return "In Pregress";
+      if (/IN\s*PROG|IN\s*PRE/.test(s)) return "In Progress";
       if (/REPAE|REPEAT/.test(s)) return "Repaeter";
       if (/STOLEN/.test(s)) return "Stolen";
       return s || "Other";

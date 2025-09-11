@@ -109,7 +109,10 @@ export default function Index() {
         </div>
 
         {/* Status ticker */}
-        <div className="ticker-wrap print:hidden" aria-label="COW status ticker">
+        <div
+          className="ticker-wrap print:hidden"
+          aria-label="COW status ticker"
+        >
           <div className="ticker">
             <span>
               {(() => {
@@ -167,7 +170,8 @@ export default function Index() {
                 <div className="text-sm text-white/80">
                   {(() => {
                     const items = cow?.byRegion ?? [];
-                    const total = items.reduce((s, x) => s + (x.count || 0), 0) || 1;
+                    const total =
+                      items.reduce((s, x) => s + (x.count || 0), 0) || 1;
                     return (
                       <div className="flex items-stretch gap-3">
                         {items.map((r) => {
@@ -188,7 +192,8 @@ export default function Index() {
                                 }}
                               />
                               <div className="absolute inset-0 flex items-center justify-center text-white font-semibold px-2 whitespace-nowrap">
-                                {(r.regionName || "Unknown").toUpperCase()} {count.toLocaleString?.() ?? count} ({pct}%)
+                                {(r.regionName || "Unknown").toUpperCase()}{" "}
+                                {count.toLocaleString?.() ?? count} ({pct}%)
                               </div>
                             </div>
                           );

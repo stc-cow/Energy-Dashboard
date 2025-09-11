@@ -6,8 +6,16 @@
 @tailwind utilities;
 
 @keyframes bar-move {
-  0% { background-position: 0 0, 0 0; }
-  100% { background-position: 20px 0, 0 0; }
+  0% {
+    background-position:
+      0 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      20px 0,
+      0 0;
+  }
 }
 
 .ticker-wrap {
@@ -31,8 +39,12 @@
   display: inline-block;
 }
 @keyframes ticker-scroll {
-  from { transform: translateX(100%); }
-  to { transform: translateX(-100%); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }
 
 @layer base {

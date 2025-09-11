@@ -934,7 +934,9 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
 
     // Status breakdown
     function normalizeCowStatusLabel(raw: string): string {
-      const s = String(raw || "").trim().toUpperCase();
+      const s = String(raw || "")
+        .trim()
+        .toUpperCase();
       if (/\bON[-\s]?AIR\b/.test(s) || s === "ON") return "ON-AIR";
       if (/\bOFF[-\s]?AIR\b/.test(s) || s === "OFF") return "OFF-AIR";
       if (/BURN/.test(s)) return "Burned";

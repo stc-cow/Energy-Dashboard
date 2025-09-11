@@ -58,8 +58,7 @@ export default function HeatMap() {
   );
   const bounds = useMemo(() => {
     const pts = combinedPoints;
-    if (!pts.length)
-      return L.latLngBounds(L.latLng(16, 34), L.latLng(32, 56));
+    if (!pts.length) return L.latLngBounds(L.latLng(16, 34), L.latLng(32, 56));
     const b = L.latLngBounds(pts.map((p) => [p.lat, p.lng]) as any);
     return b.pad(0.2);
   }, [combinedPoints]);
@@ -103,7 +102,12 @@ export default function HeatMap() {
             />
             <HeatLayer
               points={combinedPoints}
-              gradient={{ 0.0: "blue", 0.4: "green", 0.7: "yellow", 1.0: "red" }}
+              gradient={{
+                0.0: "blue",
+                0.4: "green",
+                0.7: "yellow",
+                1.0: "red",
+              }}
               intensity={1}
             />
           </MapContainer>

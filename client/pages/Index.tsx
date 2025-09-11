@@ -91,7 +91,7 @@ export default function Index() {
     queryKey: ["cowstats", scope],
     queryFn: () => fetchCowStats(scope),
     enabled: !!hierarchy,
-    refetchInterval: 60000,
+    refetchInterval: 600000, // 10 minutes
     refetchIntervalInBackground: true,
   });
 

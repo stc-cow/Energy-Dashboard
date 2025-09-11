@@ -15,7 +15,10 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // Normalize and rethrow errors so Vite overlay receives proper Error objects
-if (typeof window !== "undefined" && !(window as any).__error_normalizer_installed) {
+if (
+  typeof window !== "undefined" &&
+  !(window as any).__error_normalizer_installed
+) {
   (window as any).__error_normalizer_installed = true;
 
   // Capture synchronous runtime errors, normalize and rethrow asynchronously
@@ -55,7 +58,8 @@ if (typeof window !== "undefined" && !(window as any).__error_normalizer_install
       const reason = ev.reason as any;
       if (reason && reason.stack) return; // already an Error
       ev.preventDefault();
-      const msg = (reason && reason.message) || String(reason || "Unhandled rejection");
+      const msg =
+        (reason && reason.message) || String(reason || "Unhandled rejection");
       const err = new Error(msg);
       try {
         err.stack = `${err.name}: ${err.message}\n    at ${location.href}`;

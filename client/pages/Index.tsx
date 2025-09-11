@@ -193,10 +193,14 @@ export default function Index() {
                               />
                               <div className="absolute inset-0 flex items-center justify-center text-white font-semibold px-2 whitespace-nowrap gap-1">
                                 <p>
-                                  <strong>{(r.regionName || "Unknown").toUpperCase()}</strong>
+                                  <strong>
+                                    {(r.regionName || "Unknown").toUpperCase()}
+                                  </strong>
                                 </p>
                                 <p>
-                                  <strong>{count.toLocaleString?.() ?? count}</strong>
+                                  <strong>
+                                    {count.toLocaleString?.() ?? count}
+                                  </strong>
                                 </p>
                                 (
                                 <p>

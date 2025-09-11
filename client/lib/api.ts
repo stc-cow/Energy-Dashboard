@@ -881,9 +881,10 @@ export interface CowStats {
   onAir: number;
   offAir: number;
   byRegion: { regionId: string; regionName: string; count: number }[];
+  byStatus: { status: string; count: number }[];
 }
 export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
-  if (!SHEET_URL) return { onAir: 0, offAir: 0, byRegion: [] };
+  if (!SHEET_URL) return { onAir: 0, offAir: 0, byRegion: [], byStatus: [] };
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
@@ -931,6 +932,38 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
     const onAir = uniqueSites.reduce((s, r) => s + r.onAir, 0);
     const offAir = Math.max(0, uniqueSites.length - onAir);
 
+    // Status breakdown
+    function normalizeCowStatusLabel(raw: string): string {
+      const s = String(raw || "").trim().toUpperCase();
+      if (/\bON[-\s]?AIR\b/.test(s) || s === "ON") return "ON-AIR";
+      if (/\bOFF[-\s]?AIR\b/.test(s) || s === "OFF") return "OFF-AIR";
+      if (/BURN/.test(s)) return "Burned";
+      if (/DAMAG/.test(s)) return "Damage";
+      if (/IN\s*PRE/.test(s)) return "In Pregress";
+      if (/REPAE|REPEAT/.test(s)) return "Repaeter";
+      if (/STOLEN/.test(s)) return "Stolen";
+      return s || "Other";
+    }
+
+    const byStatusMap = new Map<string, number>();
+    for (const r of rows) {
+      const siteName = getSiteName(r);
+      if (!siteName) continue;
+      const siteId = slug(siteName);
+      const status = getCowStatus(r);
+      const label = normalizeCowStatusLabel(status);
+      // keep latest per site: update site->label if later timestamp
+      // build per-site label then aggregate
+      const prev = sites.get(siteId);
+      // prev exists; we consider its ts already latest in sites map
+      const count = byStatusMap.get(label) || 0;
+      byStatusMap.set(label, count + 1);
+    }
+
+    const byStatus = Array.from(byStatusMap.entries())
+      .map(([status, count]) => ({ status, count }))
+      .sort((a, b) => b.count - a.count);
+
     const by = new Map<
       string,
       { regionId: string; regionName: string; count: number }
@@ -945,9 +978,9 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       by.get(s.regionId)!.count += 1;
     }
     const byRegion = Array.from(by.values()).sort((a, b) => b.count - a.count);
-    return { onAir, offAir, byRegion };
+    return { onAir, offAir, byRegion, byStatus };
   } catch {
-    return { onAir: 0, offAir: 0, byRegion: [] };
+    return { onAir: 0, offAir: 0, byRegion: [], byStatus: [] };
   }
 }
 

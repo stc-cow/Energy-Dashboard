@@ -164,30 +164,31 @@ export default function Index() {
                 className="rounded-lg p-4"
                 style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
               >
-                <div className="text-sm text-white/80 overflow-auto" style={{ maxHeight: 240 }}>
+                <div className="text-sm text-white/80">
                   {(() => {
                     const items = cow?.byRegion ?? [];
                     const total = items.reduce((s, x) => s + (x.count || 0), 0) || 1;
                     return (
-                      <div className="space-y-3">
+                      <div className="flex items-stretch gap-3">
                         {items.map((r) => {
-                          const pct = Math.round(((r.count || 0) / total) * 100);
+                          const count = r.count || 0;
+                          const pct = Math.round((count / total) * 100);
                           return (
-                            <div key={r.regionId}>
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="truncate pr-2">{r.regionName || "Unknown"}</span>
-                                <span className="font-semibold tabular-nums">{r.count.toLocaleString?.() ?? r.count} ({pct}%)</span>
-                              </div>
-                              <div className="w-full h-3 rounded-md bg-white/10 overflow-hidden border border-white/10">
-                                <div
-                                  className="h-full"
-                                  style={{
-                                    width: `${pct}%`,
-                                    backgroundImage:
-                                      "linear-gradient(to right, rgba(180,120,230,0.9), rgba(120,80,200,0.9))",
-                                    transition: "width 600ms ease",
-                                  }}
-                                />
+                            <div
+                              key={r.regionId}
+                              className="relative h-10 rounded-md overflow-hidden border border-white/10 bg-white/10"
+                              style={{ flex: count || 0.0001 }}
+                              aria-label={`${r.regionName || "Unknown"} ${count} (${pct}%)`}
+                            >
+                              <div
+                                className="absolute inset-0"
+                                style={{
+                                  backgroundImage:
+                                    "linear-gradient(to right, rgba(180,120,230,0.9), rgba(120,80,200,0.9))",
+                                }}
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center text-white font-semibold px-2 whitespace-nowrap">
+                                {(r.regionName || "Unknown").toUpperCase()} {count.toLocaleString?.() ?? count} ({pct}%)
                               </div>
                             </div>
                           );

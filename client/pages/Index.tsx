@@ -182,6 +182,27 @@ export default function Index() {
                     ))}
                   </ul>
                 </div>
+                <div className="text-sm text-white/80 font-semibold mt-3 mb-1">
+                  Status breakdown
+                </div>
+                <div
+                  className="text-sm text-white/80 overflow-auto"
+                  style={{ maxHeight: 120 }}
+                >
+                  <ul className="grid grid-cols-2 gap-x-4">
+                    {(cow?.byStatus ?? []).map((s) => (
+                      <li
+                        key={s.status}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="truncate pr-2">{s.status}</span>
+                        <span className="font-semibold tabular-nums">
+                          {s.count}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

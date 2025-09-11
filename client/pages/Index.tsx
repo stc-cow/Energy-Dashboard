@@ -110,7 +110,7 @@ export default function Index() {
 
         {/* Status ticker */}
         <div
-          className="ticker-wrap print:hidden"
+          className="ticker-wrap top-bar print:hidden"
           aria-label="COW status ticker"
         >
           <div className="ticker">

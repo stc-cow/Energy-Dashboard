@@ -10,8 +10,6 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const KSA_BOUNDS = L.latLngBounds(L.latLng(16, 34), L.latLng(33, 56));
-
 function HeatLayer({
   points,
   gradient,

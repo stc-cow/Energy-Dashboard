@@ -28,8 +28,8 @@ function HeatLayer({
       p.value ?? intensity,
     ]);
     const layer = (L as any).heatLayer(heatPoints, {
-      radius: 25,
-      blur: 15,
+      radius: 15,
+      blur: 10,
       maxZoom: 10,
       gradient,
     });
@@ -104,9 +104,9 @@ export default function HeatMap() {
               points={combinedPoints}
               gradient={{
                 0.0: "blue",
-                0.4: "green",
-                0.7: "yellow",
-                1.0: "red",
+                0.5: "green",
+                0.8: "yellow",
+                1.0: "#ff6666",
               }}
               intensity={1}
             />

@@ -53,7 +53,13 @@ export default function HeatMap() {
     enabled: true,
   });
 
-  const bounds = useMemo(() => KSA_BOUNDS, []);
+  const bounds = useMemo(() => {
+    const pts = [...(statusPoints.onAir || []), ...(statusPoints.offAir || [])];
+    if (!pts.length)
+      return L.latLngBounds(L.latLng(16, 34), L.latLng(32, 56));
+    const b = L.latLngBounds(pts.map((p) => [p.lat, p.lng]) as any);
+    return b.pad(0.2);
+  }, [statusPoints]);
 
   return (
     <Layout>

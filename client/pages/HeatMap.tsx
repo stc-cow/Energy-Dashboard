@@ -90,17 +90,13 @@ export default function HeatMap() {
             </Button>
           </div>
           <MapContainer
-            style={{ height: 600, width: "100%", background: "#ffffff" }}
+            style={{ height: 600, width: "100%" }}
             bounds={bounds}
-            maxBounds={KSA_BOUNDS}
-            maxBoundsViscosity={1.0}
             scrollWheelZoom={true}
-            worldCopyJump={false}
           >
             <TileLayer
-              attribution='&copy; OpenStreetMap contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-              noWrap={true}
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <HeatLayer
               points={statusPoints.onAir}
@@ -116,8 +112,8 @@ export default function HeatMap() {
         </div>
         {statusPoints.onAir.length + statusPoints.offAir.length === 0 && (
           <div className="text-sm text-amber-300">
-            No coordinates found in columns L & M. Please ensure the sheet has
-            Lat in L and Lng in M, and COWSTATUS (ON-AIR/OFF-AIR) is present.
+            No coordinates found in columns H & I. Please ensure the sheet has
+            Lat in H and Lng in I for each row within KSA.
           </div>
         )}
       </div>

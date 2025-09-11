@@ -115,14 +115,14 @@ export default function Index() {
         >
           <div className="ticker">
             <span>
-              {[
-                `Total COWs: 544`,
-                `ON-AIR: 399`,
-                `In Progress: 12`,
-                `OFF-AIR: 133`,
-                `SEC powered COWs: 98`,
-                `Generators: 301`,
-              ].join(" | ")}
+              {(() => {
+                const map = new Map<string, number>();
+                for (const s of cow?.byStatus ?? []) map.set(s.status, s.count);
+                const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
+                const onAir = map.get("ON-AIR") ?? 0;
+                const inProg = map.get("In Progress") ?? 0;
+                return `Total COWs: ${total} | ON-AIR: ${onAir} | In Progress: ${inProg}`;
+              })()}
             </span>
           </div>
         </div>

@@ -157,78 +157,7 @@ export default function Index() {
             <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">
               COWs Status (ON-AIR / OFF-AIR)
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-              <div
-                className="rounded-lg"
-                style={{
-                  backgroundColor: "rgba(223, 208, 235, 0.4)",
-                  padding: "16px 16px 19px",
-                  marginBottom: -2,
-                }}
-              >
-                <div className="text-sm text-white/80 font-semibold mb-2">
-                  ON-AIR COWs
-                </div>
-                {(() => {
-                  const on = cow?.onAir ?? 0;
-                  const off = cow?.offAir ?? 0;
-                  const total = Math.max(1, on + off);
-                  const pct = Math.round((on / total) * 100);
-                  return (
-                    <div className="w-full h-8 rounded-md overflow-hidden border border-white/10 bg-white/10 relative">
-                      <div
-                        className="h-full"
-                        style={{
-                          width: `${pct}%`,
-                          backgroundImage:
-                            "linear-gradient(45deg, rgba(255,255,255,.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 75%, transparent 75%, transparent), linear-gradient(to right, #16a34a, #22c55e)",
-                          backgroundSize: "20px 20px, 100% 100%",
-                          animation: "bar-move 1.5s linear infinite",
-                          transition: "width 600ms ease",
-                        }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
-                        {on.toLocaleString()}
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-              <div
-                className="rounded-lg"
-                style={{
-                  backgroundColor: "rgba(224, 211, 235, 0.4)",
-                  padding: "16px 16px 19px",
-                }}
-              >
-                <div className="text-sm text-white/80 font-semibold mb-2">
-                  OFF-AIR COWs
-                </div>
-                {(() => {
-                  const on = cow?.onAir ?? 0;
-                  const off = cow?.offAir ?? 0;
-                  const total = Math.max(1, on + off);
-                  const pct = Math.round((off / total) * 100);
-                  return (
-                    <div className="w-full h-8 rounded-md overflow-hidden border border-white/10 bg-white/10 relative">
-                      <div
-                        className="h-full"
-                        style={{
-                          width: `${pct}%`,
-                          backgroundImage:
-                            "linear-gradient(45deg, rgba(255,255,255,.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 75%, transparent 75%, transparent), linear-gradient(to right, #dc2626, #ef4444)",
-                          backgroundSize: "20px 20px, 100% 100%",
-                          animation: "bar-move 1.5s linear infinite",
-                          transition: "width 600ms ease",
-                        }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
-                        {off.toLocaleString()}
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
+            <div className="grid grid-cols-1 items-start">
               <div
                 className="rounded-lg p-4"
                 style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
@@ -238,7 +167,7 @@ export default function Index() {
                 </div>
                 <div
                   className="text-sm text-white/80 overflow-auto"
-                  style={{ maxHeight: 104 }}
+                  style={{ maxHeight: 140 }}
                 >
                   <ul className="grid grid-cols-2 gap-x-4">
                     {(cow?.byRegion ?? []).map((r) => (
@@ -251,27 +180,6 @@ export default function Index() {
                         </span>
                         <span className="font-semibold tabular-nums">
                           {r.count}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="text-sm text-white/80 font-semibold mt-3 mb-1">
-                  Status breakdown
-                </div>
-                <div
-                  className="text-sm text-white/80 overflow-auto"
-                  style={{ maxHeight: 120 }}
-                >
-                  <ul className="grid grid-cols-2 gap-x-4">
-                    {(cow?.byStatus ?? []).map((s) => (
-                      <li
-                        key={s.status}
-                        className="flex items-center justify-between"
-                      >
-                        <span className="truncate pr-2">{s.status}</span>
-                        <span className="font-semibold tabular-nums">
-                          {s.count}
                         </span>
                       </li>
                     ))}

@@ -165,7 +165,7 @@ export default function Index() {
             <div className="grid grid-cols-1 items-start">
               <div
                 className="rounded-lg p-4"
-                style={{ backgroundColor: "rgba(232, 223, 240, 0.4)" }}
+                style={{ backgroundColor: "rgba(12, 12, 56, 0.4)" }}
               >
                 <div className="text-sm text-white/80">
                   {(() => {

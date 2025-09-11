@@ -1,5 +1,3 @@
-import { DemoResponse } from "@shared/api";
-
 import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";
 import KpiCard from "@/components/energy/KpiCard";

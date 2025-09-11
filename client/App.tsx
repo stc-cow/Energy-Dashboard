@@ -14,6 +14,61 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Normalize and rethrow errors so Vite overlay receives proper Error objects
+if (typeof window !== "undefined" && !(window as any).__error_normalizer_installed) {
+  (window as any).__error_normalizer_installed = true;
+
+  // Capture synchronous runtime errors, normalize and rethrow asynchronously
+  window.addEventListener(
+    "error",
+    (e: ErrorEvent) => {
+      try {
+        // If the event has a proper Error object with stack, let it proceed
+        if (e.error && e.error.stack) return;
+
+        // Prevent default handling (Vite overlay may receive malformed event)
+        e.preventDefault();
+
+        const msg = e.message || String(e.error || "Unknown error");
+        const err = new Error(msg);
+        try {
+          // include location hint
+          err.stack = `${err.name}: ${err.message}\n    at ${location.href}`;
+        } catch {
+          // ignore
+        }
+        // Rethrow asynchronously so other listeners (like Vite overlay) get a clean Error
+        setTimeout(() => {
+          throw err;
+        }, 0);
+      } catch (err) {
+        // ensure we don't throw from the handler
+        console.error("Error normalizer failed:", err);
+      }
+    },
+    true, // capture phase to run before other handlers
+  );
+
+  // Handle unhandled promise rejections
+  window.addEventListener("unhandledrejection", (ev: PromiseRejectionEvent) => {
+    try {
+      const reason = ev.reason as any;
+      if (reason && reason.stack) return; // already an Error
+      ev.preventDefault();
+      const msg = (reason && reason.message) || String(reason || "Unhandled rejection");
+      const err = new Error(msg);
+      try {
+        err.stack = `${err.name}: ${err.message}\n    at ${location.href}`;
+      } catch {}
+      setTimeout(() => {
+        throw err;
+      }, 0);
+    } catch (err) {
+      console.error("UnhandledRejection normalizer failed:", err);
+    }
+  });
+}
+
 // Wrap global fetch to avoid uncaught network errors surfacing repeatedly in the console
 if (typeof window !== "undefined" && !(window as any).__safe_fetch_installed) {
   (window as any).__safe_fetch_installed = true;
@@ -55,4 +110,14 @@ const App = () => (
   </QueryClientProvider>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+const container = document.getElementById("root");
+if (container) {
+  // reuse root across HMR/reloads to avoid createRoot being called multiple times
+  if (!(window as any).__app_root) {
+    (window as any).__app_root = createRoot(container);
+  }
+  (window as any).__app_root.render(<App />);
+} else {
+  // fallback
+  console.error("Root container not found: #root");
+}

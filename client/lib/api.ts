@@ -895,6 +895,7 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       siteName: string;
       regionId: string;
       regionName: string;
+      status: string; // normalized label
       onAir: number;
       ts: number;
     };
@@ -921,6 +922,7 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
         siteName,
         regionId,
         regionName,
+        status: normalizeCowStatusLabel(status),
         onAir: onAirFlag,
         ts,
       };
@@ -929,8 +931,6 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
     }
 
     const uniqueSites = Array.from(sites.values());
-    const onAir = uniqueSites.reduce((s, r) => s + r.onAir, 0);
-    const offAir = Math.max(0, uniqueSites.length - onAir);
 
     // Status breakdown
     function normalizeCowStatusLabel(raw: string): string {
@@ -939,30 +939,24 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
       if (/\bOFF[-\s]?AIR\b/.test(s) || s === "OFF") return "OFF-AIR";
       if (/BURN/.test(s)) return "Burned";
       if (/DAMAG/.test(s)) return "Damage";
-      if (/IN\s*PRE/.test(s)) return "In Pregress";
+      if (/IN\s*PROG|IN\s*PRE/.test(s)) return "In Pregress";
       if (/REPAE|REPEAT/.test(s)) return "Repaeter";
       if (/STOLEN/.test(s)) return "Stolen";
       return s || "Other";
     }
 
     const byStatusMap = new Map<string, number>();
-    for (const r of rows) {
-      const siteName = getSiteName(r);
-      if (!siteName) continue;
-      const siteId = slug(siteName);
-      const status = getCowStatus(r);
-      const label = normalizeCowStatusLabel(status);
-      // keep latest per site: update site->label if later timestamp
-      // build per-site label then aggregate
-      const prev = sites.get(siteId);
-      // prev exists; we consider its ts already latest in sites map
-      const count = byStatusMap.get(label) || 0;
-      byStatusMap.set(label, count + 1);
+    for (const rec of uniqueSites) {
+      const label = rec.status || "Other";
+      byStatusMap.set(label, (byStatusMap.get(label) || 0) + 1);
     }
 
     const byStatus = Array.from(byStatusMap.entries())
       .map(([status, count]) => ({ status, count }))
       .sort((a, b) => b.count - a.count);
+
+    const onAir = byStatusMap.get("ON-AIR") || 0;
+    const offAir = byStatusMap.get("OFF-AIR") || 0;
 
     const by = new Map<
       string,

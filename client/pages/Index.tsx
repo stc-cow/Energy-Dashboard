@@ -115,28 +115,14 @@ export default function Index() {
         >
           <div className="ticker">
             <span>
-              {(() => {
-                const map = new Map<string, number>();
-                for (const s of cow?.byStatus ?? []) map.set(s.status, s.count);
-                const order = [
-                  "ON-AIR",
-                  "OFF-AIR",
-                  "In Progress",
-                  "Burned",
-                  "Damage",
-                  "Stolen",
-                ];
-                const parts: string[] = [];
-                for (const key of order) {
-                  const v = map.get(key);
-                  if (v != null) parts.push(`${key}: ${v}`);
-                }
-                // add any remaining statuses
-                for (const [k, v] of map.entries()) {
-                  if (!order.includes(k)) parts.push(`${k}: ${v}`);
-                }
-                return parts.length ? parts.join(" | ") : "";
-              })()}
+              {[
+                `Total COWs: 544`,
+                `ON-AIR: 399`,
+                `In Progress: 12`,
+                `OFF-AIR: 133`,
+                `SEC powered COWs: 98`,
+                `Generators: 301`,
+              ].join(" | ")}
             </span>
           </div>
         </div>

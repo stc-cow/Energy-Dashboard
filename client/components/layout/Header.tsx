@@ -8,7 +8,7 @@ export default function Header() {
         "sticky top-0 z-30 w-full border-b border-white/10 bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60",
       )}
     >
-      <div className="container mx-auto flex h-16 items-center justify-between">
+      <div className="container mx-auto grid grid-cols-3 h-16 items-center">
         <Link to="/" className="flex items-center gap-3">
           <img
             src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F57a8a3cd81a24a69ad9bd34e4e70feb7"
@@ -16,14 +16,12 @@ export default function Header() {
             className="h-8 w-auto object-contain"
           />
         </Link>
-        <div className="flex-1 text-center hidden sm:block">
+        <div className="col-start-2 text-center">
           <div className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
-            <p className="font-black text-[35px] leading-[35px]">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COW Predictive Energy Dashboard
-            </p>
+            <p className="font-black text-[35px] leading-[35px]">COW Predictive Energy Dashboard</p>
           </div>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 justify-self-end col-start-3">
           <nav className="flex items-center gap-6 text-sm">
             <NavLink
               to="/heatmap"

@@ -445,7 +445,7 @@ function getPowerDemandKw(r: any): number {
       "Power Demand",
       "Power",
       "powerdemandkw",
-      "col22"
+      "col22",
     ],
     [/power.*(demand|kw)/i, /current.*average.*kw/i],
   );
@@ -1008,10 +1008,14 @@ export async function fetchPowerSourceCounts(
     let sec = 0;
     for (const r of rows) {
       const src = getPowerSource(r);
-      const srcNorm = String(src || "").replace(/\s+/g, "").toUpperCase();
+      const srcNorm = String(src || "")
+        .replace(/\s+/g, "")
+        .toUpperCase();
       if (srcNorm !== "SEC+SG") continue;
       const statusRaw = getCowStatus(r);
-      const statusNorm = String(statusRaw || "").trim().toUpperCase();
+      const statusNorm = String(statusRaw || "")
+        .trim()
+        .toUpperCase();
       const isAllowedStatus =
         statusNorm.includes("ON-AIR") || statusNorm.includes("IN PROG");
       if (isAllowedStatus) sec++;
@@ -1021,10 +1025,14 @@ export async function fetchPowerSourceCounts(
     let gen = 0;
     for (const r of rows) {
       const src = getPowerSource(r);
-      const srcNorm = String(src || "").replace(/\s+/g, "").toUpperCase();
+      const srcNorm = String(src || "")
+        .replace(/\s+/g, "")
+        .toUpperCase();
       if (srcNorm !== "SG") continue;
       const statusRaw = getCowStatus(r);
-      const statusNorm = String(statusRaw || "").trim().toUpperCase();
+      const statusNorm = String(statusRaw || "")
+        .trim()
+        .toUpperCase();
       const isAllowedStatus =
         statusNorm.includes("ON-AIR") || statusNorm.includes("IN PROG");
       if (isAllowedStatus) gen++;

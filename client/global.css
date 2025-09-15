@@ -21,10 +21,12 @@
 .ticker-wrap {
   width: 100%;
   overflow: hidden;
-  background: rgba(59, 212, 212, 1);
-  padding: 8px 0;
-  border-top: 2px solid #ff3333;
-  border-bottom: 2px solid #ff3333;
+  color: #ffffff;
+  display: flex;
+  background: #761ba5;
+  padding: 6px 16px;
+  border-top: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
 }
 .ticker {
   display: flex;

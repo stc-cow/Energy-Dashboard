@@ -190,3 +190,19 @@
 .dashboard .status-green-bg {
   background-color: #ff3333;
 }
+
+/* Moving bar styling */
+.moving-bar {
+  background-color: #993399;
+  color: #ffffff;
+  border: 1px solid #ff3333;
+}
+
+.moving-bar span,
+.moving-bar div {
+  color: #ffffff;
+}
+
+.moving-bar .highlight {
+  color: #ff3333;
+}

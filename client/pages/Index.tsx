@@ -12,6 +12,7 @@ import {
   fetchTimeSeries,
   fetchAccumulations,
   fetchCowStats,
+  fetchPowerSourceCounts,
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import { Button } from "@/components/ui/button";
@@ -96,6 +97,12 @@ export default function Index() {
   });
 
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
+
+  const { data: powerSources } = useQuery({
+    queryKey: ["powerSources", scope],
+    queryFn: () => fetchPowerSourceCounts(scope),
+    enabled: !!hierarchy,
+  });
 
   return (
     <Layout>
@@ -219,11 +226,13 @@ export default function Index() {
             title="Diesel Consumption"
             value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
             unit={kpis?.kpis.dieselLitersPerDay.unit ?? ""}
+            footer={`Total of all Generators Connected sites: ${powerSources?.generatorConnected ?? 0}`}
           />
           <KpiCard
             title="Power Demand"
             value={kpis?.kpis.powerDemandKw.value ?? 0}
             unit={kpis?.kpis.powerDemandKw.unit ?? ""}
+            footer={`Total of all SEC Connected sites: ${powerSources?.secConnected ?? 0}`}
           />
           <KpiCard
             title="Daily CO₂ Emissions"
@@ -252,16 +261,19 @@ export default function Index() {
             title="Accum. Power Consumption"
             value={Math.round((accum?.powerKwh ?? 0) / 1000)}
             unit="MWh"
+            footer="from 01/01/2025 uP TO NOW"
           />
           <KpiCard
             title="Accum. Fuel Consumption"
             value={Math.round(accumFuelLiters)}
             unit="L"
+            footer="from 01/01/2025 uP TO NOW"
           />
           <KpiCard
             title="Accum. CO₂ Emissions"
             value={Number(accumCo2Tons.toFixed(2))}
             unit="TON"
+            footer="from 01/01/2025 uP TO NOW"
           />
         </div>
       </FitToScreen>

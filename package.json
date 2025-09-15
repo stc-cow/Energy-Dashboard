@@ -18,7 +18,8 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "brief": "tsx scripts/make-brief.ts"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.20",

@@ -1,16 +1,16 @@
-import TrendArrow from "./TrendArrow";
-
 export default function KpiCard({
   title,
   value,
   unit,
+  footer,
 }: {
   title: string;
   value: number;
   unit: string;
+  footer?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-36 md:h-40 lg:h-44 flex flex-col items-center justify-center text-center">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none min-h-40 flex flex-col items-center text-center">
       <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold">
         {title}
       </div>
@@ -22,6 +22,11 @@ export default function KpiCard({
           </span>
         </div>
       </div>
+      {footer ? (
+        <div className="mt-3 text-xs text-white/80 font-semibold text-center">
+          {footer}
+        </div>
+      ) : null}
     </div>
   );
 }

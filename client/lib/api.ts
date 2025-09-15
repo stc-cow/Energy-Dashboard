@@ -462,6 +462,13 @@ function getCo2TonsPerDay(r: any): number {
     [/co2|carbon/i],
   );
 }
+function getPowerSource(r: any): string {
+  return pickStringFromRow(
+    r,
+    ["Power Source", "PowerSource", "Power_Source", "Power src"],
+    [/power.*source/i],
+  );
+}
 function getFuelTankLevelPct(r: any): number {
   return pickNumberFromRow(
     r,
@@ -985,6 +992,31 @@ export async function fetchCowStats(scope: HierarchyFilter): Promise<CowStats> {
     return { onAir, offAir, byRegion, byStatus };
   } catch {
     return { onAir: 0, offAir: 0, byRegion: [], byStatus: [] };
+  }
+}
+
+export async function fetchPowerSourceCounts(
+  scope: HierarchyFilter,
+): Promise<{ generatorConnected: number; secConnected: number }> {
+  try {
+    const rowsAll = await getRows();
+    const rows = rowsInScope(rowsAll, scope);
+    const seen = new Set<string>();
+    let gen = 0;
+    let sec = 0;
+    for (const r of rows) {
+      const siteName = getSiteName(r);
+      if (!siteName) continue;
+      const id = slug(siteName);
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const src = getPowerSource(r).toLowerCase();
+      if (/sec/.test(src)) sec++;
+      if (/gen/.test(src) || /generator/.test(src)) gen++;
+    }
+    return { generatorConnected: gen, secConnected: sec };
+  } catch {
+    return { generatorConnected: 0, secConnected: 0 };
   }
 }
 

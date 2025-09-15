@@ -1001,28 +1001,36 @@ export async function fetchPowerSourceCounts(
   try {
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
-    const seen = new Set<string>();
-    let gen = 0;
+
+    // SEC total by unique site
     let sec = 0;
+    const secSeen = new Set<string>();
     for (const r of rows) {
       const siteName = getSiteName(r);
       if (!siteName) continue;
       const id = slug(siteName);
-      if (seen.has(id)) continue;
-      seen.add(id);
-
+      if (secSeen.has(id)) continue;
       const src = getPowerSource(r);
       const srcNorm = String(src || "").replace(/\s+/g, "").toUpperCase();
+      if (srcNorm.includes("SEC")) {
+        secSeen.add(id);
+        sec++;
+      }
+    }
 
+    // Generators total by rows (no de-dup), only SG + allowed statuses
+    let gen = 0;
+    for (const r of rows) {
+      const src = getPowerSource(r);
+      const srcNorm = String(src || "").replace(/\s+/g, "").toUpperCase();
+      if (srcNorm !== "SG") continue;
       const statusRaw = getCowStatus(r);
       const statusNorm = String(statusRaw || "").trim().toUpperCase();
       const isAllowedStatus =
-        statusNorm.includes("ON-AIR") ||
-        statusNorm.includes("IN PROG");
-
-      if (srcNorm.includes("SEC")) sec++;
-      if (srcNorm.includes("SG") && isAllowedStatus) gen++;
+        statusNorm.includes("ON-AIR") || statusNorm.includes("IN PROG");
+      if (isAllowedStatus) gen++;
     }
+
     return { generatorConnected: gen, secConnected: sec };
   } catch {
     return { generatorConnected: 0, secConnected: 0 };

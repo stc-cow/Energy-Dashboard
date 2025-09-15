@@ -23,7 +23,10 @@ export default function Header() {
         </Link>
         <div className="flex-1 text-center hidden sm:block">
           <div className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
-            <p className="font-black text-[35px]"> COW Predictive Energy Dashboard</p>
+            <p className="font-black text-[35px]">
+              {" "}
+              COW Predictive Energy Dashboard
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-6">

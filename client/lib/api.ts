@@ -424,13 +424,15 @@ function getDieselLitersPerDay(r: any): number {
   return pickNumberFromRow(
     r,
     [
+      "CurrentAverageLiterPerDay",
+      "Current Average Liter Per Day",
       "dieselLitersPerDay",
       "Diesel Consumption",
       "Diesel",
       "diesellitersperday",
       "col21",
     ],
-    [/diesel/i],
+    [/diesel/i, /current.*average.*liter.*day/i],
   );
 }
 function getPowerDemandKw(r: any): number {

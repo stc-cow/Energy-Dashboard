@@ -436,8 +436,16 @@ function getDieselLitersPerDay(r: any): number {
 function getPowerDemandKw(r: any): number {
   return pickNumberFromRow(
     r,
-    ["powerDemandKw", "Power Demand", "Power", "powerdemandkw", "col22"],
-    [/power.*(demand|kw)/i],
+    [
+      "CurrentAverageKW",
+      "Current Average KW",
+      "powerDemandKw",
+      "Power Demand",
+      "Power",
+      "powerdemandkw",
+      "col22"
+    ],
+    [/power.*(demand|kw)/i, /current.*average.*kw/i],
   );
 }
 function getCo2TonsPerDay(r: any): number {

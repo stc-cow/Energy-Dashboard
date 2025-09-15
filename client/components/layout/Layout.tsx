@@ -114,9 +114,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             justifyContent: "center",
           }}
         >
-          <p>
-            <strong>Powered by ACES MS</strong>
-          </p>
+          <p>Powered by ACES MSD</p>
         </div>
       </footer>
 

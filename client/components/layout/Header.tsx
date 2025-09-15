@@ -18,7 +18,7 @@ export default function Header() {
         </Link>
         <div className="col-start-2 text-center">
           <div className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
-            <p className="font-black text-[35px] leading-[35px]">COW Predictive Energy Dashboard</p>
+            <p className="font-black text-[35px] leading-[35px] whitespace-nowrap">COW Predictive Energy Dashboard</p>
           </div>
         </div>
         <div className="flex items-center gap-6 justify-self-end col-start-3">

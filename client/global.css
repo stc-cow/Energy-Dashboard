@@ -21,10 +21,10 @@
 .ticker-wrap {
   width: 100%;
   overflow: hidden;
-  background: #000000;
+  background: #993399;
   padding: 8px 0;
-  border-top: 2px solid #00ff00;
-  border-bottom: 2px solid #00ff00;
+  border-top: 2px solid #ff3333;
+  border-bottom: 2px solid #ff3333;
 }
 .ticker {
   display: flex;
@@ -35,7 +35,7 @@
 .ticker span {
   font-size: 16px;
   font-weight: 700;
-  color: #00ff00;
+  color: #ffffff;
   display: inline-block;
 }
 .ticker__item {

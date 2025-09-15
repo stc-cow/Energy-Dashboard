@@ -1018,8 +1018,6 @@ export async function fetchPowerSourceCounts(
       const statusNorm = String(statusRaw || "").trim().toUpperCase();
       const isAllowedStatus =
         statusNorm.includes("ON-AIR") ||
-        statusNorm === "ON" ||
-        statusNorm.includes("REPEAT") ||
         statusNorm.includes("IN PROG");
 
       if (srcNorm.includes("SEC")) sec++;

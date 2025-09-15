@@ -229,7 +229,7 @@ export default function Index() {
             footer={`Total of all Generators Connected sites: ${powerSources?.generatorConnected ?? 0}`}
           />
           <KpiCard
-            title="Power Demand"
+            title="Elec. Power Consumption"
             value={kpis?.kpis.powerDemandKw.value ?? 0}
             unit="kW/h"
             footer={`Total of all SEC Connected sites: ${powerSources?.secConnected ?? 0}`}

@@ -41,7 +41,7 @@ async function makeBrief() {
     { text: "Filters: Region, District, City, Site", options: { bullet: true } },
     { text: "Status ticker and regional breakdown", options: { bullet: true } },
     { text: "Accumulated metrics from 01/01/2025", options: { bullet: true } },
-  ], { x: 0.4, y: 0.9, w: 12.2, fontSize: 16, color: "#333" });
+  ], { x: 0.4, y: 0.9, w: 12.2, fontSize: 16, color: "#333333" });
 
   const url = process.env.DASHBOARD_URL || "https://dbadbf7db6cb4fc790d7fec680240bb0-b7787409c20e41169bf893bf6.fly.dev/";
   const img = await fetchScreenshot(url);

@@ -1010,9 +1010,10 @@ export async function fetchPowerSourceCounts(
       const id = slug(siteName);
       if (seen.has(id)) continue;
       seen.add(id);
-      const src = getPowerSource(r).toLowerCase();
-      if (/sec/.test(src)) sec++;
-      if (/gen/.test(src) || /generator/.test(src)) gen++;
+      const src = getPowerSource(r);
+      const s = String(src || "").replace(/\s+/g, "").toUpperCase();
+      if (s.includes("SEC")) sec++;
+      if (s.includes("SG")) gen++;
     }
     return { generatorConnected: gen, secConnected: sec };
   } catch {

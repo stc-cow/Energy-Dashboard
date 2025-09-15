@@ -1002,20 +1002,17 @@ export async function fetchPowerSourceCounts(
     const rowsAll = await getRows();
     const rows = rowsInScope(rowsAll, scope);
 
-    // SEC total by unique site
+    // SEC total by rows (no de-dup), only when Power Source = SEC+SG and allowed statuses
     let sec = 0;
-    const secSeen = new Set<string>();
     for (const r of rows) {
-      const siteName = getSiteName(r);
-      if (!siteName) continue;
-      const id = slug(siteName);
-      if (secSeen.has(id)) continue;
       const src = getPowerSource(r);
       const srcNorm = String(src || "").replace(/\s+/g, "").toUpperCase();
-      if (srcNorm.includes("SEC")) {
-        secSeen.add(id);
-        sec++;
-      }
+      if (srcNorm !== "SEC+SG") continue;
+      const statusRaw = getCowStatus(r);
+      const statusNorm = String(statusRaw || "").trim().toUpperCase();
+      const isAllowedStatus =
+        statusNorm.includes("ON-AIR") || statusNorm.includes("IN PROG");
+      if (isAllowedStatus) sec++;
     }
 
     // Generators total by rows (no de-dup), only SG + allowed statuses

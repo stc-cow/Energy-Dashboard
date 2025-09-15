@@ -28,11 +28,16 @@ export default function FilterBar({
 
   const districts = useMemo(() => {
     const set = new Set<string>();
-    for (const s of sites) {
+    const byRegion = sites.filter((s) => {
+      if (!scope.regionId) return true;
+      const city = cities.find((c) => c.id === s.cityId);
+      return city?.regionId === scope.regionId;
+    });
+    for (const s of byRegion) {
       if (s.district && s.district.trim()) set.add(s.district.trim());
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [sites]);
+  }, [sites, cities, scope.regionId]);
 
   const filteredRegions = useMemo(() => {
     const q = regionQuery.trim().toLowerCase();
@@ -96,11 +101,9 @@ export default function FilterBar({
             setScope({
               regionId: val === "__ALL__" ? undefined : val,
               // reset deeper filters when region changes
-              cityId: val === "__ALL__" ? undefined : scope.cityId,
-              siteId:
-                val === "__ALL__" || (scope.cityId && scope.cityId !== "")
-                  ? undefined
-                  : scope.siteId,
+              cityId: undefined,
+              district: undefined,
+              siteId: undefined,
             })
           }
         >

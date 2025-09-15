@@ -1010,10 +1010,20 @@ export async function fetchPowerSourceCounts(
       const id = slug(siteName);
       if (seen.has(id)) continue;
       seen.add(id);
+
       const src = getPowerSource(r);
-      const s = String(src || "").replace(/\s+/g, "").toUpperCase();
-      if (s.includes("SEC")) sec++;
-      if (s.includes("SG")) gen++;
+      const srcNorm = String(src || "").replace(/\s+/g, "").toUpperCase();
+
+      const statusRaw = getCowStatus(r);
+      const statusNorm = String(statusRaw || "").trim().toUpperCase();
+      const isAllowedStatus =
+        statusNorm.includes("ON-AIR") ||
+        statusNorm === "ON" ||
+        statusNorm.includes("REPEAT") ||
+        statusNorm.includes("IN PROG");
+
+      if (srcNorm.includes("SEC")) sec++;
+      if (srcNorm.includes("SG") && isAllowedStatus) gen++;
     }
     return { generatorConnected: gen, secConnected: sec };
   } catch {

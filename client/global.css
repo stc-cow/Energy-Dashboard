@@ -176,3 +176,17 @@
     }
   }
 }
+
+/* Dashboard theming and status helpers */
+.dashboard {
+  background-color: #993399;
+  color: #ffffff;
+}
+
+.dashboard .status-green {
+  color: #ff3333;
+}
+
+.dashboard .status-green-bg {
+  background-color: #ff3333;
+}

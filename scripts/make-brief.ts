@@ -1,19 +1,11 @@
 import PptxGenJS from "pptxgenjs";
-import puppeteer from "puppeteer";
 
-async function captureScreenshot(url: string, width = 1600, height = 900) {
-  const browser = await puppeteer.launch({ headless: "new" });
-  try {
-    const page = await browser.newPage();
-    await page.setViewport({ width, height, deviceScaleFactor: 2 });
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 120_000 });
-    // small delay to ensure animations settle
-    await page.waitForTimeout(1500);
-    const buf = await page.screenshot({ type: "png", fullPage: false }) as Buffer;
-    return buf;
-  } finally {
-    await browser.close();
-  }
+async function fetchScreenshot(url: string) {
+  const thum = `https://image.thum.io/get/width/1600/${encodeURIComponent(url)}`;
+  const res = await fetch(thum, { cache: "no-store" });
+  if (!res.ok) throw new Error(`screenshot fetch failed: ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  return buf;
 }
 
 async function makeBrief() {
@@ -36,7 +28,7 @@ async function makeBrief() {
 
   // Screenshot
   const url = process.env.DASHBOARD_URL || "https://dbadbf7db6cb4fc790d7fec680240bb0-b7787409c20e41169bf893bf6.fly.dev/";
-  const img = await captureScreenshot(url);
+  const img = await fetchScreenshot(url);
   const data = `image/png;base64,${img.toString("base64")}`;
   slide.addImage({ data, x: 0.3, y: 1.6, w: 12.8 });
 

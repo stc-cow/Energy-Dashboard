@@ -10,7 +10,7 @@ export default function Header() {
     >
       <div className="container mx-auto grid grid-cols-3 h-16 items-center">
         <Link to="/" className="flex items-center gap-3">
-          <div className="text-white font-black text-[35px] leading-[35px] whitespace-nowrap ml-[-4px]">
+          <div className="text-white font-black text-[35px] leading-[35px] whitespace-nowrap ml-[360px]">
             COW Predictive Energy Dashboard
           </div>
         </Link>

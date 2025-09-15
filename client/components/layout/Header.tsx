@@ -10,6 +10,11 @@ export default function Header() {
     >
       <div className="container mx-auto grid grid-cols-3 h-16 items-center">
         <Link to="/" className="flex items-center gap-3">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F0198dd0082b54c8c8c332a08688180d4?format=webp&width=800"
+            alt="stc"
+            className="h-8 w-auto object-contain"
+          />
           <div className="text-white font-black text-[35px] leading-[35px] whitespace-nowrap ml-[360px]">
             COW Predictive Energy Dashboard
           </div>

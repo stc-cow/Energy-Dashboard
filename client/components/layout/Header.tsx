@@ -15,7 +15,7 @@ export default function Header() {
             alt="stc"
             className="h-8 w-auto object-contain"
           />
-          <div className="text-white font-black text-[35px] leading-[20px] whitespace-nowrap ml-[290px]">
+          <div className="text-white font-black text-[20px] leading-[20px] whitespace-nowrap ml-[290px]">
             COW Predictive Energy Dashboard
           </div>
         </Link>

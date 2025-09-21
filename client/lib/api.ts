@@ -454,6 +454,8 @@ function getCo2TonsPerDay(r: any): number {
   return pickNumberFromRow(
     r,
     [
+      "CurrentCO2Tons",
+      "Current CO2 Tons",
       "co2Tons",
       "Daily CO₂ Emissions",
       "Daily CO2 Emissions",
@@ -461,7 +463,7 @@ function getCo2TonsPerDay(r: any): number {
       "co2tonsperday",
       "col23",
     ],
-    [/co2|carbon/i],
+    [/current.*(co2|carbon).*(ton|tons)/i, /co2|carbon/i],
   );
 }
 function getPowerSource(r: any): string {
@@ -726,7 +728,7 @@ export async function fetchKPIs(scope: HierarchyFilter): Promise<KPIsResponse> {
           unit: "kW",
         },
         co2TonsPerDay: {
-          label: "CO�� Emissions",
+          label: "CO₂ Emissions",
           value: Math.round(co2 * 100) / 100,
           unit: "t/day",
         },

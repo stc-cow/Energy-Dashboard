@@ -231,7 +231,7 @@ export default function Index() {
           <KpiCard
             title="Elec. Power Consumption"
             value={kpis?.kpis.powerDemandKw.value ?? 0}
-            unit="kW/h"
+            unit="kW"
             footer={`Total of all SEC Connected sites: ${powerSources?.secConnected ?? 0}`}
           />
           <KpiCard

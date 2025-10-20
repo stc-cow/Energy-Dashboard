@@ -116,23 +116,58 @@ export default function EnergyTrends() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-6">
+        {/* Header with Close Button */}
+        <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-white">
             COW Energy Trends (Accumulative & Current Metrics)
           </h1>
+          <button
+            onClick={() => navigate("/")}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+          >
+            Close
+          </button>
         </div>
 
-        {/* Filter Controls */}
+        {/* Filter Controls - Region and District Only */}
         {hierarchy && (
           <div className="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
-            <FilterBar
-              regions={hierarchy.regions}
-              cities={hierarchy.cities}
-              sites={hierarchy.sites}
-              scope={scope}
-              onChange={setScope}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Region Filter */}
+              <div>
+                <label className="block text-white text-sm font-semibold mb-2">
+                  Region
+                </label>
+                <select
+                  value={scope.regionId || ""}
+                  onChange={(e) => {
+                    const regionId = e.target.value || undefined;
+                    setScope({ level: regionId ? "region" : "national", regionId });
+                  }}
+                  className="w-full px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  <option value="">All Regions</option>
+                  {hierarchy.regions?.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* District Filter */}
+              <div>
+                <label className="block text-white text-sm font-semibold mb-2">
+                  District
+                </label>
+                <select
+                  disabled={!scope.regionId}
+                  className="w-full px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+                >
+                  <option>All Districts</option>
+                </select>
+              </div>
+            </div>
           </div>
         )}
 

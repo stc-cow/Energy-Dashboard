@@ -26,11 +26,18 @@ export default function FuelLevelChart({
       return { chartData: [], averageValue: 0 };
     }
 
-    const extracted = extractMetricByCities(data, "fuel_level_%", cities);
+    // Process data - cities are already in the data structure with "name" field for x-axis
+    const chartData = data.map((row) => {
+      const result: any = { name: row.name };
+      cities.forEach((city) => {
+        result[city] = row[city] ?? 0;
+      });
+      return result;
+    });
 
     // Calculate overall average
     const allValues: number[] = [];
-    extracted.forEach((row) => {
+    chartData.forEach((row) => {
       cities.forEach((city) => {
         const val = row[city];
         if (typeof val === "number") {
@@ -46,7 +53,7 @@ export default function FuelLevelChart({
           ) / 10
         : 0;
 
-    return { chartData: extracted, averageValue: avg };
+    return { chartData, averageValue: avg };
   }, [data, cities]);
 
   if (!cities || cities.length === 0 || chartData.length === 0) {
@@ -64,7 +71,7 @@ export default function FuelLevelChart({
       >
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
         <XAxis
-          dataKey="date"
+          dataKey="name"
           stroke="rgba(255,255,255,0.6)"
           tick={{ fontSize: 12 }}
         />

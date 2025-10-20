@@ -17,13 +17,41 @@ interface TrendsResponse {
 }
 
 // Import mock data function directly for client-side data generation
-function generateMockTrendsData(scope: HierarchyFilter): TrendsResponse {
+function generateMockTrendsData(
+  scope: HierarchyFilter,
+  allCities: { id: string; name: string }[],
+  allSites: { id: string; name: string; cityId: string }[]
+): TrendsResponse {
   const seededRandom = (seed: number) => {
     let x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
   };
 
-  const cities = ["Riyadh", "Jeddah", "Dammam", "Medina", "Abha"];
+  // Filter cities based on scope
+  let filteredCities = allCities;
+
+  if (scope.cityId) {
+    // If city is selected, only show that city
+    filteredCities = allCities.filter((c) => c.id === scope.cityId);
+  } else if (scope.regionId) {
+    // If region is selected, filter cities in that region
+    const citiesInRegion = allSites
+      .filter((s) => {
+        const city = allCities.find((c) => c.id === s.cityId);
+        return city?.name?.toLowerCase().includes(
+          scope.regionId?.toLowerCase() || ""
+        );
+      })
+      .map((s) => s.cityId);
+
+    filteredCities = allCities.filter((c) =>
+      Array.from(new Set(citiesInRegion)).includes(c.id)
+    );
+  }
+
+  // Use city names for the chart
+  const cities = filteredCities.map((c) => c.name);
+
   const days = 30;
   const now = new Date();
 
@@ -34,7 +62,7 @@ function generateMockTrendsData(scope: HierarchyFilter): TrendsResponse {
 
     const row: any = { date: dateStr };
 
-    // Generate data for each city
+    // Generate data for each filtered city
     cities.forEach((cityName, cityIdx) => {
       const baseSeed = dayIdx * 100 + cityIdx * 10;
       const diesel = 1000 + Math.floor(seededRandom(baseSeed) * 800);
@@ -50,7 +78,7 @@ function generateMockTrendsData(scope: HierarchyFilter): TrendsResponse {
       row[`gen_load_%_${cityName}`] = genLoad;
     });
 
-    // Aggregated totals
+    // Aggregated totals from filtered cities
     const totalDiesel = cities.reduce((acc, _, i) => {
       return acc + (1000 + Math.floor(seededRandom(dayIdx * 100 + i) * 800));
     }, 0);
@@ -130,7 +158,7 @@ export default function EnergyTrends() {
               </div>
             </div>
 
-            {/* Accumulative CO₂ Emissions */}
+            {/* Accumulative CO�� Emissions */}
             <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
               <h2 className="text-xl font-semibold text-white mb-4">
                 Accumulative CO₂ Emissions

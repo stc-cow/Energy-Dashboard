@@ -24,10 +24,19 @@ const LOAD_COLORS = [
 
 export default function GeneratorLoadChart({ data, cities }: { data: any[]; cities: string[] }) {
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    
-    return extractMetricByCities(data, "gen_load_%", cities);
+    if (!data || data.length === 0 || !cities || cities.length === 0) {
+      console.warn("GeneratorLoadChart: Missing data or cities", { dataLen: data?.length, citiesLen: cities?.length });
+      return [];
+    }
+
+    const result = extractMetricByCities(data, "gen_load_%", cities);
+    console.log("GeneratorLoadChart data:", result.slice(0, 2), "cities:", cities);
+    return result;
   }, [data, cities]);
+
+  if (!cities || cities.length === 0) {
+    return <div className="text-white/60 p-4">No cities selected</div>;
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%">

@@ -25,24 +25,24 @@ const CITY_COLORS = [
 export default function FuelLevelChart({ data, cities }: { data: any[]; cities: string[] }) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0 || !cities || cities.length === 0) {
-      console.warn("FuelLevelChart: Missing data or cities", { dataLen: data?.length, citiesLen: cities?.length });
       return [];
     }
 
-    const result = extractMetricByCities(data, "fuel_level_%", cities);
-    console.log("FuelLevelChart data:", result.slice(0, 2), "cities:", cities);
-    return result;
+    return extractMetricByCities(data, "fuel_level_%", cities);
   }, [data, cities]);
 
-  if (!cities || cities.length === 0) {
-    return <div className="text-white/60 p-4">No cities selected</div>;
+  if (!cities || cities.length === 0 || chartData.length === 0) {
+    return <div className="text-white/60 p-4">No data available</div>;
   }
+
+  // Limit to max 5 cities for better visualization
+  const displayCities = cities.slice(0, 5);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-        <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" />
+        <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fontSize: 12 }} />
         <YAxis stroke="rgba(255,255,255,0.6)" domain={[0, 100]} />
         <Tooltip
           contentStyle={{
@@ -51,17 +51,17 @@ export default function FuelLevelChart({ data, cities }: { data: any[]; cities: 
           }}
           labelStyle={{ color: "#fff" }}
         />
-        <Legend />
-        {cities.map((city, idx) => (
+        <Legend wrapperStyle={{ paddingTop: "16px" }} />
+        {displayCities.map((city, idx) => (
           <Line
             key={city}
             type="monotone"
             dataKey={city}
-            name={`${city} Fuel Level (%)`}
+            name={`${city}`}
             stroke={CITY_COLORS[idx % CITY_COLORS.length]}
             strokeWidth={2}
             dot={false}
-            isAnimationActive={true}
+            isAnimationActive={false}
           />
         ))}
       </LineChart>

@@ -18,6 +18,7 @@ import {
   mockBreakdown,
   mockKPIs,
   mockTimeSeries,
+  mockEnergyTrends,
 } from "./data";
 
 function parseScope(query: any): HierarchyFilter {

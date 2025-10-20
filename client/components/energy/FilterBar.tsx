@@ -89,7 +89,7 @@ export default function FilterBar({
   }
 
   return (
-    <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
       {/* Region */}
       <div>
         <label className="mb-1 block text-xs text-muted-foreground">

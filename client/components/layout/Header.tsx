@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Link, NavLink } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
   return (

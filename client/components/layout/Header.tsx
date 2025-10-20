@@ -16,9 +16,9 @@ export default function Header() {
             className="h-6 w-auto object-contain"
           />
         </Link>
-        <div className="col-start-2 text-center">
-          <p className="text-white font-black text-[16px] leading-[16px] whitespace-nowrap">
-            COW Predictive Energy Dashboard
+        <div className="col-start-2 text-center text-[25px]">
+          <p className="text-white font-black leading-[16px] whitespace-nowrap">
+            <strong>COW Predictive Energy Dashboard</strong>
           </p>
         </div>
         <div className="flex items-center gap-4 justify-self-end col-start-3">

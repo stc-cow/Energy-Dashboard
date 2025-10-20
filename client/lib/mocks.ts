@@ -285,7 +285,7 @@ export function mockBreakdown(
 export function mockAlerts(scope: HierarchyFilter): AlertsResponse {
   const items = sites.slice(0, 3).map((site, i) => ({
     id: `${site.id}-fuel`,
-    severity: i % 2 ? "medium" : "high",
+    severity: (i % 2 ? "medium" : "high") as "high" | "medium",
     kind: i % 2 ? "co2_spike" : "fuel_low",
     message: `${site.name} ${i % 2 ? "CO₂ emissions spiked" : "fuel tank below 20%"}`,
     siteId: site.id,

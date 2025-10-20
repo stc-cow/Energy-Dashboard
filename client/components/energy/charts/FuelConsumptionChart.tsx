@@ -9,26 +9,56 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useMemo } from "react";
-import { makeCumulative } from "@/lib/chartUtils";
+
+const FUEL_COLORS = [
+  "#4B0082",
+  "#00C5D4",
+  "#FF3B61",
+  "#FF7A33",
+];
 
 export default function FuelConsumptionChart({ data }: { data: any[] }) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];
-    
-    // Make accumulative
-    const cumulative = makeCumulative(data, ["fuel_consumption_l_total"]);
-    
-    return cumulative.map((row) => ({
-      date: row.date,
-      fuel: row.fuel_consumption_l_total || 0,
-    }));
+
+    // Extract all cities from data keys
+    const citySet = new Set<string>();
+    data.forEach((row) => {
+      Object.keys(row).forEach((key) => {
+        if (key.startsWith("fuel_consumption_L_")) {
+          const city = key.replace("fuel_consumption_L_", "");
+          citySet.add(city);
+        }
+      });
+    });
+
+    const cities = Array.from(citySet).sort();
+
+    return data.map((row) => {
+      const result: any = { date: row.date };
+      cities.forEach((city) => {
+        result[city] = row[`fuel_consumption_L_${city}`] || 0;
+      });
+      return result;
+    });
   }, [data]);
+
+  if (chartData.length === 0) {
+    return <div className="text-white/60 p-4">No data available</div>;
+  }
+
+  // Get cities from first row
+  const cities = chartData.length > 0
+    ? Object.keys(chartData[0]).filter(k => k !== "date")
+    : [];
+
+  const displayCities = cities.slice(0, 4);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-        <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" />
+        <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fontSize: 12 }} />
         <YAxis stroke="rgba(255,255,255,0.6)" />
         <Tooltip
           contentStyle={{
@@ -37,16 +67,19 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
           }}
           labelStyle={{ color: "#fff" }}
         />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="fuel"
-          name="Fuel Consumption (L)"
-          stroke="#ffcc00"
-          strokeWidth={2}
-          dot={false}
-          isAnimationActive={true}
-        />
+        <Legend wrapperStyle={{ paddingTop: "16px" }} />
+        {displayCities.map((city, idx) => (
+          <Line
+            key={city}
+            type="monotone"
+            dataKey={city}
+            name={city}
+            stroke={FUEL_COLORS[idx % FUEL_COLORS.length]}
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   );

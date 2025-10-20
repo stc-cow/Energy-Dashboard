@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import FitToScreen from "@/components/layout/FitToScreen";
 
 export default function Index() {
+  const navigate = useNavigate();
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
   const [now, setNow] = useState(new Date());
   useEffect(() => {

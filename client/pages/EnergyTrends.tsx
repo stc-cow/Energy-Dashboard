@@ -24,20 +24,24 @@ export default function EnergyTrends() {
     queryFn: fetchHierarchy,
   });
 
-  const { data: trendsData } = useQuery<TrendsResponse>({
+  const { data: trendsData, isLoading } = useQuery<TrendsResponse>({
     queryKey: ["energy-trends", scope],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (scope.level) params.set("level", scope.level);
+      params.set("level", scope.level || "national");
       if (scope.regionId) params.set("regionId", scope.regionId);
       if (scope.cityId) params.set("cityId", scope.cityId);
       if (scope.siteId) params.set("siteId", scope.siteId);
       if (scope.district) params.set("district", scope.district);
 
-      const response = await fetch(`/api/energy/trends?${params.toString()}`);
+      const url = `/api/energy/trends?${params.toString()}`;
+      console.log("Fetching trends from:", url);
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     },
     enabled: !!hierarchy,
+    retry: 1,
   });
 
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);

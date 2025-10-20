@@ -37,6 +37,7 @@ export function createServer() {
   app.get("/api/breakdown/site", getBreakdownBySite);
   app.get("/api/benchmark", getBenchmark);
   app.get("/api/alerts", getAlerts);
+  app.get("/api/energy/trends", getTrends);
 
   // Manual trigger to send a test fuel alert email via Zapier
   app.post("/api/test-fuel-email", async (req, res) => {

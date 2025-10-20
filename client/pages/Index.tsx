@@ -278,6 +278,24 @@ export default function Index() {
             footer="from 01/01/2025 uP TO NOW"
           />
         </div>
+
+        <div className="grid grid-cols-2 gap-6 mt-6">
+          <div
+            onClick={() => navigate("/heatmap")}
+            className="cursor-pointer bg-purple-800 hover:bg-purple-700 rounded-2xl p-6 text-center shadow-lg transition"
+          >
+            <h3 className="text-white text-xl font-semibold">COW Distribution Map</h3>
+            <p className="text-purple-200 text-sm mt-2">View site distribution and status heatmap</p>
+          </div>
+
+          <div
+            onClick={() => navigate("/trends")}
+            className="cursor-pointer bg-purple-800 hover:bg-purple-700 rounded-2xl p-6 text-center shadow-lg transition"
+          >
+            <h3 className="text-white text-xl font-semibold">Energy Trends</h3>
+            <p className="text-purple-200 text-sm mt-2">Analyze accumulative fuel, power, CO₂, and generator load trends</p>
+          </div>
+        </div>
       </FitToScreen>
     </Layout>
   );

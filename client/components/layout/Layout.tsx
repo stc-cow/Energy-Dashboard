@@ -95,11 +95,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           borderTopWidth: "1px",
           borderWidth: "1px 0px 0px",
           color: "rgb(235, 235, 235)",
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: 400,
-          lineHeight: "16px",
-          marginTop: 16,
-          padding: "6px 0 0",
+          lineHeight: "12px",
+          marginTop: 4,
+          padding: "2px 0 0",
           textAlign: "center",
         }}
       >

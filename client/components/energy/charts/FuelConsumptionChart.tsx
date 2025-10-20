@@ -8,13 +8,21 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { TimePoint } from "@shared/api";
+import { useMemo } from "react";
+import { makeCumulative } from "@/lib/chartUtils";
 
-export default function FuelConsumptionChart({ data }: { data: TimePoint[] }) {
-  const chartData = data.map((p) => ({
-    date: new Date(p.t).toLocaleDateString(),
-    fuel: p.dieselLiters,
-  }));
+export default function FuelConsumptionChart({ data }: { data: any[] }) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
+    // Make accumulative
+    const cumulative = makeCumulative(data, ["fuel_consumption_l_total"]);
+    
+    return cumulative.map((row) => ({
+      date: row.date,
+      fuel: row.fuel_consumption_l_total || 0,
+    }));
+  }, [data]);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -31,11 +39,13 @@ export default function FuelConsumptionChart({ data }: { data: TimePoint[] }) {
         />
         <Legend />
         <Line
+          type="monotone"
           dataKey="fuel"
           name="Fuel Consumption (L)"
           stroke="#ffcc00"
+          strokeWidth={2}
           dot={false}
-          isAnimationActive={false}
+          isAnimationActive={true}
         />
       </LineChart>
     </ResponsiveContainer>

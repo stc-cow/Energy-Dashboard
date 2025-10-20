@@ -183,7 +183,7 @@ export default function Index() {
                           return (
                             <div
                               key={r.regionId}
-                              className="relative h-10 rounded-md overflow-hidden border border-white/10 bg-white/10"
+                              className="relative h-8 rounded-md overflow-hidden border border-white/10 bg-white/10"
                               style={{ flex: count || 0.0001 }}
                               aria-label={`${r.regionName || "Unknown"} ${count} (${pct}%)`}
                             >

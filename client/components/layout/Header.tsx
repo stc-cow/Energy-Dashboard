@@ -8,21 +8,21 @@ export default function Header() {
         "sticky top-0 z-30 w-full border-b border-white/10 bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60",
       )}
     >
-      <div className="container mx-auto grid grid-cols-3 h-[75px] items-center">
-        <Link to="/" className="flex items-center gap-3">
+      <div className="container mx-auto grid grid-cols-3 h-[60px] items-center">
+        <Link to="/" className="flex items-center gap-2">
           <img
             src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F0198dd0082b54c8c8c332a08688180d4?format=webp&width=800"
             alt="stc"
-            className="h-8 w-auto object-contain"
+            className="h-6 w-auto object-contain"
           />
         </Link>
         <div className="col-start-2 text-center">
-          <p className="text-white font-black text-[20px] leading-[20px] whitespace-nowrap">
+          <p className="text-white font-black text-[16px] leading-[16px] whitespace-nowrap">
             COW Predictive Energy Dashboard
           </p>
         </div>
-        <div className="flex items-center gap-6 justify-self-end col-start-3">
-          <nav className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-4 justify-self-end col-start-3">
+          <nav className="flex items-center gap-4 text-xs">
             <NavLink
               to="/heatmap"
               className={({ isActive }) =>
@@ -53,7 +53,7 @@ export default function Header() {
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2Ff13ebfdd5372404fad3f58e87a2908e4?format=webp&width=800"
               alt="ACES"
-              className="h-24 w-24 object-contain bg-transparent"
+              className="h-16 w-16 object-contain bg-transparent"
             />
           </a>
         </div>

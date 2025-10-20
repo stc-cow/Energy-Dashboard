@@ -13,14 +13,10 @@ import { useMemo } from "react";
 import { extractMetricByCities } from "@/lib/chartUtils";
 
 const LOAD_COLORS = [
-  "#ff9900",
-  "#ff3b3b",
-  "#aaf255",
-  "#00e0ff",
-  "#9d4edd",
-  "#3a86ff",
-  "#fb5607",
-  "#ffcc00",
+  "#4B0082",
+  "#00C5D4",
+  "#FF3B61",
+  "#FF7A33",
 ];
 
 export default function GeneratorLoadChart({ data, cities }: { data: any[]; cities: string[] }) {

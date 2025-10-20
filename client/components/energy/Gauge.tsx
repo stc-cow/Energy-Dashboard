@@ -27,14 +27,14 @@ export default function Gauge({
 
   return (
     <div
-      className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none flex flex-col items-center justify-center text-center"
+      className="rounded-xl border border-white/20 bg-card p-3 lg:p-4 shadow-none flex flex-col items-center justify-center text-center"
       style={{ height }}
     >
       <div className="flex flex-col items-center">
-        <div className="text-lg lg:text-xl tracking-wider text-white/90 mb-2 font-bold">
+        <div className="text-sm lg:text-base tracking-wider text-white/90 mb-1 font-bold">
           {label}
         </div>
-        <div className="w-72">
+        <div className="w-48 flex-1 flex items-center justify-center">
           <GaugeChart
             id={`gauge-${label}`}
             nrOfLevels={3}
@@ -51,11 +51,11 @@ export default function Gauge({
             style={{ width: "100%" }}
           />
         </div>
-        <div className="mt-2 text-5xl lg:text-6xl font-extrabold text-white">
+        <div className="mt-1 text-3xl lg:text-4xl font-extrabold text-white">
           {pct.toFixed(1)}%
         </div>
         {metric === "fuel" && (
-          <div className="text-xs text-white/80 mt-1 font-bold">
+          <div className="text-xs text-white/80 mt-1 font-bold line-clamp-1">
             Current Tank Average Level
           </div>
         )}

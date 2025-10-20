@@ -19,7 +19,7 @@ interface TrendsResponse {
 function generateMockTrendsData(
   scope: HierarchyFilter,
   allCities: { id: string; name: string; regionId?: string }[],
-  allSites: { id: string; name: string; cityId: string }[]
+  allSites: { id: string; name: string; cityId: string; district?: string }[]
 ): TrendsResponse {
   const seededRandom = (seed: number) => {
     let x = Math.sin(seed) * 10000;
@@ -35,6 +35,17 @@ function generateMockTrendsData(
   } else if (scope.regionId) {
     // If region is selected, filter cities in that region
     filteredCities = allCities.filter((c) => c.regionId === scope.regionId);
+  }
+
+  // If district is selected, further filter cities that have sites in that district
+  if (scope.district) {
+    const citiesWithDistrict = new Set<string>();
+    allSites.forEach((site) => {
+      if (site.district === scope.district) {
+        citiesWithDistrict.add(site.cityId);
+      }
+    });
+    filteredCities = filteredCities.filter((c) => citiesWithDistrict.has(c.id));
   }
 
   // Use city names for the chart
@@ -224,7 +235,7 @@ export default function EnergyTrends() {
               {/* Accumulative CO₂ Emissions */}
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative CO₂ Emissions
+                  Accumulative CO��� Emissions
                 </h2>
                 <div className="w-full h-80">
                   <Co2EmissionsChart data={trendsData.data} />

@@ -92,6 +92,7 @@ function generateMockTrendsData(
 }
 
 export default function EnergyTrends() {
+  const navigate = useNavigate();
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
 
   const { data: hierarchy } = useQuery({

@@ -13,14 +13,10 @@ import { useMemo } from "react";
 import { extractMetricByCities } from "@/lib/chartUtils";
 
 const CITY_COLORS = [
-  "#00e0ff",
-  "#ff3b3b",
-  "#ffcc00",
-  "#aaf255",
-  "#ff9900",
-  "#9d4edd",
-  "#3a86ff",
-  "#fb5607",
+  "#4B0082",
+  "#00C5D4",
+  "#FF3B61",
+  "#FF7A33",
 ];
 
 export default function FuelLevelChart({ data, cities }: { data: any[]; cities: string[] }) {

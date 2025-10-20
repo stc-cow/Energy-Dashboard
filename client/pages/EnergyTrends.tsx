@@ -10,7 +10,8 @@ import FuelLevelChart from "@/components/energy/charts/FuelLevelChart";
 import GeneratorLoadChart from "@/components/energy/charts/GeneratorLoadChart";
 
 interface TrendsResponse {
-  data: Array<{ [key: string]: any }>;
+  currentData: Array<{ [key: string]: any }>;  // Today's data for fuel level and generator load
+  accumulativeData: Array<{ [key: string]: any }>;  // Monthly data for accumulative charts
   metrics: string[];
   cities: string[];
 }

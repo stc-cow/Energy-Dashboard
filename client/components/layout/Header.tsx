@@ -31,9 +31,7 @@ export default function Header() {
                   : "text-white/80 hover:text-white"
               }
             >
-              <p>
-                <strong>COW Distribution Map</strong>
-              </p>
+              <p />
             </NavLink>
             <NavLink
               to="/trends"
@@ -43,9 +41,7 @@ export default function Header() {
                   : "text-white/80 hover:text-white"
               }
             >
-              <p>
-                <strong>Energy Trends</strong>
-              </p>
+              <p />
             </NavLink>
           </nav>
           <a

@@ -377,7 +377,7 @@ export default function EnergyTrends() {
               {trendsData.cities && trendsData.cities.length > 0 && (
                 <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    Current Fuel Level per City (Today)
+                    Current Fuel Level per {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
                   </h2>
                   <div className="w-full h-80">
                     <FuelLevelChart
@@ -392,7 +392,7 @@ export default function EnergyTrends() {
               {trendsData.cities && trendsData.cities.length > 0 && (
                 <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    Generator Load Trend (Today)
+                    Generator Load Trend per {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
                   </h2>
                   <div className="w-full h-80">
                     <GeneratorLoadChart

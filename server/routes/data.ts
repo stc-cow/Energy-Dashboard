@@ -303,3 +303,78 @@ export function mockAlerts(scope: HierarchyFilter): AlertsResponse {
   });
   return { scope, items };
 }
+
+export function mockEnergyTrends(scope: HierarchyFilter): {
+  data: Array<{
+    date: string;
+    [key: string]: string | number;
+  }>;
+  metrics: string[];
+  cities: string[];
+} {
+  const now = new Date();
+  const days = 30;
+  const scopeCities = Array.from(
+    new Set(
+      scopeSites(scope)
+        .map((s) => {
+          const city = cities.find((c) => c.id === s.cityId);
+          return city?.name || "";
+        })
+        .filter(Boolean),
+    ),
+  );
+
+  const data = Array.from({ length: days }).map((_, dayIdx) => {
+    const date = new Date(now);
+    date.setDate(now.getDate() - (days - 1 - dayIdx));
+    const dateStr = date.toISOString().split("T")[0];
+
+    const row: any = { date: dateStr };
+
+    const metrics = [
+      "fuel_consumption_l",
+      "co2_ton",
+      "power_kw",
+      "fuel_level_%",
+      "gen_load_%",
+    ];
+
+    // Generate data for each city
+    scopeCities.forEach((cityName, cityIdx) => {
+      const baseSeed = dayIdx * 100 + cityIdx * 10;
+      const diesel = 1000 + Math.floor(seededRandom(baseSeed) * 800);
+      const power = 600 + Math.floor(seededRandom(baseSeed + 1) * 400);
+      const co2 = Math.round(diesel * 2.68) / 1000;
+      const fuelLevel = Math.round((40 + seededRandom(baseSeed + 2) * 50) * 10) / 10;
+      const genLoad = Math.round((45 + seededRandom(baseSeed + 3) * 55) * 10) / 10;
+
+      row[`fuel_consumption_l_${cityName}`] = diesel;
+      row[`co2_ton_${cityName}`] = co2;
+      row[`power_kw_${cityName}`] = power;
+      row[`fuel_level_%_${cityName}`] = fuelLevel;
+      row[`gen_load_%_${cityName}`] = genLoad;
+    });
+
+    // Also add aggregated totals
+    const totalDiesel = scopeSites(scope).reduce((acc, _, i) => {
+      return acc + (1000 + Math.floor(seededRandom(dayIdx * 100 + i) * 800));
+    }, 0);
+    const totalCo2 = Math.round(totalDiesel * 2.68) / 1000;
+    const totalPower = scopeSites(scope).reduce((acc, _, i) => {
+      return acc + (600 + Math.floor(seededRandom(dayIdx * 100 + i + 1) * 400));
+    }, 0);
+
+    row["fuel_consumption_l_total"] = totalDiesel;
+    row["co2_ton_total"] = totalCo2;
+    row["power_kw_total"] = totalPower;
+
+    return row;
+  });
+
+  return {
+    data,
+    metrics: ["fuel_consumption_l", "co2_ton", "power_kw", "fuel_level_%", "gen_load_%"],
+    cities: scopeCities,
+  };
+}

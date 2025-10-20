@@ -109,8 +109,8 @@ export default function Index() {
   return (
     <Layout>
       <FitToScreen bottomOffset={16}>
-        <div className="mb-4">
-          <p className="text-sm sm:text-base text-white/80 font-bold text-left">
+        <div className="mb-2">
+          <p className="text-xs sm:text-sm text-white/80 font-bold text-left">
             As of {asOf}
           </p>
         </div>
@@ -155,12 +155,12 @@ export default function Index() {
         )}
 
         {/* COWs Status card */}
-        <div className="mt-4 grid grid-cols-1">
+        <div className="mt-2 grid grid-cols-1">
           <div
             className="rounded-xl border border-white/20 bg-card shadow-none flex flex-col"
-            style={{ padding: "32px 32px 20px", marginBottom: 20 }}
+            style={{ padding: "16px 16px 12px", marginBottom: 12 }}
           >
-            <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold mb-3">
+            <div className="text-sm lg:text-base tracking-wider text-white/90 font-bold mb-2">
               <p>
                 <strong>Regional breakdown</strong>
               </p>
@@ -223,7 +223,7 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mt-2">
           <KpiCard
             title="Diesel Consumption"
             value={kpis?.kpis.dieselLitersPerDay.value ?? 0}
@@ -243,22 +243,22 @@ export default function Index() {
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2">
+        <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
           <Gauge
             value={kpis?.kpis.fuelTankLevelPct.value ?? 0}
             label="Fuel Tank Level"
             metric="fuel"
-            height={258}
+            height={200}
           />
           <Gauge
             value={kpis?.kpis.generatorLoadFactorPct.value ?? 0}
             label="Average Generator Load"
             metric="power"
-            height={257}
+            height={200}
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-3">
           <KpiCard
             title="Accum. Power Consumption"
             value={Math.round((accum?.powerKwh ?? 0) / 1000)}
@@ -279,7 +279,7 @@ export default function Index() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-2 gap-3 mt-2">
           <div
             onClick={() => navigate("/heatmap")}
             className="cursor-pointer rounded-2xl p-6 text-center shadow-lg transition hover:opacity-90"

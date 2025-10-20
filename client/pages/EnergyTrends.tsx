@@ -110,11 +110,17 @@ export default function EnergyTrends() {
   });
 
   const trendsData = useMemo(() => {
-    return hierarchy ? generateMockTrendsData(scope) : null;
+    if (!hierarchy) return null;
+    return generateMockTrendsData(
+      scope,
+      hierarchy.cities || [],
+      hierarchy.sites || []
+    );
   }, [hierarchy, scope]);
 
   const isLoading = !hierarchy;
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
+  const allCities = useMemo(() => hierarchy?.cities ?? [], [hierarchy]);
 
   return (
     <Layout>
@@ -158,7 +164,7 @@ export default function EnergyTrends() {
               </div>
             </div>
 
-            {/* Accumulative CO�� Emissions */}
+            {/* Accumulative CO₂ Emissions */}
             <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
               <h2 className="text-xl font-semibold text-white mb-4">
                 Accumulative CO₂ Emissions

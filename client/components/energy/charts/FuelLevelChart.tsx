@@ -10,7 +10,6 @@ import {
   ReferenceLine,
 } from "recharts";
 import { useMemo } from "react";
-import { extractMetricByCities } from "@/lib/chartUtils";
 
 const CITY_COLORS = ["#4B0082", "#00C5D4", "#FF3B61", "#FF7A33"];
 

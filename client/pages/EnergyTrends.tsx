@@ -368,11 +368,11 @@ export default function EnergyTrends() {
           trendsData.currentData &&
           trendsData.accumulativeData && (
             <div className="space-y-8">
-              {/* Current Fuel Level per City */}
-              {trendsData.cities && trendsData.cities.length > 0 && (
+              {/* Current Fuel Level by Region/District */}
+              {trendsData.currentData && trendsData.currentData.length > 0 && (
                 <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    Current Fuel Level per {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
+                    Current Fuel Level by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
                   </h2>
                   <div className="w-full h-80">
                     <FuelLevelChart
@@ -383,11 +383,11 @@ export default function EnergyTrends() {
                 </div>
               )}
 
-              {/* Generator Load Trend */}
-              {trendsData.cities && trendsData.cities.length > 0 && (
+              {/* Generator Load Trend by Region/District */}
+              {trendsData.currentData && trendsData.currentData.length > 0 && (
                 <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    Generator Load Trend per {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
+                    Generator Load Trend by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
                   </h2>
                   <div className="w-full h-80">
                     <GeneratorLoadChart

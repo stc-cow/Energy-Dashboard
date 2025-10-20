@@ -1,6 +1,6 @@
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -27,7 +27,7 @@ export default function GeneratorLoadChart({ data, cities }: { data: any[]; citi
     if (!data || data.length === 0 || !cities || cities.length === 0) {
       return [];
     }
-
+    
     return extractMetricByCities(data, "gen_load_%", cities);
   }, [data, cities]);
 
@@ -40,7 +40,7 @@ export default function GeneratorLoadChart({ data, cities }: { data: any[]; citi
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+      <BarChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
         <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fontSize: 12 }} />
         <YAxis stroke="rgba(255,255,255,0.6)" domain={[0, 100]} />
@@ -53,18 +53,15 @@ export default function GeneratorLoadChart({ data, cities }: { data: any[]; citi
         />
         <Legend wrapperStyle={{ paddingTop: "16px" }} />
         {displayCities.map((city, idx) => (
-          <Line
+          <Bar
             key={city}
-            type="monotone"
             dataKey={city}
             name={`${city}`}
-            stroke={LOAD_COLORS[idx % LOAD_COLORS.length]}
-            strokeWidth={2}
-            dot={false}
+            fill={LOAD_COLORS[idx % LOAD_COLORS.length]}
             isAnimationActive={false}
           />
         ))}
-      </LineChart>
+      </BarChart>
     </ResponsiveContainer>
   );
 }

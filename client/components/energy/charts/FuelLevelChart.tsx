@@ -8,7 +8,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { TimePoint } from "@shared/api";
+import { useMemo } from "react";
+import { extractMetricByCities } from "@/lib/chartUtils";
 
 const CITY_COLORS = [
   "#00e0ff",
@@ -21,18 +22,12 @@ const CITY_COLORS = [
   "#fb5607",
 ];
 
-export default function FuelLevelChart({ data }: { data: TimePoint[] }) {
-  const cities = ["Riyadh", "Jeddah", "Dammam", "Medina", "Abha"];
-
-  const chartData = data.map((p, idx) => {
-    const obj: any = {
-      date: new Date(p.t).toLocaleDateString(),
-    };
-    cities.forEach((city, cityIdx) => {
-      obj[city] = Math.max(15, 85 - ((idx + cityIdx) * 3) % 70);
-    });
-    return obj;
-  });
+export default function FuelLevelChart({ data, cities }: { data: any[]; cities: string[] }) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
+    return extractMetricByCities(data, "fuel_level_%", cities);
+  }, [data, cities]);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -51,11 +46,13 @@ export default function FuelLevelChart({ data }: { data: TimePoint[] }) {
         {cities.map((city, idx) => (
           <Line
             key={city}
+            type="monotone"
             dataKey={city}
             name={`${city} Fuel Level (%)`}
             stroke={CITY_COLORS[idx % CITY_COLORS.length]}
+            strokeWidth={2}
             dot={false}
-            isAnimationActive={false}
+            isAnimationActive={true}
           />
         ))}
       </LineChart>

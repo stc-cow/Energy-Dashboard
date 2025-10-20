@@ -52,42 +52,59 @@ function generateMockTrendsData(
   // Use city names for the chart
   const cities = filteredCities.map((c) => c.name);
 
-  // Generate data for each day from 1/1/2025 to today
   const startDate = new Date(2025, 0, 1); // January 1, 2025
   const today = new Date();
-  const data = [];
 
-  for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
-    const dateStr = d.toISOString().split("T")[0];
-    const row: any = { date: dateStr };
+  // ===== CURRENT DATA (Today only) =====
+  const currentData = [];
+  const todayStr = today.toISOString().split("T")[0];
+  const todayRow: any = { date: todayStr };
+
+  cities.forEach((city, cityIdx) => {
+    const cityId = filteredCities[cityIdx].id;
+    const seed = `${cityId}-${todayStr}`.length;
+
+    // Current fuel level (0-100%)
+    todayRow[`fuel_${city}`] = Math.round(seededRandom(seed * 11) * 100);
+
+    // Generator load (0-100%)
+    todayRow[`gen_${city}`] = Math.round(seededRandom(seed * 13) * 100);
+  });
+
+  currentData.push(todayRow);
+
+  // ===== ACCUMULATIVE DATA (Monthly from Jan 2025 to today) =====
+  const accumulativeData = [];
+  const currentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Last day of current month
+
+  for (let m = new Date(2025, 0, 1); m <= today; m.setMonth(m.getMonth() + 1)) {
+    const monthStr = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`;
+    const monthRow: any = { date: monthStr };
 
     cities.forEach((city, cityIdx) => {
       const cityId = filteredCities[cityIdx].id;
-      const seed = `${cityId}-${dateStr}`.length;
 
-      // Current fuel level (0-100%)
-      row[`fuel_${city}`] = Math.round(seededRandom(seed * 11) * 100);
+      // Calculate total days elapsed until end of this month
+      const monthEnd = new Date(m.getFullYear(), m.getMonth() + 1, 0);
+      const effectiveEndDate = monthEnd <= today ? monthEnd : today;
+      const dayOffset = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
-      // Generator load (0-100%)
-      row[`gen_${city}`] = Math.round(seededRandom(seed * 13) * 100);
-
-      // For accumulative metrics, use date offset
-      const dayOffset = Math.floor((d.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const seed = `${cityId}-${monthStr}`.length;
 
       // Accumulative fuel (liters)
-      row[`fuel_liters_${city}`] = (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
+      monthRow[`fuel_liters_${city}`] = (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
 
       // Accumulative CO2 (tons)
-      row[`co2_tons_${city}`] = ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
+      monthRow[`co2_tons_${city}`] = ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
 
       // Accumulative power (kWh)
-      row[`power_kwh_${city}`] = (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
+      monthRow[`power_kwh_${city}`] = (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
     });
 
-    data.push(row);
+    accumulativeData.push(monthRow);
   }
 
-  return { data, metrics: [], cities };
+  return { currentData, accumulativeData, metrics: [], cities };
 }
 
 export default function EnergyTrends() {

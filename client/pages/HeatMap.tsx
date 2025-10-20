@@ -129,16 +129,34 @@ export default function HeatMap() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <HeatLayer
-              points={combinedPoints}
-              gradient={{
-                0.0: "blue",
-                0.5: "green",
-                0.8: "yellow",
-                1.0: "#ff6666",
-              }}
-              intensity={1}
-            />
+            <MapZoomListener />
+            {zoom < 10 && (
+              <HeatLayer
+                points={combinedPoints}
+                gradient={{
+                  0.0: "blue",
+                  0.5: "green",
+                  0.8: "yellow",
+                  1.0: "#ff6666",
+                }}
+                intensity={1}
+              />
+            )}
+            {zoom >= 10 && combinedPoints.map((point, idx) => {
+              const siteId = siteMap.get(`${point.lat},${point.lng}`);
+              return (
+                <Marker
+                  key={idx}
+                  position={[point.lat, point.lng]}
+                >
+                  <Popup>
+                    <div style={{ fontWeight: "bold", color: "#000" }}>
+                      {siteId || "Site"}
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MapContainer>
         </div>
         {combinedPoints.length === 0 && (

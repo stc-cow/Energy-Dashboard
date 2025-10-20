@@ -6,6 +6,7 @@ import {
   fetchAccumulations,
 } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
+import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";
 import FuelConsumptionChart from "@/components/energy/charts/FuelConsumptionChart";
 import Co2EmissionsChart from "@/components/energy/charts/Co2EmissionsChart";
@@ -18,10 +19,7 @@ export default function EnergyTrends() {
 
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],
-    queryFn: async () => {
-      const response = await fetch("/api/hierarchy");
-      return response.json();
-    },
+    queryFn: fetchHierarchy,
   });
 
   const { data: tsDaily } = useQuery({
@@ -43,19 +41,13 @@ export default function EnergyTrends() {
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
-      <div className="max-w-6xl mx-auto bg-background min-h-screen p-6">
+    <Layout>
+      <div className="max-w-6xl mx-auto p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-white">
             COW Energy Trends (Accumulative & Current Metrics)
           </h1>
-          <button
-            onClick={() => window.history.back()}
-            className="text-white/80 hover:text-white text-lg"
-          >
-            ✕
-          </button>
         </div>
 
         {/* Filter Controls */}
@@ -124,6 +116,6 @@ export default function EnergyTrends() {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

@@ -108,13 +108,28 @@ export default function EnergyTrends() {
   }, [hierarchy, scope]);
 
   const isLoading = !hierarchy;
-  
+
   // Get districts for selected region
   const filteredCities = useMemo(() => {
     if (!hierarchy) return [];
     if (!scope.regionId) return hierarchy.cities || [];
     return hierarchy.cities?.filter((c) => c.regionId === scope.regionId) || [];
   }, [hierarchy, scope.regionId]);
+
+  // Get distinct districts from sites in filtered cities
+  const districts = useMemo(() => {
+    if (!hierarchy || filteredCities.length === 0) return [];
+    const filteredCityIds = new Set(filteredCities.map((c) => c.id));
+    const districtSet = new Set<string>();
+
+    (hierarchy.sites || []).forEach((site) => {
+      if (filteredCityIds.has(site.cityId) && site.district) {
+        districtSet.add(site.district);
+      }
+    });
+
+    return Array.from(districtSet).sort();
+  }, [hierarchy, filteredCities]);
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto flex items-center justify-center p-4">

@@ -1,6 +1,7 @@
 import {
-  BarChart,
+  ComposedChart,
   Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -28,7 +29,17 @@ export default function FuelLevelChart({ data, cities }: { data: any[]; cities: 
       return [];
     }
     
-    return extractMetricByCities(data, "fuel_level_%", cities);
+    const extracted = extractMetricByCities(data, "fuel_level_%", cities);
+    
+    // Calculate average for each date
+    return extracted.map((row) => {
+      const values = cities.map((city) => row[city] || 0);
+      const average = values.reduce((a, b) => a + b, 0) / values.length;
+      return {
+        ...row,
+        average: Math.round(average * 10) / 10,
+      };
+    });
   }, [data, cities]);
 
   if (!cities || cities.length === 0 || chartData.length === 0) {
@@ -40,7 +51,7 @@ export default function FuelLevelChart({ data, cities }: { data: any[]; cities: 
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+      <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
         <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fontSize: 12 }} />
         <YAxis stroke="rgba(255,255,255,0.6)" domain={[0, 100]} />
@@ -59,9 +70,20 @@ export default function FuelLevelChart({ data, cities }: { data: any[]; cities: 
             name={`${city}`}
             fill={CITY_COLORS[idx % CITY_COLORS.length]}
             isAnimationActive={false}
+            yAxisId="left"
           />
         ))}
-      </BarChart>
+        <Line
+          type="monotone"
+          dataKey="average"
+          name="Average"
+          stroke="#ffffff"
+          strokeWidth={3}
+          dot={false}
+          isAnimationActive={false}
+          yAxisId="left"
+        />
+      </ComposedChart>
     </ResponsiveContainer>
   );
 }

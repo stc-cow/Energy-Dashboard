@@ -10,11 +10,29 @@ import {
 } from "recharts";
 import { TimePoint } from "@shared/api";
 
+const CITY_COLORS = [
+  "#00e0ff",
+  "#ff3b3b",
+  "#ffcc00",
+  "#aaf255",
+  "#ff9900",
+  "#9d4edd",
+  "#3a86ff",
+  "#fb5607",
+];
+
 export default function FuelLevelChart({ data }: { data: TimePoint[] }) {
-  const chartData = data.map((p, idx) => ({
-    date: new Date(p.t).toLocaleDateString(),
-    fuelLevel: Math.max(20, 80 - (idx * 2) % 60),
-  }));
+  const cities = ["Riyadh", "Jeddah", "Dammam", "Medina", "Abha"];
+
+  const chartData = data.map((p, idx) => {
+    const obj: any = {
+      date: new Date(p.t).toLocaleDateString(),
+    };
+    cities.forEach((city, cityIdx) => {
+      obj[city] = Math.max(15, 85 - ((idx + cityIdx) * 3) % 70);
+    });
+    return obj;
+  });
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -30,13 +48,16 @@ export default function FuelLevelChart({ data }: { data: TimePoint[] }) {
           labelStyle={{ color: "#fff" }}
         />
         <Legend />
-        <Line
-          dataKey="fuelLevel"
-          name="Fuel Level (%)"
-          stroke="#00e0ff"
-          dot={false}
-          isAnimationActive={false}
-        />
+        {cities.map((city, idx) => (
+          <Line
+            key={city}
+            dataKey={city}
+            name={`${city} Fuel Level (%)`}
+            stroke={CITY_COLORS[idx % CITY_COLORS.length]}
+            dot={false}
+            isAnimationActive={false}
+          />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   );

@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Reports from "./pages/Reports";
 import Independent from "./pages/Independent";
 import HeatMap from "./pages/HeatMap";
+import EnergyTrends from "./pages/EnergyTrends";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,7 @@ const App = () => (
           <Route path="/reports" element={<Reports />} />
           <Route path="/independent" element={<Independent />} />
           <Route path="/heatmap" element={<HeatMap />} />
+          <Route path="/trends" element={<EnergyTrends />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

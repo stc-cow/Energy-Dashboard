@@ -10,7 +10,7 @@ export default function KpiCard({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none min-h-40 flex flex-col items-center text-center">
+    <div className="rounded-xl border border-white/20 bg-card p-6 lg:p-8 shadow-none h-full flex flex-col items-center text-center justify-between">
       <div className="text-lg lg:text-xl tracking-wider text-white/90 font-bold">
         {title}
       </div>

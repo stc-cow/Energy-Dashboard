@@ -24,10 +24,19 @@ const CITY_COLORS = [
 
 export default function FuelLevelChart({ data, cities }: { data: any[]; cities: string[] }) {
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    
-    return extractMetricByCities(data, "fuel_level_%", cities);
+    if (!data || data.length === 0 || !cities || cities.length === 0) {
+      console.warn("FuelLevelChart: Missing data or cities", { dataLen: data?.length, citiesLen: cities?.length });
+      return [];
+    }
+
+    const result = extractMetricByCities(data, "fuel_level_%", cities);
+    console.log("FuelLevelChart data:", result.slice(0, 2), "cities:", cities);
+    return result;
   }, [data, cities]);
+
+  if (!cities || cities.length === 0) {
+    return <div className="text-white/60 p-4">No cities selected</div>;
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%">

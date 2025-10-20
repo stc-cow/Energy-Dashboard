@@ -42,6 +42,7 @@ function HeatLayer({
 }
 
 export default function HeatMap() {
+  const [zoom, setZoom] = useState(6);
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],
     queryFn: fetchHierarchy,
@@ -56,12 +57,40 @@ export default function HeatMap() {
     () => [...(statusPoints.onAir || []), ...(statusPoints.offAir || [])],
     [statusPoints],
   );
+
+  // Create a map of site coordinates to site IDs from hierarchy
+  const siteMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (hierarchy?.sites) {
+      hierarchy.sites.forEach((site: any) => {
+        const key = `${site.lat},${site.lng}`;
+        map.set(key, site.id || site.name);
+      });
+    }
+    return map;
+  }, [hierarchy]);
+
   const bounds = useMemo(() => {
     const pts = combinedPoints;
     if (!pts.length) return L.latLngBounds(L.latLng(16, 34), L.latLng(32, 56));
     const b = L.latLngBounds(pts.map((p) => [p.lat, p.lng]) as any);
     return b.pad(0.2);
   }, [combinedPoints]);
+
+  function MapZoomListener() {
+    const map = useMap();
+    useEffect(() => {
+      const handleZoom = () => {
+        setZoom(map.getZoom());
+      };
+      map.on("zoom", handleZoom);
+      setZoom(map.getZoom());
+      return () => {
+        map.off("zoom", handleZoom);
+      };
+    }, [map]);
+    return null;
+  }
 
   return (
     <Layout>

@@ -35,6 +35,18 @@ export default function Header() {
                 <strong>COW Distribution Map</strong>
               </p>
             </NavLink>
+            <NavLink
+              to="/trends"
+              className={({ isActive }) =>
+                isActive
+                  ? "font-semibold text-white"
+                  : "text-white/80 hover:text-white"
+              }
+            >
+              <p>
+                <strong>Energy Trends</strong>
+              </p>
+            </NavLink>
           </nav>
           <a
             href="https://aces-co.com/"

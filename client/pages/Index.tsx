@@ -4,6 +4,7 @@ import KpiCard from "@/components/energy/KpiCard";
 import Gauge from "@/components/energy/Gauge";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   fetchAlerts,
   fetchBenchmark,

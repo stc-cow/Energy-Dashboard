@@ -183,12 +183,17 @@ export default function EnergyTrends() {
                   </label>
                   <select
                     disabled={!scope.regionId}
+                    value={scope.district || ""}
+                    onChange={(e) => {
+                      const district = e.target.value || undefined;
+                      setScope((prev) => ({ ...prev, district }));
+                    }}
                     className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
                   >
-                    <option style={{ color: "black" }}>All Districts</option>
-                    {filteredCities.map((city) => (
-                      <option key={city.id} style={{ color: "black" }}>
-                        {city.name}
+                    <option value="" style={{ color: "black" }}>All Districts</option>
+                    {districts.map((district) => (
+                      <option key={district} value={district} style={{ color: "black" }}>
+                        {district}
                       </option>
                     ))}
                   </select>

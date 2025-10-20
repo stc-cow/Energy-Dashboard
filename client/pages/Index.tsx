@@ -167,7 +167,7 @@ export default function Index() {
             </div>
             <div className="grid grid-cols-1 items-start">
               <div
-                className="rounded-lg p-4"
+                className="rounded-lg p-2"
                 style={{ backgroundColor: "rgba(12, 12, 56, 0.4)" }}
               >
                 <div className="text-sm text-white/80">
@@ -176,7 +176,7 @@ export default function Index() {
                     const total =
                       items.reduce((s, x) => s + (x.count || 0), 0) || 1;
                     return (
-                      <div className="flex items-stretch gap-3">
+                      <div className="flex items-stretch gap-2">
                         {items.map((r) => {
                           const count = r.count || 0;
                           const pct = Math.round((count / total) * 100);

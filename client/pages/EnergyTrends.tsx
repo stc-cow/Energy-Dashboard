@@ -170,6 +170,26 @@ function generateMockTrendsData(
   return { currentData, accumulativeData, metrics: [], cities };
 }
 
+// Helper function to extract metric from grouped data
+function extractMetricFromGroupedData(
+  data: Array<{ [key: string]: any }>,
+  cities: string[],
+  metricPrefix: string,
+): Array<{ [key: string]: any }> {
+  return data.map((row) => {
+    const result: any = { name: row.name };
+    cities.forEach((city) => {
+      const key = `${metricPrefix}_${city}`;
+      if (row[key] !== undefined) {
+        result[city] = row[key];
+      } else {
+        result[city] = row[city] ?? 0;
+      }
+    });
+    return result;
+  });
+}
+
 export default function EnergyTrends() {
   const navigate = useNavigate();
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });

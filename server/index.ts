@@ -8,6 +8,7 @@ import {
   getTimeSeries,
   getBenchmark,
   getAlerts,
+  getTrends,
   getBreakdownByRegion,
   getBreakdownBySite,
 } from "./routes/energy";

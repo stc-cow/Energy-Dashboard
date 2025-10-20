@@ -20,29 +20,24 @@ export default function FuelLevelChart({
   data: any[];
   cities: string[];
 }) {
-  const { chartData, averageValue } = useMemo(() => {
-    if (!data || data.length === 0 || !cities || cities.length === 0) {
-      return { chartData: [], averageValue: 0 };
+  const { chartData, displayItems, averageValue } = useMemo(() => {
+    if (!data || data.length === 0) {
+      return { chartData: [], displayItems: [], averageValue: 0 };
     }
 
-    // Process data - cities are already in the data structure with "name" field for x-axis
-    const chartData = data.map((row) => {
-      const result: any = { name: row.name };
-      cities.forEach((city) => {
-        result[city] = row[city] ?? 0;
-      });
-      return result;
-    });
-
-    // Calculate overall average
+    // Extract all keys from the data row that represent regions/districts (excluding "name" and "gen_*" keys)
+    const row = data[0];
+    const displayItems: string[] = [];
     const allValues: number[] = [];
-    chartData.forEach((row) => {
-      cities.forEach((city) => {
-        const val = row[city];
+
+    Object.keys(row).forEach((key) => {
+      if (key !== "name" && !key.startsWith("gen_")) {
+        displayItems.push(key);
+        const val = row[key];
         if (typeof val === "number") {
           allValues.push(val);
         }
-      });
+      }
     });
 
     const avg =
@@ -52,15 +47,15 @@ export default function FuelLevelChart({
           ) / 10
         : 0;
 
-    return { chartData, averageValue: avg };
+    return { chartData: data, displayItems, averageValue: avg };
   }, [data, cities]);
 
-  if (!cities || cities.length === 0 || chartData.length === 0) {
+  if (!displayItems || displayItems.length === 0 || chartData.length === 0) {
     return <div className="text-white/60 p-4">No data available</div>;
   }
 
-  // Limit to max 5 cities for better visualization
-  const displayCities = cities.slice(0, 5);
+  // Limit to max 5 regions/districts for better visualization
+  const displayRegions = displayItems.slice(0, 5);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -83,11 +78,11 @@ export default function FuelLevelChart({
           labelStyle={{ color: "#fff" }}
         />
         <Legend wrapperStyle={{ paddingTop: "16px" }} />
-        {displayCities.map((city, idx) => (
+        {displayRegions.map((region, idx) => (
           <Bar
-            key={city}
-            dataKey={city}
-            name={`${city}`}
+            key={region}
+            dataKey={region}
+            name={region}
             fill={CITY_COLORS[idx % CITY_COLORS.length]}
             isAnimationActive={false}
           />

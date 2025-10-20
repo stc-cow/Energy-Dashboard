@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { fetchHierarchy } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import FuelConsumptionChart from "@/components/energy/charts/FuelConsumptionChart";
@@ -51,53 +51,42 @@ function generateMockTrendsData(
   // Use city names for the chart
   const cities = filteredCities.map((c) => c.name);
 
-  const days = 30;
-  const now = new Date();
+  // Generate data for each day from 1/1/2025 to today
+  const startDate = new Date(2025, 0, 1); // January 1, 2025
+  const today = new Date();
+  const data = [];
 
-  const data = Array.from({ length: days }).map((_, dayIdx) => {
-    const date = new Date(now);
-    date.setDate(now.getDate() - (days - 1 - dayIdx));
-    const dateStr = date.toISOString().split("T")[0];
-
+  for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+    const dateStr = d.toISOString().split("T")[0];
     const row: any = { date: dateStr };
 
-    // Generate data for each filtered city
-    cities.forEach((cityName, cityIdx) => {
-      const baseSeed = dayIdx * 100 + cityIdx * 10;
-      const diesel = 1000 + Math.floor(seededRandom(baseSeed) * 800);
-      const power = 600 + Math.floor(seededRandom(baseSeed + 1) * 400);
-      const co2 = Math.round(diesel * 2.68) / 1000;
-      const fuelLevel = Math.round((40 + seededRandom(baseSeed + 2) * 50) * 10) / 10;
-      const genLoad = Math.round((45 + seededRandom(baseSeed + 3) * 55) * 10) / 10;
+    cities.forEach((city, cityIdx) => {
+      const cityId = filteredCities[cityIdx].id;
+      const seed = `${cityId}-${dateStr}`.length;
 
-      row[`fuel_consumption_l_${cityName}`] = diesel;
-      row[`co2_ton_${cityName}`] = co2;
-      row[`power_kw_${cityName}`] = power;
-      row[`fuel_level_%_${cityName}`] = fuelLevel;
-      row[`gen_load_%_${cityName}`] = genLoad;
+      // Current fuel level (0-100%)
+      row[`fuel_${city}`] = Math.round(seededRandom(seed * 11) * 100);
+
+      // Generator load (0-100%)
+      row[`gen_${city}`] = Math.round(seededRandom(seed * 13) * 100);
+
+      // For accumulative metrics, use date offset
+      const dayOffset = Math.floor((d.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      // Accumulative fuel (liters)
+      row[`fuel_liters_${city}`] = (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
+
+      // Accumulative CO2 (tons)
+      row[`co2_tons_${city}`] = ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
+
+      // Accumulative power (kWh)
+      row[`power_kwh_${city}`] = (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
     });
 
-    // Aggregated totals from filtered cities
-    const totalDiesel = cities.reduce((acc, _, i) => {
-      return acc + (1000 + Math.floor(seededRandom(dayIdx * 100 + i) * 800));
-    }, 0);
-    const totalCo2 = Math.round(totalDiesel * 2.68) / 1000;
-    const totalPower = cities.reduce((acc, _, i) => {
-      return acc + (600 + Math.floor(seededRandom(dayIdx * 100 + i + 1) * 400));
-    }, 0);
+    data.push(row);
+  }
 
-    row["fuel_consumption_l_total"] = totalDiesel;
-    row["co2_ton_total"] = totalCo2;
-    row["power_kw_total"] = totalPower;
-
-    return row;
-  });
-
-  return {
-    data,
-    metrics: ["fuel_consumption_l", "co2_ton", "power_kw", "fuel_level_%", "gen_load_%"],
-    cities,
-  };
+  return { data, metrics: [], cities };
 }
 
 export default function EnergyTrends() {
@@ -106,7 +95,10 @@ export default function EnergyTrends() {
 
   const { data: hierarchy } = useQuery({
     queryKey: ["hierarchy"],
-    queryFn: fetchHierarchy,
+    queryFn: async () => {
+      const res = await fetch("/api/hierarchy");
+      return res.json();
+    },
   });
 
   const trendsData = useMemo(() => {
@@ -143,153 +135,171 @@ export default function EnergyTrends() {
   }, [hierarchy, filteredCities]);
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl bg-background rounded-2xl border border-white/20 shadow-2xl">
-        <div className="max-h-[90vh] overflow-y-auto p-8">
-          {/* Header with Close Button */}
-          <div className="mb-6 flex items-center justify-between sticky top-0 bg-background pb-4 border-b border-white/10">
-            <h1 className="text-3xl font-bold text-white">
-              COW Energy Trends (Accumulative & Current Metrics)
-            </h1>
-            <button
-              onClick={() => navigate("/")}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex-shrink-0 ml-4"
-            >
-              Close
-            </button>
-          </div>
-
-          {/* Filter Controls - Region and District Only */}
-          {hierarchy && (
-            <div className="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Region Filter */}
-                <div>
-                  <label className="block text-white text-sm font-semibold mb-2">
-                    Region
-                  </label>
-                  <select
-                    value={scope.regionId || ""}
-                    onChange={(e) => {
-                      const regionId = e.target.value || undefined;
-                      setScope({ level: regionId ? "region" : "national", regionId });
-                    }}
-                    className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
-                  >
-                    <option value="" style={{ color: "black" }}>
-                      All Regions
-                    </option>
-                    {hierarchy.regions?.map((r) => (
-                      <option key={r.id} value={r.id} style={{ color: "black" }}>
-                        {r.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* District Filter */}
-                <div>
-                  <label className="block text-white text-sm font-semibold mb-2">
-                    District
-                  </label>
-                  <select
-                    disabled={!scope.regionId}
-                    value={scope.district || ""}
-                    onChange={(e) => {
-                      const district = e.target.value || undefined;
-                      setScope((prev) => ({ ...prev, district }));
-                    }}
-                    className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
-                  >
-                    <option value="" style={{ color: "black" }}>All Districts</option>
-                    {districts.map((district) => (
-                      <option key={district} value={district} style={{ color: "black" }}>
-                        {district}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Charts Container */}
-          {isLoading && (
-            <div className="text-center py-12">
-              <p className="text-white/60">Loading trends data...</p>
-            </div>
-          )}
-
-          {trendsData && trendsData.data && trendsData.data.length > 0 && (
-            <div className="space-y-8">
-              {/* Accumulative Fuel Consumption */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative Fuel Consumption
-                </h2>
-                <div className="w-full h-80">
-                  <FuelConsumptionChart data={trendsData.data} />
-                </div>
-              </div>
-
-              {/* Accumulative CO₂ Emissions */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative CO��� Emissions
-                </h2>
-                <div className="w-full h-80">
-                  <Co2EmissionsChart data={trendsData.data} />
-                </div>
-              </div>
-
-              {/* Accumulative Power Consumption */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative Power Consumption
-                </h2>
-                <div className="w-full h-80">
-                  <PowerConsumptionChart data={trendsData.data} />
-                </div>
-              </div>
-
-              {/* Current Fuel Level per City */}
-              {trendsData.cities && trendsData.cities.length > 0 && (
-                <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                  <h2 className="text-xl font-semibold text-white mb-4">
-                    Current Fuel Level per City
-                  </h2>
-                  <div className="w-full h-80">
-                    <FuelLevelChart
-                      data={trendsData.data}
-                      cities={trendsData.cities}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Generator Load Trend */}
-              {trendsData.cities && trendsData.cities.length > 0 && (
-                <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                  <h2 className="text-xl font-semibold text-white mb-4">
-                    Generator Load Trend
-                  </h2>
-                  <div className="w-full h-80">
-                    <GeneratorLoadChart
-                      data={trendsData.data}
-                      cities={trendsData.cities}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {!isLoading && (!trendsData || !trendsData.data || trendsData.data.length === 0) && (
-            <div className="text-center py-12">
-              <p className="text-white/60">No data available for the selected filters.</p>
-            </div>
-          )}
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 50,
+      }}
+      onClick={() => navigate("/")}
+    >
+      <div
+        style={{
+          backgroundColor: "#5c0ba2",
+          borderRadius: "12px",
+          padding: "24px",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          maxWidth: "1200px",
+          width: "95%",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h1 style={{ color: "white", fontSize: "24px", fontWeight: "bold", margin: 0 }}>
+            Energy Trends
+          </h1>
+          <button
+            onClick={() => navigate("/")}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex-shrink-0"
+          >
+            Close
+          </button>
         </div>
+
+        {/* Filters */}
+        {!isLoading && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+            {/* Region Filter */}
+            <div>
+              <label className="block text-white text-sm font-semibold mb-2">
+                Region
+              </label>
+              <select
+                value={scope.regionId || ""}
+                onChange={(e) => {
+                  const regionId = e.target.value || undefined;
+                  setScope((prev) => ({ ...prev, regionId, district: undefined }));
+                }}
+                className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
+              >
+                <option value="" style={{ color: "black" }}>All Regions</option>
+                {hierarchy?.regions?.map((region) => (
+                  <option key={region.id} value={region.id} style={{ color: "black" }}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* District Filter */}
+            <div>
+              <label className="block text-white text-sm font-semibold mb-2">
+                District
+              </label>
+              <select
+                disabled={!scope.regionId}
+                value={scope.district || ""}
+                onChange={(e) => {
+                  const district = e.target.value || undefined;
+                  setScope((prev) => ({ ...prev, district }));
+                }}
+                className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+              >
+                <option value="" style={{ color: "black" }}>All Districts</option>
+                {districts.map((district) => (
+                  <option key={district} value={district} style={{ color: "black" }}>
+                    {district}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Charts Container */}
+        {isLoading && (
+          <div className="text-center py-12">
+            <p className="text-white/60">Loading trends data...</p>
+          </div>
+        )}
+
+        {trendsData && trendsData.data && trendsData.data.length > 0 && (
+          <div className="space-y-8">
+            {/* Current Fuel Level per City */}
+            {trendsData.cities && trendsData.cities.length > 0 && (
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Current Fuel Level per City
+                </h2>
+                <div className="w-full h-80">
+                  <FuelLevelChart
+                    data={trendsData.data}
+                    cities={trendsData.cities}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Generator Load Trend */}
+            {trendsData.cities && trendsData.cities.length > 0 && (
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Generator Load Trend
+                </h2>
+                <div className="w-full h-80">
+                  <GeneratorLoadChart
+                    data={trendsData.data}
+                    cities={trendsData.cities}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Accumulative Fuel Consumption */}
+            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Accumulative Fuel Consumption (from 1/1/2025 to Today)
+              </h2>
+              <div className="w-full h-80">
+                <FuelConsumptionChart data={trendsData.data} />
+              </div>
+            </div>
+
+            {/* Accumulative CO₂ Emissions */}
+            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Accumulative CO₂ Emissions (from 1/1/2025 to Today)
+              </h2>
+              <div className="w-full h-80">
+                <Co2EmissionsChart data={trendsData.data} />
+              </div>
+            </div>
+
+            {/* Accumulative Power Consumption */}
+            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Accumulative Power Consumption (from 1/1/2025 to Today)
+              </h2>
+              <div className="w-full h-80">
+                <PowerConsumptionChart data={trendsData.data} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!isLoading && (!trendsData || !trendsData.data || trendsData.data.length === 0) && (
+          <div className="text-center py-12">
+            <p className="text-white/60">No data available for the selected filters.</p>
+          </div>
+        )}
       </div>
     </div>
   );

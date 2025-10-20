@@ -64,11 +64,11 @@ function generateMockTrendsData(
     const cityId = filteredCities[cityIdx].id;
     const seed = `${cityId}-${todayStr}`.length;
 
-    // Current fuel level (0-100%)
-    todayRow[`fuel_${city}`] = Math.round(seededRandom(seed * 11) * 100);
+    // Current fuel level (0-100%) - matches extractMetricByCities "fuel_level_%"
+    todayRow[`fuel_level_%_${city}`] = Math.round(seededRandom(seed * 11) * 100);
 
-    // Generator load (0-100%)
-    todayRow[`gen_${city}`] = Math.round(seededRandom(seed * 13) * 100);
+    // Generator load (0-100%) - matches extractMetricByCities "gen_load_%"
+    todayRow[`gen_load_%_${city}`] = Math.round(seededRandom(seed * 13) * 100);
   });
 
   currentData.push(todayRow);

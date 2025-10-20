@@ -108,7 +108,7 @@ export default function Index() {
 
   return (
     <Layout>
-      <FitToScreen bottomOffset={16}>
+      <FitToScreen topOffset={70} bottomOffset={16}>
         <div className="mb-2">
           <p className="text-xs sm:text-sm text-white/80 font-bold text-left">
             As of {asOf}

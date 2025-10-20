@@ -8,13 +8,26 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { TimePoint } from "@shared/api";
+import { useMemo } from "react";
+import { extractMetricByCities } from "@/lib/chartUtils";
 
-export default function GeneratorLoadChart({ data }: { data: TimePoint[] }) {
-  const chartData = data.map((p, idx) => ({
-    date: new Date(p.t).toLocaleDateString(),
-    load: Math.min(100, 30 + ((idx * 7) % 60)),
-  }));
+const LOAD_COLORS = [
+  "#ff9900",
+  "#ff3b3b",
+  "#aaf255",
+  "#00e0ff",
+  "#9d4edd",
+  "#3a86ff",
+  "#fb5607",
+  "#ffcc00",
+];
+
+export default function GeneratorLoadChart({ data, cities }: { data: any[]; cities: string[] }) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
+    return extractMetricByCities(data, "gen_load_%", cities);
+  }, [data, cities]);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -30,13 +43,18 @@ export default function GeneratorLoadChart({ data }: { data: TimePoint[] }) {
           labelStyle={{ color: "#fff" }}
         />
         <Legend />
-        <Line
-          dataKey="load"
-          name="Generator Load (%)"
-          stroke="#ff9900"
-          dot={false}
-          isAnimationActive={false}
-        />
+        {cities.map((city, idx) => (
+          <Line
+            key={city}
+            type="monotone"
+            dataKey={city}
+            name={`${city} Generator Load (%)`}
+            stroke={LOAD_COLORS[idx % LOAD_COLORS.length]}
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={true}
+          />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   );

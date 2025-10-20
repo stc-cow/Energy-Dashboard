@@ -8,17 +8,21 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useMemo } from "react";
+import { makeCumulative } from "@/lib/chartUtils";
 
-export default function PowerConsumptionChart({ accum }: { accum: number }) {
-  const chartData = [
-    { date: "2025-01-01", power: accum * 0.1 },
-    { date: "2025-01-02", power: accum * 0.2 },
-    { date: "2025-01-03", power: accum * 0.35 },
-    { date: "2025-01-04", power: accum * 0.5 },
-    { date: "2025-01-05", power: accum * 0.65 },
-    { date: "2025-01-06", power: accum * 0.8 },
-    { date: "2025-01-07", power: accum },
-  ];
+export default function PowerConsumptionChart({ data }: { data: any[] }) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
+    // Make accumulative
+    const cumulative = makeCumulative(data, ["power_kw_total"]);
+    
+    return cumulative.map((row) => ({
+      date: row.date,
+      power: row.power_kw_total || 0,
+    }));
+  }, [data]);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -35,11 +39,13 @@ export default function PowerConsumptionChart({ accum }: { accum: number }) {
         />
         <Legend />
         <Line
+          type="monotone"
           dataKey="power"
           name="Power Consumption (kWh)"
           stroke="#aaf255"
+          strokeWidth={2}
           dot={false}
-          isAnimationActive={false}
+          isAnimationActive={true}
         />
       </LineChart>
     </ResponsiveContainer>

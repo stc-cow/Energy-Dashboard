@@ -81,7 +81,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           maxWidth: 1400,
           width: "100%",
           margin: "0 auto",
-          padding: "0 16px",
+          padding: "0 8px",
         }}
       >
         {children}

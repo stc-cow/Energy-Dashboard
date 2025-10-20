@@ -3,8 +3,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchHierarchy } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
-import Layout from "@/components/layout/Layout";
-import FilterBar from "@/components/energy/FilterBar";
 import FuelConsumptionChart from "@/components/energy/charts/FuelConsumptionChart";
 import Co2EmissionsChart from "@/components/energy/charts/Co2EmissionsChart";
 import PowerConsumptionChart from "@/components/energy/charts/PowerConsumptionChart";
@@ -110,144 +108,158 @@ export default function EnergyTrends() {
   }, [hierarchy, scope]);
 
   const isLoading = !hierarchy;
-  const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
-  const allCities = useMemo(() => hierarchy?.cities ?? [], [hierarchy]);
+  
+  // Get districts for selected region
+  const filteredCities = useMemo(() => {
+    if (!hierarchy) return [];
+    if (!scope.regionId) return hierarchy.cities || [];
+    return hierarchy.cities?.filter((c) => c.regionId === scope.regionId) || [];
+  }, [hierarchy, scope.regionId]);
 
   return (
-    <Layout>
-      <div className="max-w-6xl mx-auto p-6">
-        {/* Header with Close Button */}
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white">
-            COW Energy Trends (Accumulative & Current Metrics)
-          </h1>
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
-          >
-            Close
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl bg-background rounded-2xl border border-white/20 shadow-2xl">
+        <div className="max-h-[90vh] overflow-y-auto p-8">
+          {/* Header with Close Button */}
+          <div className="mb-6 flex items-center justify-between sticky top-0 bg-background pb-4 border-b border-white/10">
+            <h1 className="text-3xl font-bold text-white">
+              COW Energy Trends (Accumulative & Current Metrics)
+            </h1>
+            <button
+              onClick={() => navigate("/")}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex-shrink-0 ml-4"
+            >
+              Close
+            </button>
+          </div>
 
-        {/* Filter Controls - Region and District Only */}
-        {hierarchy && (
-          <div className="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Region Filter */}
-              <div>
-                <label className="block text-white text-sm font-semibold mb-2">
-                  Region
-                </label>
-                <select
-                  value={scope.regionId || ""}
-                  onChange={(e) => {
-                    const regionId = e.target.value || undefined;
-                    setScope({ level: regionId ? "region" : "national", regionId });
-                  }}
-                  className="w-full px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
-                >
-                  <option value="">All Regions</option>
-                  {hierarchy.regions?.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
+          {/* Filter Controls - Region and District Only */}
+          {hierarchy && (
+            <div className="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Region Filter */}
+                <div>
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    Region
+                  </label>
+                  <select
+                    value={scope.regionId || ""}
+                    onChange={(e) => {
+                      const regionId = e.target.value || undefined;
+                      setScope({ level: regionId ? "region" : "national", regionId });
+                    }}
+                    className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    <option value="" style={{ color: "black" }}>
+                      All Regions
                     </option>
-                  ))}
-                </select>
-              </div>
+                    {hierarchy.regions?.map((r) => (
+                      <option key={r.id} value={r.id} style={{ color: "black" }}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* District Filter */}
-              <div>
-                <label className="block text-white text-sm font-semibold mb-2">
-                  District
-                </label>
-                <select
-                  disabled={!scope.regionId}
-                  className="w-full px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
-                >
-                  <option>All Districts</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Charts Container */}
-        {isLoading && (
-          <div className="text-center py-12">
-            <p className="text-white/60">Loading trends data...</p>
-          </div>
-        )}
-
-        {trendsData && trendsData.data && trendsData.data.length > 0 && (
-          <div className="space-y-8">
-            {/* Accumulative Fuel Consumption */}
-            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative Fuel Consumption
-              </h2>
-              <div className="w-full h-80">
-                <FuelConsumptionChart data={trendsData.data} />
-              </div>
-            </div>
-
-            {/* Accumulative CO₂ Emissions */}
-            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative CO₂ Emissions
-              </h2>
-              <div className="w-full h-80">
-                <Co2EmissionsChart data={trendsData.data} />
-              </div>
-            </div>
-
-            {/* Accumulative Power Consumption */}
-            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative Power Consumption
-              </h2>
-              <div className="w-full h-80">
-                <PowerConsumptionChart data={trendsData.data} />
-              </div>
-            </div>
-
-            {/* Current Fuel Level per City */}
-            {trendsData.cities && trendsData.cities.length > 0 && (
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Current Fuel Level per City
-                </h2>
-                <div className="w-full h-80">
-                  <FuelLevelChart
-                    data={trendsData.data}
-                    cities={trendsData.cities}
-                  />
+                {/* District Filter */}
+                <div>
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    District
+                  </label>
+                  <select
+                    disabled={!scope.regionId}
+                    className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+                  >
+                    <option style={{ color: "black" }}>All Districts</option>
+                    {filteredCities.map((city) => (
+                      <option key={city.id} style={{ color: "black" }}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Generator Load Trend */}
-            {trendsData.cities && trendsData.cities.length > 0 && (
+          {/* Charts Container */}
+          {isLoading && (
+            <div className="text-center py-12">
+              <p className="text-white/60">Loading trends data...</p>
+            </div>
+          )}
+
+          {trendsData && trendsData.data && trendsData.data.length > 0 && (
+            <div className="space-y-8">
+              {/* Accumulative Fuel Consumption */}
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  Generator Load Trend
+                  Accumulative Fuel Consumption
                 </h2>
                 <div className="w-full h-80">
-                  <GeneratorLoadChart
-                    data={trendsData.data}
-                    cities={trendsData.cities}
-                  />
+                  <FuelConsumptionChart data={trendsData.data} />
                 </div>
               </div>
-            )}
-          </div>
-        )}
 
-        {!isLoading && (!trendsData || !trendsData.data || trendsData.data.length === 0) && (
-          <div className="text-center py-12">
-            <p className="text-white/60">No data available for the selected filters.</p>
-          </div>
-        )}
+              {/* Accumulative CO₂ Emissions */}
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Accumulative CO₂ Emissions
+                </h2>
+                <div className="w-full h-80">
+                  <Co2EmissionsChart data={trendsData.data} />
+                </div>
+              </div>
+
+              {/* Accumulative Power Consumption */}
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Accumulative Power Consumption
+                </h2>
+                <div className="w-full h-80">
+                  <PowerConsumptionChart data={trendsData.data} />
+                </div>
+              </div>
+
+              {/* Current Fuel Level per City */}
+              {trendsData.cities && trendsData.cities.length > 0 && (
+                <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                  <h2 className="text-xl font-semibold text-white mb-4">
+                    Current Fuel Level per City
+                  </h2>
+                  <div className="w-full h-80">
+                    <FuelLevelChart
+                      data={trendsData.data}
+                      cities={trendsData.cities}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Generator Load Trend */}
+              {trendsData.cities && trendsData.cities.length > 0 && (
+                <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                  <h2 className="text-xl font-semibold text-white mb-4">
+                    Generator Load Trend
+                  </h2>
+                  <div className="w-full h-80">
+                    <GeneratorLoadChart
+                      data={trendsData.data}
+                      cities={trendsData.cities}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isLoading && (!trendsData || !trendsData.data || trendsData.data.length === 0) && (
+            <div className="text-center py-12">
+              <p className="text-white/60">No data available for the selected filters.</p>
+            </div>
+          )}
+        </div>
       </div>
-    </Layout>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchHierarchy } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import Layout from "@/components/layout/Layout";

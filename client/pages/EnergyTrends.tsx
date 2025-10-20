@@ -19,7 +19,7 @@ interface TrendsResponse {
 // Import mock data function directly for client-side data generation
 function generateMockTrendsData(
   scope: HierarchyFilter,
-  allCities: { id: string; name: string }[],
+  allCities: { id: string; name: string; regionId?: string }[],
   allSites: { id: string; name: string; cityId: string }[]
 ): TrendsResponse {
   const seededRandom = (seed: number) => {
@@ -35,18 +35,7 @@ function generateMockTrendsData(
     filteredCities = allCities.filter((c) => c.id === scope.cityId);
   } else if (scope.regionId) {
     // If region is selected, filter cities in that region
-    const citiesInRegion = allSites
-      .filter((s) => {
-        const city = allCities.find((c) => c.id === s.cityId);
-        return city?.name?.toLowerCase().includes(
-          scope.regionId?.toLowerCase() || ""
-        );
-      })
-      .map((s) => s.cityId);
-
-    filteredCities = allCities.filter((c) =>
-      Array.from(new Set(citiesInRegion)).includes(c.id)
-    );
+    filteredCities = allCities.filter((c) => c.regionId === scope.regionId);
   }
 
   // Use city names for the chart

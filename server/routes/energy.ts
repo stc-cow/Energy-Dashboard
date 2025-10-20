@@ -74,3 +74,9 @@ export const getAlerts: RequestHandler = (req, res) => {
   const response: AlertsResponse = mockAlerts(scope);
   res.json(response);
 };
+
+export const getTrends: RequestHandler = (req, res) => {
+  const scope = parseScope(req.query);
+  const response = mockEnergyTrends(scope);
+  res.json(response);
+};

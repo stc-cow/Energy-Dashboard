@@ -16,6 +16,63 @@ interface TrendsResponse {
   cities: string[];
 }
 
+// Import mock data function directly for client-side data generation
+function generateMockTrendsData(scope: HierarchyFilter): TrendsResponse {
+  const seededRandom = (seed: number) => {
+    let x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const cities = ["Riyadh", "Jeddah", "Dammam", "Medina", "Abha"];
+  const days = 30;
+  const now = new Date();
+
+  const data = Array.from({ length: days }).map((_, dayIdx) => {
+    const date = new Date(now);
+    date.setDate(now.getDate() - (days - 1 - dayIdx));
+    const dateStr = date.toISOString().split("T")[0];
+
+    const row: any = { date: dateStr };
+
+    // Generate data for each city
+    cities.forEach((cityName, cityIdx) => {
+      const baseSeed = dayIdx * 100 + cityIdx * 10;
+      const diesel = 1000 + Math.floor(seededRandom(baseSeed) * 800);
+      const power = 600 + Math.floor(seededRandom(baseSeed + 1) * 400);
+      const co2 = Math.round(diesel * 2.68) / 1000;
+      const fuelLevel = Math.round((40 + seededRandom(baseSeed + 2) * 50) * 10) / 10;
+      const genLoad = Math.round((45 + seededRandom(baseSeed + 3) * 55) * 10) / 10;
+
+      row[`fuel_consumption_l_${cityName}`] = diesel;
+      row[`co2_ton_${cityName}`] = co2;
+      row[`power_kw_${cityName}`] = power;
+      row[`fuel_level_%_${cityName}`] = fuelLevel;
+      row[`gen_load_%_${cityName}`] = genLoad;
+    });
+
+    // Aggregated totals
+    const totalDiesel = cities.reduce((acc, _, i) => {
+      return acc + (1000 + Math.floor(seededRandom(dayIdx * 100 + i) * 800));
+    }, 0);
+    const totalCo2 = Math.round(totalDiesel * 2.68) / 1000;
+    const totalPower = cities.reduce((acc, _, i) => {
+      return acc + (600 + Math.floor(seededRandom(dayIdx * 100 + i + 1) * 400));
+    }, 0);
+
+    row["fuel_consumption_l_total"] = totalDiesel;
+    row["co2_ton_total"] = totalCo2;
+    row["power_kw_total"] = totalPower;
+
+    return row;
+  });
+
+  return {
+    data,
+    metrics: ["fuel_consumption_l", "co2_ton", "power_kw", "fuel_level_%", "gen_load_%"],
+    cities,
+  };
+}
+
 export default function EnergyTrends() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
 
@@ -24,26 +81,11 @@ export default function EnergyTrends() {
     queryFn: fetchHierarchy,
   });
 
-  const { data: trendsData, isLoading } = useQuery<TrendsResponse>({
-    queryKey: ["energy-trends", scope],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      params.set("level", scope.level || "national");
-      if (scope.regionId) params.set("regionId", scope.regionId);
-      if (scope.cityId) params.set("cityId", scope.cityId);
-      if (scope.siteId) params.set("siteId", scope.siteId);
-      if (scope.district) params.set("district", scope.district);
+  const trendsData = useMemo(() => {
+    return hierarchy ? generateMockTrendsData(scope) : null;
+  }, [hierarchy, scope]);
 
-      const url = `/api/energy/trends?${params.toString()}`;
-      console.log("Fetching trends from:", url);
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    },
-    enabled: !!hierarchy,
-    retry: 1,
-  });
-
+  const isLoading = !hierarchy;
   const sites = useMemo(() => hierarchy?.sites ?? [], [hierarchy]);
 
   return (

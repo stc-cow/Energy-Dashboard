@@ -194,7 +194,7 @@ export default function Index() {
                                     "linear-gradient(to right, rgba(180,120,230,0.9), rgba(120,80,200,0.9))",
                                 }}
                               />
-                              <div className="absolute inset-0 flex items-center justify-center text-white font-semibold px-2 whitespace-nowrap gap-1">
+                              <div className="absolute inset-0 flex items-center justify-center text-white font-semibold px-2 whitespace-nowrap gap-1 text-xs">
                                 <p>
                                   <strong>
                                     {(r.regionName || "Unknown").toUpperCase()}

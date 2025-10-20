@@ -91,14 +91,14 @@ function generateMockTrendsData(
 
       const seed = `${cityId}-${monthStr}`.length;
 
-      // Accumulative fuel (liters)
-      monthRow[`fuel_liters_${city}`] = (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
+      // Accumulative fuel (liters) - for FuelConsumptionChart
+      monthRow[`fuel_consumption_L_${city}`] = (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
 
-      // Accumulative CO2 (tons)
-      monthRow[`co2_tons_${city}`] = ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
+      // Accumulative CO2 (tons) - for Co2EmissionsChart
+      monthRow[`co2_emissions_tons_${city}`] = ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
 
-      // Accumulative power (kWh)
-      monthRow[`power_kwh_${city}`] = (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
+      // Accumulative power (kWh) - for PowerConsumptionChart
+      monthRow[`power_consumption_kWh_${city}`] = (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
     });
 
     accumulativeData.push(monthRow);

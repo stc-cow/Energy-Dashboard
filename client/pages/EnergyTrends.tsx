@@ -1,10 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import {
-  fetchHierarchy,
-  fetchTimeSeries,
-  fetchAccumulations,
-} from "@/lib/api";
+import { fetchHierarchy } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import Layout from "@/components/layout/Layout";
 import FilterBar from "@/components/energy/FilterBar";
@@ -14,6 +10,12 @@ import PowerConsumptionChart from "@/components/energy/charts/PowerConsumptionCh
 import FuelLevelChart from "@/components/energy/charts/FuelLevelChart";
 import GeneratorLoadChart from "@/components/energy/charts/GeneratorLoadChart";
 
+interface TrendsResponse {
+  data: Array<{ [key: string]: any }>;
+  metrics: string[];
+  cities: string[];
+}
+
 export default function EnergyTrends() {
   const [scope, setScope] = useState<HierarchyFilter>({ level: "national" });
 
@@ -22,19 +24,19 @@ export default function EnergyTrends() {
     queryFn: fetchHierarchy,
   });
 
-  const { data: tsDaily } = useQuery({
-    queryKey: ["ts", scope, "daily"],
-    queryFn: () =>
-      fetchTimeSeries(scope, {
-        granularity: "daily",
-        from: "2025-01-01",
-      }),
-    enabled: !!hierarchy,
-  });
+  const { data: trendsData } = useQuery<TrendsResponse>({
+    queryKey: ["energy-trends", scope],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (scope.level) params.set("level", scope.level);
+      if (scope.regionId) params.set("regionId", scope.regionId);
+      if (scope.cityId) params.set("cityId", scope.cityId);
+      if (scope.siteId) params.set("siteId", scope.siteId);
+      if (scope.district) params.set("district", scope.district);
 
-  const { data: accum } = useQuery({
-    queryKey: ["accum", scope],
-    queryFn: () => fetchAccumulations(scope),
+      const response = await fetch(`/api/energy/trends?${params.toString()}`);
+      return response.json();
+    },
     enabled: !!hierarchy,
   });
 
@@ -64,57 +66,69 @@ export default function EnergyTrends() {
         )}
 
         {/* Charts Container */}
-        <div className="space-y-8">
-          {/* Accumulative Fuel Consumption */}
-          <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Accumulative Fuel Consumption
-            </h2>
-            <div className="w-full h-80">
-              <FuelConsumptionChart data={tsDaily?.series ?? []} />
+        {trendsData && (
+          <div className="space-y-8">
+            {/* Accumulative Fuel Consumption */}
+            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Accumulative Fuel Consumption
+              </h2>
+              <div className="w-full h-80">
+                <FuelConsumptionChart data={trendsData.data} />
+              </div>
             </div>
-          </div>
 
-          {/* Accumulative CO₂ Emissions */}
-          <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Accumulative CO₂ Emissions
-            </h2>
-            <div className="w-full h-80">
-              <Co2EmissionsChart data={tsDaily?.series ?? []} />
+            {/* Accumulative CO₂ Emissions */}
+            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Accumulative CO₂ Emissions
+              </h2>
+              <div className="w-full h-80">
+                <Co2EmissionsChart data={trendsData.data} />
+              </div>
             </div>
-          </div>
 
-          {/* Accumulative Power Consumption */}
-          <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Accumulative Power Consumption
-            </h2>
-            <div className="w-full h-80">
-              <PowerConsumptionChart accum={accum?.powerKwh ?? 0} />
+            {/* Accumulative Power Consumption */}
+            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Accumulative Power Consumption
+              </h2>
+              <div className="w-full h-80">
+                <PowerConsumptionChart data={trendsData.data} />
+              </div>
             </div>
-          </div>
 
-          {/* Current Fuel Level per City */}
-          <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Current Fuel Level per City
-            </h2>
-            <div className="w-full h-80">
-              <FuelLevelChart data={tsDaily?.series ?? []} />
-            </div>
-          </div>
+            {/* Current Fuel Level per City */}
+            {trendsData.cities.length > 0 && (
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Current Fuel Level per City
+                </h2>
+                <div className="w-full h-80">
+                  <FuelLevelChart
+                    data={trendsData.data}
+                    cities={trendsData.cities}
+                  />
+                </div>
+              </div>
+            )}
 
-          {/* Generator Load Trend */}
-          <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Generator Load Trend
-            </h2>
-            <div className="w-full h-80">
-              <GeneratorLoadChart data={tsDaily?.series ?? []} />
-            </div>
+            {/* Generator Load Trend */}
+            {trendsData.cities.length > 0 && (
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Generator Load Trend
+                </h2>
+                <div className="w-full h-80">
+                  <GeneratorLoadChart
+                    data={trendsData.data}
+                    cities={trendsData.cities}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </Layout>
   );

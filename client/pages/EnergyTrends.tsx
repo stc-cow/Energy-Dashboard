@@ -55,79 +55,74 @@ function generateMockTrendsData(
   const startDate = new Date(2025, 0, 1); // January 1, 2025
   const today = new Date();
 
-  // ===== CURRENT DATA (Grouped by Region or District) =====
+  // ===== CURRENT DATA (Single "Today" row with regions/districts as legend items) =====
   const currentData = [];
+  const todayStr = "Today";
 
-  // Determine grouping: by region or by district
+  // Determine if grouping by region or district
   const groupByDistrict = !!scope.district;
   const groupByRegion = !!scope.regionId && !scope.district;
 
   if (groupByDistrict) {
-    // Group cities by district (only one district since it's already filtered)
+    // Show districts for selected region
     const districtSites = allSites.filter((s) => s.district === scope.district);
     const districtCities = new Set(districtSites.map((s) => s.cityId));
     const citiesInDistrict = filteredCities.filter((c) => districtCities.has(c.id));
 
-    const row: any = { name: scope.district };
+    const row: any = { name: todayStr };
     citiesInDistrict.forEach((city) => {
       const seed = `${city.id}-district`.length;
-      row[city.name] = Math.round(seededRandom(seed * 11) * 100);
-      row[`gen_${city.name}`] = Math.round(seededRandom(seed * 13) * 100);
+      row[scope.district] = Math.round(seededRandom(seed * 11) * 100);
+      row[`gen_${scope.district}`] = Math.round(seededRandom(seed * 13) * 100);
     });
     if (Object.keys(row).length > 1) currentData.push(row);
-  } else if (groupByRegion && scope.regionId) {
-    // Group cities by district within the selected region
+  } else if (groupByRegion) {
+    // Show districts within the selected region
     const regionSites = allSites.filter((s) => {
       const city = filteredCities.find((c) => c.id === s.cityId);
       return city && city.regionId === scope.regionId;
     });
-    const districtMap = new Map<string, typeof filteredCities>();
+    const districtSet = new Set<string>();
+    const districtValues: Map<string, number> = new Map();
+    const districtGenValues: Map<string, number> = new Map();
 
     regionSites.forEach((site) => {
       if (site.district) {
-        if (!districtMap.has(site.district)) {
-          districtMap.set(site.district, []);
-        }
-        const city = filteredCities.find((c) => c.id === site.cityId);
-        if (city && !districtMap.get(site.district)!.find((c) => c.id === city.id)) {
-          districtMap.get(site.district)!.push(city);
-        }
+        districtSet.add(site.district);
+        const seed = `${site.id}-${site.district}`.length;
+        const prevVal = districtValues.get(site.district) || 0;
+        districtValues.set(site.district, prevVal + Math.round(seededRandom(seed * 11) * 50));
+        const prevGenVal = districtGenValues.get(site.district) || 0;
+        districtGenValues.set(site.district, prevGenVal + Math.round(seededRandom(seed * 13) * 50));
       }
     });
 
-    districtMap.forEach((districtCities, districtName) => {
-      const row: any = { name: districtName };
-      districtCities.forEach((city) => {
-        const seed = `${city.id}-${districtName}`.length;
-        row[city.name] = Math.round(seededRandom(seed * 11) * 100);
-        row[`gen_${city.name}`] = Math.round(seededRandom(seed * 13) * 100);
-      });
-      if (Object.keys(row).length > 1) currentData.push(row);
+    const row: any = { name: todayStr };
+    Array.from(districtSet).forEach((district) => {
+      row[district] = (districtValues.get(district) || 0) % 100;
+      row[`gen_${district}`] = (districtGenValues.get(district) || 0) % 100;
     });
+    if (Object.keys(row).length > 1) currentData.push(row);
   } else {
-    // No region selected: group by regions
-    const regionMap = new Map<string, typeof filteredCities>();
+    // Show all regions
+    const regionMap = new Map<string, number>();
+    const regionGenMap = new Map<string, number>();
 
     filteredCities.forEach((city) => {
       const regionId = city.regionId || "Unknown";
-      if (!regionMap.has(regionId)) {
-        regionMap.set(regionId, []);
-      }
-      regionMap.get(regionId)!.push(city);
+      const seed = `${city.id}-${regionId}`.length;
+      const prevVal = regionMap.get(regionId) || 0;
+      regionMap.set(regionId, prevVal + Math.round(seededRandom(seed * 11) * 50));
+      const prevGenVal = regionGenMap.get(regionId) || 0;
+      regionGenMap.set(regionId, prevGenVal + Math.round(seededRandom(seed * 13) * 50));
     });
 
-    regionMap.forEach((regionCities, regionId) => {
-      const regionCity = allCities.find((c) => c.regionId === regionId);
-      const regionName = regionCity ? regionId : regionId;
-      const row: any = { name: regionName };
-
-      regionCities.forEach((city) => {
-        const seed = `${city.id}-${regionId}`.length;
-        row[city.name] = Math.round(seededRandom(seed * 11) * 100);
-        row[`gen_${city.name}`] = Math.round(seededRandom(seed * 13) * 100);
-      });
-      if (Object.keys(row).length > 1) currentData.push(row);
+    const row: any = { name: todayStr };
+    regionMap.forEach((value, regionId) => {
+      row[regionId] = value % 100;
+      row[`gen_${regionId}`] = (regionGenMap.get(regionId) || 0) % 100;
     });
+    if (Object.keys(row).length > 1) currentData.push(row);
   }
 
   // ===== ACCUMULATIVE DATA (Monthly from Jan 2025 to today) =====

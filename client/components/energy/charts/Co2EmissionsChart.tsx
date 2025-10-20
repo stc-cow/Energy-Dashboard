@@ -8,13 +8,21 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { TimePoint } from "@shared/api";
+import { useMemo } from "react";
+import { makeCumulative } from "@/lib/chartUtils";
 
-export default function Co2EmissionsChart({ data }: { data: TimePoint[] }) {
-  const chartData = data.map((p) => ({
-    date: new Date(p.t).toLocaleDateString(),
-    co2: p.co2Tons,
-  }));
+export default function Co2EmissionsChart({ data }: { data: any[] }) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
+    // Make accumulative
+    const cumulative = makeCumulative(data, ["co2_ton_total"]);
+    
+    return cumulative.map((row) => ({
+      date: row.date,
+      co2: row.co2_ton_total || 0,
+    }));
+  }, [data]);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -31,11 +39,13 @@ export default function Co2EmissionsChart({ data }: { data: TimePoint[] }) {
         />
         <Legend />
         <Line
+          type="monotone"
           dataKey="co2"
           name="CO₂ Emissions (Tons)"
           stroke="#ff3b3b"
+          strokeWidth={2}
           dot={false}
-          isAnimationActive={false}
+          isAnimationActive={true}
         />
       </LineChart>
     </ResponsiveContainer>

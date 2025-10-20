@@ -285,7 +285,9 @@ export default function Index() {
             className="cursor-pointer rounded-2xl p-6 text-center shadow-lg transition hover:opacity-90"
             style={{ backgroundColor: "#5c0ba2" }}
           >
-            <h3 className="text-white text-xl font-semibold">COW Distribution Map</h3>
+            <h3 className="text-white text-xl font-semibold">
+              COW Distribution Map
+            </h3>
             <div className="text-purple-200 text-sm mt-2">
               <p>View Sites Distribution Map</p>
             </div>

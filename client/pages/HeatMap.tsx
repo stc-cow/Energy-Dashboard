@@ -142,21 +142,19 @@ export default function HeatMap() {
                 intensity={1}
               />
             )}
-            {zoom >= 10 && combinedPoints.map((point, idx) => {
-              const siteId = siteMap.get(`${point.lat},${point.lng}`);
-              return (
-                <Marker
-                  key={idx}
-                  position={[point.lat, point.lng]}
-                >
-                  <Popup>
-                    <div style={{ fontWeight: "bold", color: "#000" }}>
-                      {siteId || "Site"}
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            })}
+            {zoom >= 10 &&
+              combinedPoints.map((point, idx) => {
+                const siteId = siteMap.get(`${point.lat},${point.lng}`);
+                return (
+                  <Marker key={idx} position={[point.lat, point.lng]}>
+                    <Popup>
+                      <div style={{ fontWeight: "bold", color: "#000" }}>
+                        {siteId || "Site"}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
           </MapContainer>
         </div>
         {combinedPoints.length === 0 && (

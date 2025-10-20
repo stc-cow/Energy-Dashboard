@@ -10,12 +10,7 @@ import {
 } from "recharts";
 import { useMemo } from "react";
 
-const FUEL_COLORS = [
-  "#4B0082",
-  "#00C5D4",
-  "#FF3B61",
-  "#FF7A33",
-];
+const FUEL_COLORS = ["#4B0082", "#00C5D4", "#FF3B61", "#FF7A33"];
 
 export default function FuelConsumptionChart({ data }: { data: any[] }) {
   const chartData = useMemo(() => {
@@ -48,17 +43,25 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
   }
 
   // Get cities from first row
-  const cities = chartData.length > 0
-    ? Object.keys(chartData[0]).filter(k => k !== "date")
-    : [];
+  const cities =
+    chartData.length > 0
+      ? Object.keys(chartData[0]).filter((k) => k !== "date")
+      : [];
 
   const displayCities = cities.slice(0, 4);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+      <LineChart
+        data={chartData}
+        margin={{ left: 8, right: 8, top: 10, bottom: 0 }}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-        <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fontSize: 12 }} />
+        <XAxis
+          dataKey="date"
+          stroke="rgba(255,255,255,0.6)"
+          tick={{ fontSize: 12 }}
+        />
         <YAxis stroke="rgba(255,255,255,0.6)" />
         <Tooltip
           contentStyle={{

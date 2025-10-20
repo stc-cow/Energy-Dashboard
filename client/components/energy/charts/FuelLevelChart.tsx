@@ -12,21 +12,22 @@ import {
 import { useMemo } from "react";
 import { extractMetricByCities } from "@/lib/chartUtils";
 
-const CITY_COLORS = [
-  "#4B0082",
-  "#00C5D4",
-  "#FF3B61",
-  "#FF7A33",
-];
+const CITY_COLORS = ["#4B0082", "#00C5D4", "#FF3B61", "#FF7A33"];
 
-export default function FuelLevelChart({ data, cities }: { data: any[]; cities: string[] }) {
+export default function FuelLevelChart({
+  data,
+  cities,
+}: {
+  data: any[];
+  cities: string[];
+}) {
   const { chartData, averageValue } = useMemo(() => {
     if (!data || data.length === 0 || !cities || cities.length === 0) {
       return { chartData: [], averageValue: 0 };
     }
-    
+
     const extracted = extractMetricByCities(data, "fuel_level_%", cities);
-    
+
     // Calculate overall average
     const allValues: number[] = [];
     extracted.forEach((row) => {
@@ -37,11 +38,14 @@ export default function FuelLevelChart({ data, cities }: { data: any[]; cities: 
         }
       });
     });
-    
-    const avg = allValues.length > 0 
-      ? Math.round((allValues.reduce((a, b) => a + b, 0) / allValues.length) * 10) / 10
-      : 0;
-    
+
+    const avg =
+      allValues.length > 0
+        ? Math.round(
+            (allValues.reduce((a, b) => a + b, 0) / allValues.length) * 10,
+          ) / 10
+        : 0;
+
     return { chartData: extracted, averageValue: avg };
   }, [data, cities]);
 
@@ -54,9 +58,16 @@ export default function FuelLevelChart({ data, cities }: { data: any[]; cities: 
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+      <BarChart
+        data={chartData}
+        margin={{ left: 8, right: 8, top: 10, bottom: 0 }}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-        <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fontSize: 12 }} />
+        <XAxis
+          dataKey="date"
+          stroke="rgba(255,255,255,0.6)"
+          tick={{ fontSize: 12 }}
+        />
         <YAxis stroke="rgba(255,255,255,0.6)" domain={[0, 100]} />
         <Tooltip
           contentStyle={{

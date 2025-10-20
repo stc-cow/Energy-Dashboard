@@ -10,8 +10,8 @@ import FuelLevelChart from "@/components/energy/charts/FuelLevelChart";
 import GeneratorLoadChart from "@/components/energy/charts/GeneratorLoadChart";
 
 interface TrendsResponse {
-  currentData: Array<{ [key: string]: any }>;  // Today's data for fuel level and generator load
-  accumulativeData: Array<{ [key: string]: any }>;  // Monthly data for accumulative charts
+  currentData: Array<{ [key: string]: any }>; // Today's data for fuel level and generator load
+  accumulativeData: Array<{ [key: string]: any }>; // Monthly data for accumulative charts
   metrics: string[];
   cities: string[];
 }
@@ -20,7 +20,7 @@ interface TrendsResponse {
 function generateMockTrendsData(
   scope: HierarchyFilter,
   allCities: { id: string; name: string; regionId?: string }[],
-  allSites: { id: string; name: string; cityId: string; district?: string }[]
+  allSites: { id: string; name: string; cityId: string; district?: string }[],
 ): TrendsResponse {
   const seededRandom = (seed: number) => {
     let x = Math.sin(seed) * 10000;
@@ -65,7 +65,9 @@ function generateMockTrendsData(
     const seed = `${cityId}-${todayStr}`.length;
 
     // Current fuel level (0-100%) - matches extractMetricByCities "fuel_level_%"
-    todayRow[`fuel_level_%_${city}`] = Math.round(seededRandom(seed * 11) * 100);
+    todayRow[`fuel_level_%_${city}`] = Math.round(
+      seededRandom(seed * 11) * 100,
+    );
 
     // Generator load (0-100%) - matches extractMetricByCities "gen_load_%"
     todayRow[`gen_load_%_${city}`] = Math.round(seededRandom(seed * 13) * 100);
@@ -87,18 +89,24 @@ function generateMockTrendsData(
       // Calculate total days elapsed until end of this month
       const monthEnd = new Date(m.getFullYear(), m.getMonth() + 1, 0);
       const effectiveEndDate = monthEnd <= today ? monthEnd : today;
-      const dayOffset = Math.floor((effectiveEndDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const dayOffset = Math.floor(
+        (effectiveEndDate.getTime() - startDate.getTime()) /
+          (1000 * 60 * 60 * 24),
+      );
 
       const seed = `${cityId}-${monthStr}`.length;
 
       // Accumulative fuel (liters) - for FuelConsumptionChart
-      monthRow[`fuel_consumption_L_${city}`] = (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
+      monthRow[`fuel_consumption_L_${city}`] =
+        (dayOffset + 1) * 1000 + Math.round(seededRandom(seed * 17) * 500);
 
       // Accumulative CO2 (tons) - for Co2EmissionsChart
-      monthRow[`co2_emissions_tons_${city}`] = ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
+      monthRow[`co2_emissions_tons_${city}`] =
+        ((dayOffset + 1) * 50 + Math.round(seededRandom(seed * 19) * 30)) / 10;
 
       // Accumulative power (kWh) - for PowerConsumptionChart
-      monthRow[`power_consumption_kWh_${city}`] = (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
+      monthRow[`power_consumption_kWh_${city}`] =
+        (dayOffset + 1) * 500 + Math.round(seededRandom(seed * 23) * 200);
     });
 
     accumulativeData.push(monthRow);
@@ -124,7 +132,7 @@ export default function EnergyTrends() {
     return generateMockTrendsData(
       scope,
       hierarchy.cities || [],
-      hierarchy.sites || []
+      hierarchy.sites || [],
     );
   }, [hierarchy, scope]);
 
@@ -180,8 +188,22 @@ export default function EnergyTrends() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h1 style={{ color: "white", fontSize: "24px", fontWeight: "bold", margin: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <h1
+            style={{
+              color: "white",
+              fontSize: "24px",
+              fontWeight: "bold",
+              margin: 0,
+            }}
+          >
             Energy Trends
           </h1>
           <button
@@ -194,7 +216,14 @@ export default function EnergyTrends() {
 
         {/* Filters */}
         {!isLoading && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "16px",
+              marginBottom: "20px",
+            }}
+          >
             {/* Region Filter */}
             <div>
               <label className="block text-white text-sm font-semibold mb-2">
@@ -204,13 +233,23 @@ export default function EnergyTrends() {
                 value={scope.regionId || ""}
                 onChange={(e) => {
                   const regionId = e.target.value || undefined;
-                  setScope((prev) => ({ ...prev, regionId, district: undefined }));
+                  setScope((prev) => ({
+                    ...prev,
+                    regionId,
+                    district: undefined,
+                  }));
                 }}
                 className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
               >
-                <option value="" style={{ color: "black" }}>All Regions</option>
+                <option value="" style={{ color: "black" }}>
+                  All Regions
+                </option>
                 {hierarchy?.regions?.map((region) => (
-                  <option key={region.id} value={region.id} style={{ color: "black" }}>
+                  <option
+                    key={region.id}
+                    value={region.id}
+                    style={{ color: "black" }}
+                  >
                     {region.name}
                   </option>
                 ))}
@@ -231,9 +270,15 @@ export default function EnergyTrends() {
                 }}
                 className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
               >
-                <option value="" style={{ color: "black" }}>All Districts</option>
+                <option value="" style={{ color: "black" }}>
+                  All Districts
+                </option>
                 {districts.map((district) => (
-                  <option key={district} value={district} style={{ color: "black" }}>
+                  <option
+                    key={district}
+                    value={district}
+                    style={{ color: "black" }}
+                  >
                     {district}
                   </option>
                 ))}
@@ -249,75 +294,82 @@ export default function EnergyTrends() {
           </div>
         )}
 
-        {trendsData && trendsData.currentData && trendsData.accumulativeData && (
-          <div className="space-y-8">
-            {/* Current Fuel Level per City */}
-            {trendsData.cities && trendsData.cities.length > 0 && (
+        {trendsData &&
+          trendsData.currentData &&
+          trendsData.accumulativeData && (
+            <div className="space-y-8">
+              {/* Current Fuel Level per City */}
+              {trendsData.cities && trendsData.cities.length > 0 && (
+                <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                  <h2 className="text-xl font-semibold text-white mb-4">
+                    Current Fuel Level per City (Today)
+                  </h2>
+                  <div className="w-full h-80">
+                    <FuelLevelChart
+                      data={trendsData.currentData}
+                      cities={trendsData.cities}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Generator Load Trend */}
+              {trendsData.cities && trendsData.cities.length > 0 && (
+                <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                  <h2 className="text-xl font-semibold text-white mb-4">
+                    Generator Load Trend (Today)
+                  </h2>
+                  <div className="w-full h-80">
+                    <GeneratorLoadChart
+                      data={trendsData.currentData}
+                      cities={trendsData.cities}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Accumulative Fuel Consumption */}
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  Current Fuel Level per City (Today)
+                  Accumulative Fuel Consumption (Monthly from 1/1/2025)
                 </h2>
                 <div className="w-full h-80">
-                  <FuelLevelChart
-                    data={trendsData.currentData}
-                    cities={trendsData.cities}
-                  />
+                  <FuelConsumptionChart data={trendsData.accumulativeData} />
                 </div>
               </div>
-            )}
 
-            {/* Generator Load Trend */}
-            {trendsData.cities && trendsData.cities.length > 0 && (
+              {/* Accumulative CO₂ Emissions */}
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  Generator Load Trend (Today)
+                  Accumulative CO₂ Emissions (Monthly from 1/1/2025)
                 </h2>
                 <div className="w-full h-80">
-                  <GeneratorLoadChart
-                    data={trendsData.currentData}
-                    cities={trendsData.cities}
-                  />
+                  <Co2EmissionsChart data={trendsData.accumulativeData} />
                 </div>
               </div>
-            )}
 
-            {/* Accumulative Fuel Consumption */}
-            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative Fuel Consumption (Monthly from 1/1/2025)
-              </h2>
-              <div className="w-full h-80">
-                <FuelConsumptionChart data={trendsData.accumulativeData} />
+              {/* Accumulative Power Consumption */}
+              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Accumulative Power Consumption (Monthly from 1/1/2025)
+                </h2>
+                <div className="w-full h-80">
+                  <PowerConsumptionChart data={trendsData.accumulativeData} />
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Accumulative CO₂ Emissions */}
-            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative CO₂ Emissions (Monthly from 1/1/2025)
-              </h2>
-              <div className="w-full h-80">
-                <Co2EmissionsChart data={trendsData.accumulativeData} />
-              </div>
+        {!isLoading &&
+          (!trendsData ||
+            !trendsData.currentData ||
+            !trendsData.accumulativeData) && (
+            <div className="text-center py-12">
+              <p className="text-white/60">
+                No data available for the selected filters.
+              </p>
             </div>
-
-            {/* Accumulative Power Consumption */}
-            <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative Power Consumption (Monthly from 1/1/2025)
-              </h2>
-              <div className="w-full h-80">
-                <PowerConsumptionChart data={trendsData.accumulativeData} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {!isLoading && (!trendsData || !trendsData.currentData || !trendsData.accumulativeData) && (
-          <div className="text-center py-12">
-            <p className="text-white/60">No data available for the selected filters.</p>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );

@@ -70,7 +70,13 @@ export default function EnergyTrends() {
         )}
 
         {/* Charts Container */}
-        {trendsData && (
+        {isLoading && (
+          <div className="text-center py-12">
+            <p className="text-white/60">Loading trends data...</p>
+          </div>
+        )}
+
+        {trendsData && trendsData.data && trendsData.data.length > 0 && (
           <div className="space-y-8">
             {/* Accumulative Fuel Consumption */}
             <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
@@ -103,7 +109,7 @@ export default function EnergyTrends() {
             </div>
 
             {/* Current Fuel Level per City */}
-            {trendsData.cities.length > 0 && (
+            {trendsData.cities && trendsData.cities.length > 0 && (
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
                   Current Fuel Level per City
@@ -118,7 +124,7 @@ export default function EnergyTrends() {
             )}
 
             {/* Generator Load Trend */}
-            {trendsData.cities.length > 0 && (
+            {trendsData.cities && trendsData.cities.length > 0 && (
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
                   Generator Load Trend
@@ -131,6 +137,12 @@ export default function EnergyTrends() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {!isLoading && (!trendsData || !trendsData.data || trendsData.data.length === 0) && (
+          <div className="text-center py-12">
+            <p className="text-white/60">No data available for the selected filters.</p>
           </div>
         )}
       </div>

@@ -249,17 +249,17 @@ export default function EnergyTrends() {
           </div>
         )}
 
-        {trendsData && trendsData.data && trendsData.data.length > 0 && (
+        {trendsData && trendsData.currentData && trendsData.accumulativeData && (
           <div className="space-y-8">
             {/* Current Fuel Level per City */}
             {trendsData.cities && trendsData.cities.length > 0 && (
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  Current Fuel Level per City
+                  Current Fuel Level per City (Today)
                 </h2>
                 <div className="w-full h-80">
                   <FuelLevelChart
-                    data={trendsData.data}
+                    data={trendsData.currentData}
                     cities={trendsData.cities}
                   />
                 </div>
@@ -270,11 +270,11 @@ export default function EnergyTrends() {
             {trendsData.cities && trendsData.cities.length > 0 && (
               <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  Generator Load Trend
+                  Generator Load Trend (Today)
                 </h2>
                 <div className="w-full h-80">
                   <GeneratorLoadChart
-                    data={trendsData.data}
+                    data={trendsData.currentData}
                     cities={trendsData.cities}
                   />
                 </div>
@@ -284,36 +284,36 @@ export default function EnergyTrends() {
             {/* Accumulative Fuel Consumption */}
             <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
               <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative Fuel Consumption (from 1/1/2025 to Today)
+                Accumulative Fuel Consumption (Monthly from 1/1/2025)
               </h2>
               <div className="w-full h-80">
-                <FuelConsumptionChart data={trendsData.data} />
+                <FuelConsumptionChart data={trendsData.accumulativeData} />
               </div>
             </div>
 
             {/* Accumulative CO₂ Emissions */}
             <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
               <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative CO₂ Emissions (from 1/1/2025 to Today)
+                Accumulative CO₂ Emissions (Monthly from 1/1/2025)
               </h2>
               <div className="w-full h-80">
-                <Co2EmissionsChart data={trendsData.data} />
+                <Co2EmissionsChart data={trendsData.accumulativeData} />
               </div>
             </div>
 
             {/* Accumulative Power Consumption */}
             <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
               <h2 className="text-xl font-semibold text-white mb-4">
-                Accumulative Power Consumption (from 1/1/2025 to Today)
+                Accumulative Power Consumption (Monthly from 1/1/2025)
               </h2>
               <div className="w-full h-80">
-                <PowerConsumptionChart data={trendsData.data} />
+                <PowerConsumptionChart data={trendsData.accumulativeData} />
               </div>
             </div>
           </div>
         )}
 
-        {!isLoading && (!trendsData || !trendsData.data || trendsData.data.length === 0) && (
+        {!isLoading && (!trendsData || !trendsData.currentData || !trendsData.accumulativeData) && (
           <div className="text-center py-12">
             <p className="text-white/60">No data available for the selected filters.</p>
           </div>

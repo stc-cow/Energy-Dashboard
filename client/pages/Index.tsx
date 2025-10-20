@@ -282,18 +282,24 @@ export default function Index() {
         <div className="grid grid-cols-2 gap-6 mt-6">
           <div
             onClick={() => navigate("/heatmap")}
-            className="cursor-pointer bg-purple-800 hover:bg-purple-700 rounded-2xl p-6 text-center shadow-lg transition"
+            className="cursor-pointer rounded-2xl p-6 text-center shadow-lg transition hover:opacity-90"
+            style={{ backgroundColor: "#5c0ba2" }}
           >
             <h3 className="text-white text-xl font-semibold">COW Distribution Map</h3>
-            <p className="text-purple-200 text-sm mt-2">View site distribution and status heatmap</p>
+            <div className="text-purple-200 text-sm mt-2">
+              <p>View Sites Distribution Map</p>
+            </div>
           </div>
 
           <div
             onClick={() => navigate("/trends")}
-            className="cursor-pointer bg-purple-800 hover:bg-purple-700 rounded-2xl p-6 text-center shadow-lg transition"
+            className="cursor-pointer rounded-2xl p-6 text-center shadow-lg transition hover:opacity-90"
+            style={{ backgroundColor: "#5c0ba2" }}
           >
             <h3 className="text-white text-xl font-semibold">Energy Trends</h3>
-            <p className="text-purple-200 text-sm mt-2">Analyze accumulative fuel, power, CO₂, and generator load trends</p>
+            <div className="text-purple-200 text-sm mt-2">
+              <p>Click to view Energy Trends</p>
+            </div>
           </div>
         </div>
       </FitToScreen>

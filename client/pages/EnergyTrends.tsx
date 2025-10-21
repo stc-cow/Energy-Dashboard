@@ -179,8 +179,62 @@ function generateMockTrendsData(
   const startDate = new Date(2025, 0, 1); // January 1, 2025
   const today = new Date();
 
-  // ===== CURRENT DATA - Will be set from real data =====
+  // ===== CURRENT DATA (Mock fallback - will be overridden by real data if available) =====
   const currentData: Array<{ [key: string]: any }> = [];
+  const todayStr = "Today";
+
+  // Determine if grouping by region or district
+  const groupByDistrict = !!scope.district;
+  const groupByRegion = !!scope.regionId && !scope.district;
+
+  if (groupByDistrict) {
+    // Show single district for selected region
+    const row: any = { name: todayStr };
+    row[scope.district] = Math.round(seededRandom(123) * 100);
+    row[`gen_${scope.district}`] = Math.round(seededRandom(456) * 100);
+    if (Object.keys(row).length > 1) currentData.push(row);
+  } else if (groupByRegion) {
+    // Show districts within the selected region
+    const regionSites = allSites.filter((s) => {
+      const city = filteredCities.find((c) => c.id === s.cityId);
+      return city && city.regionId === scope.regionId;
+    });
+    const districtSet = new Set<string>();
+
+    regionSites.forEach((site) => {
+      if (site.district) {
+        districtSet.add(site.district);
+      }
+    });
+
+    const row: any = { name: todayStr };
+    let seed = 789;
+    Array.from(districtSet).forEach((district) => {
+      row[district] = Math.round(seededRandom(seed++) * 100);
+      row[`gen_${district}`] = Math.round(seededRandom(seed++) * 100);
+    });
+    if (Object.keys(row).length > 1) currentData.push(row);
+  } else {
+    // Show all regions
+    const regionMap = new Map<string, number>();
+    const regionGenMap = new Map<string, number>();
+
+    filteredCities.forEach((city, idx) => {
+      const regionId = city.regionId || "Unknown";
+      const seed = idx * 100;
+      const prevVal = regionMap.get(regionId) || 0;
+      regionMap.set(regionId, prevVal + Math.round(seededRandom(seed + 11) * 50));
+      const prevGenVal = regionGenMap.get(regionId) || 0;
+      regionGenMap.set(regionId, prevGenVal + Math.round(seededRandom(seed + 13) * 50));
+    });
+
+    const row: any = { name: todayStr };
+    regionMap.forEach((value, regionId) => {
+      row[regionId] = value % 100;
+      row[`gen_${regionId}`] = (regionGenMap.get(regionId) || 0) % 100;
+    });
+    if (Object.keys(row).length > 1) currentData.push(row);
+  }
 
   // ===== ACCUMULATIVE DATA (Monthly from Jan 2025 to today) =====
   const accumulativeData = [];

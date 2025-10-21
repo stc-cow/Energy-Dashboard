@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchHierarchy, fetchKPIs } from "@/lib/api";
+import { fetchHierarchy } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import FuelConsumptionChart from "@/components/energy/charts/FuelConsumptionChart";
 import Co2EmissionsChart from "@/components/energy/charts/Co2EmissionsChart";
@@ -13,6 +13,145 @@ import GeneratorLoadChart from "@/components/energy/charts/GeneratorLoadChart";
 function getRegionNameForCity(cityId: string, allCities: { id: string; name: string; regionId?: string }[]): string {
   const city = allCities.find(c => c.id === cityId);
   return city?.regionId || "Unknown";
+}
+
+// Helper function to fetch and parse raw sheet data (mimic api.ts logic)
+async function getRawSheetData(): Promise<any[]> {
+  try {
+    const resp = await fetch(`/api/sheet`);
+    if (resp.ok) {
+      const data = await resp.json();
+      return Array.isArray(data) ? data : [];
+    }
+  } catch {
+    /* fallback to mock data */
+  }
+  return [];
+}
+
+// Helper functions to extract KPI values from row (matching api.ts)
+function getFuelTankLevelPct(r: any): number {
+  const keys = Object.keys(r || {});
+  let value: any = undefined;
+
+  // Try common header names first
+  const candidates = [
+    "fuelTankLevelPct",
+    "Fuel Tank Level %",
+    "Fuel Level %",
+    "fuel_level_pct",
+    "fuel_tank_level_pct",
+    "col24",
+  ];
+
+  for (const cand of candidates) {
+    if (r[cand] !== undefined) {
+      value = r[cand];
+      break;
+    }
+  }
+
+  if (value === undefined) {
+    return 0;
+  }
+
+  const num = parseFloat(String(value).replace(/,/g, "").trim());
+  return isNaN(num) ? 0 : num;
+}
+
+function getGeneratorLoadFactorPct(r: any): number {
+  const keys = Object.keys(r || {});
+  let value: any = undefined;
+
+  // Try common header names first
+  const candidates = [
+    "generatorLoadFactorPct",
+    "Load Factor %",
+    "Generator Load Factor %",
+    "load_factor_pct",
+    "gen_load_factor_pct",
+    "col25",
+  ];
+
+  for (const cand of candidates) {
+    if (r[cand] !== undefined) {
+      value = r[cand];
+      break;
+    }
+  }
+
+  if (value === undefined) {
+    return 0;
+  }
+
+  const num = parseFloat(String(value).replace(/,/g, "").trim());
+  return isNaN(num) ? 0 : num;
+}
+
+function getRegionName(r: any): string {
+  const candidates = [
+    "regionName",
+    "Region",
+    "region",
+    "Region Name",
+    "region_name",
+    "Province",
+    "province",
+    "Area",
+    "area",
+    "col3",
+  ];
+
+  for (const cand of candidates) {
+    if (r[cand] !== undefined && r[cand] !== "") {
+      return String(r[cand]).trim();
+    }
+  }
+  return "Unknown";
+}
+
+function getCityName(r: any): string {
+  const candidates = [
+    "cityName",
+    "City",
+    "city",
+    "City Name",
+    "city_name",
+    "Municipality",
+    "municipality",
+    "Governorate",
+    "governorate",
+    "col5",
+  ];
+
+  for (const cand of candidates) {
+    if (r[cand] !== undefined && r[cand] !== "") {
+      return String(r[cand]).trim();
+    }
+  }
+  return "Unknown";
+}
+
+function getDistrictName(r: any): string {
+  const candidates = [
+    "districtName",
+    "district",
+    "District",
+    "District Name",
+    "district_name",
+    "Neighborhood",
+    "neighborhood",
+    "Subdistrict",
+    "subdistrict",
+    "col4",
+  ];
+
+  for (const cand of candidates) {
+    if (r[cand] !== undefined && r[cand] !== "") {
+      return String(r[cand]).trim();
+    }
+  }
+  return "";
 }
 
 interface TrendsResponse {

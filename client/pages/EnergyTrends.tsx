@@ -333,7 +333,7 @@ export default function EnergyTrends() {
                 Current Fuel Level by Region (Today)
               </h3>
               <div className="h-64 bg-black/30 rounded-lg p-4">
-                <FuelLevelChart data={trendsData.currentData} cities={[]} />
+                <FuelLevelChart data={trendsData.currentData} cities={trendsData.cities} />
               </div>
             </div>
 
@@ -342,7 +342,7 @@ export default function EnergyTrends() {
                 Generator Load Trend by Region (Today)
               </h3>
               <div className="h-64 bg-black/30 rounded-lg p-4">
-                <GeneratorLoadChart data={trendsData.currentData} cities={[]} />
+                <GeneratorLoadChart data={trendsData.currentData} cities={trendsData.cities} />
               </div>
             </div>
 
@@ -351,7 +351,7 @@ export default function EnergyTrends() {
                 Accumulative Fuel Consumption (Monthly from 1/1/2025)
               </h3>
               <div className="h-64 bg-black/30 rounded-lg p-4">
-                <FuelConsumptionChart data={trendsData.accumulativeData} cities={[]} />
+                <FuelConsumptionChart data={trendsData.accumulativeData} />
               </div>
             </div>
 
@@ -360,7 +360,7 @@ export default function EnergyTrends() {
                 Accumulative CO₂ Emissions (Monthly from 1/1/2025)
               </h3>
               <div className="h-64 bg-black/30 rounded-lg p-4">
-                <Co2EmissionsChart data={trendsData.accumulativeData} cities={[]} />
+                <Co2EmissionsChart data={trendsData.accumulativeData} />
               </div>
             </div>
 
@@ -369,7 +369,7 @@ export default function EnergyTrends() {
                 Accumulative Power Consumption (Monthly from 1/1/2025)
               </h3>
               <div className="h-64 bg-black/30 rounded-lg p-4">
-                <PowerConsumptionChart data={trendsData.accumulativeData} cities={[]} />
+                <PowerConsumptionChart data={trendsData.accumulativeData} />
               </div>
             </div>
           </div>

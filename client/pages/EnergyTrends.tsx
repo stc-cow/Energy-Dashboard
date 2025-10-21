@@ -10,8 +10,11 @@ import FuelLevelChart from "@/components/energy/charts/FuelLevelChart";
 import GeneratorLoadChart from "@/components/energy/charts/GeneratorLoadChart";
 
 // Helper to get region name for a city ID
-function getRegionNameForCity(cityId: string, allCities: { id: string; name: string; regionId?: string }[]): string {
-  const city = allCities.find(c => c.id === cityId);
+function getRegionNameForCity(
+  cityId: string,
+  allCities: { id: string; name: string; regionId?: string }[],
+): string {
+  const city = allCities.find((c) => c.id === cityId);
   return city?.regionId || "Unknown";
 }
 
@@ -24,7 +27,7 @@ async function getRawSheetData(): Promise<any[]> {
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
 
     const resp = await fetch(
-      `/api/sheet?sheet=${encodeURIComponent(sheetUrl || "")}`
+      `/api/sheet?sheet=${encodeURIComponent(sheetUrl || "")}`,
     );
     if (resp.ok) {
       const data = await resp.json();
@@ -227,10 +230,16 @@ async function generateCurrentDataFromRawSheets(
     });
 
     const avgFuel = districtFuels.length
-      ? Math.round((districtFuels.reduce((a, b) => a + b, 0) / districtFuels.length) * 10) / 10
+      ? Math.round(
+          (districtFuels.reduce((a, b) => a + b, 0) / districtFuels.length) *
+            10,
+        ) / 10
       : 0;
     const avgLoad = districtLoads.length
-      ? Math.round((districtLoads.reduce((a, b) => a + b, 0) / districtLoads.length) * 10) / 10
+      ? Math.round(
+          (districtLoads.reduce((a, b) => a + b, 0) / districtLoads.length) *
+            10,
+        ) / 10
       : 0;
 
     const row: any = { name: todayStr };
@@ -239,10 +248,7 @@ async function generateCurrentDataFromRawSheets(
     currentData.push(row);
   } else if (groupByRegion) {
     // Show districts within the selected region with separate aggregates
-    const districtMap = new Map<
-      string,
-      { fuels: number[]; loads: number[] }
-    >();
+    const districtMap = new Map<string, { fuels: number[]; loads: number[] }>();
 
     filteredRows.forEach((row) => {
       const districtName = getDistrictName(row);
@@ -262,10 +268,12 @@ async function generateCurrentDataFromRawSheets(
     const row: any = { name: todayStr };
     districtMap.forEach(({ fuels, loads }, district) => {
       const avgFuel = fuels.length
-        ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) / 10
+        ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
+          10
         : 0;
       const avgLoad = loads.length
-        ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) / 10
+        ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
+          10
         : 0;
       row[district] = avgFuel;
       row[`gen_${district}`] = avgLoad;
@@ -274,10 +282,7 @@ async function generateCurrentDataFromRawSheets(
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {
     // Show all regions with separate aggregates for each
-    const regionMap = new Map<
-      string,
-      { fuels: number[]; loads: number[] }
-    >();
+    const regionMap = new Map<string, { fuels: number[]; loads: number[] }>();
 
     filteredRows.forEach((row) => {
       const regionName = getRegionName(row);
@@ -297,10 +302,12 @@ async function generateCurrentDataFromRawSheets(
     const row: any = { name: todayStr };
     regionMap.forEach(({ fuels, loads }, region) => {
       const avgFuel = fuels.length
-        ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) / 10
+        ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
+          10
         : 0;
       const avgLoad = loads.length
-        ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) / 10
+        ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
+          10
         : 0;
       row[region] = avgFuel;
       row[`gen_${region}`] = avgLoad;
@@ -393,7 +400,10 @@ function generateMockTrendsData(
 
     // Build region map with actual names
     const regionNameMap = new Map<string, string>();
-    if (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SHEET_URL) {
+    if (
+      typeof import.meta !== "undefined" &&
+      (import.meta as any).env?.VITE_SHEET_URL
+    ) {
       // If we have real data source, we can map region IDs to names
       allCities.forEach((city) => {
         if (city.regionId && !regionNameMap.has(city.regionId)) {
@@ -415,17 +425,27 @@ function generateMockTrendsData(
         regionGenMap.set(regionName, { name: regionName, values: [] });
       }
 
-      regionMap.get(regionName)!.values.push(Math.round(seededRandom(seed + 11) * 100));
-      regionGenMap.get(regionName)!.values.push(Math.round(seededRandom(seed + 13) * 100));
+      regionMap
+        .get(regionName)!
+        .values.push(Math.round(seededRandom(seed + 11) * 100));
+      regionGenMap
+        .get(regionName)!
+        .values.push(Math.round(seededRandom(seed + 13) * 100));
     });
 
     const row: any = { name: todayStr };
     regionMap.forEach(({ name, values }) => {
-      const avg = values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
+      const avg =
+        values.length > 0
+          ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+          : 0;
       row[name] = avg;
     });
     regionGenMap.forEach(({ name, values }) => {
-      const avg = values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
+      const avg =
+        values.length > 0
+          ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+          : 0;
       row[`gen_${name}`] = avg;
     });
     if (Object.keys(row).length > 1) currentData.push(row);
@@ -704,7 +724,13 @@ export default function EnergyTrends() {
               {trendsData.currentData && trendsData.currentData.length > 0 && (
                 <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    Current Fuel Level by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
+                    Current Fuel Level by{" "}
+                    {scope.district
+                      ? "District"
+                      : scope.regionId
+                        ? "District"
+                        : "Region"}{" "}
+                    (Today)
                   </h2>
                   <div className="w-full h-80">
                     <FuelLevelChart
@@ -719,7 +745,13 @@ export default function EnergyTrends() {
               {trendsData.currentData && trendsData.currentData.length > 0 && (
                 <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    Generator Load Trend by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
+                    Generator Load Trend by{" "}
+                    {scope.district
+                      ? "District"
+                      : scope.regionId
+                        ? "District"
+                        : "Region"}{" "}
+                    (Today)
                   </h2>
                   <div className="w-full h-80">
                     <GeneratorLoadChart

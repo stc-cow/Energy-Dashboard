@@ -254,14 +254,47 @@ export default function EnergyTrends() {
     },
   });
 
+  // Fetch real fuel and generator load data
+  const { data: sheetData } = useQuery({
+    queryKey: ["trends-sheet-data"],
+    queryFn: async () => {
+      return await fetchRealTrendsData(
+        scope,
+        hierarchy?.cities || [],
+        hierarchy?.sites || [],
+      );
+    },
+    enabled: !!hierarchy,
+  });
+
   const trendsData = useMemo(() => {
     if (!hierarchy) return null;
-    return generateMockTrendsData(
+
+    // Generate base mock data structure
+    const mockData = generateMockTrendsData(
       scope,
       hierarchy.cities || [],
       hierarchy.sites || [],
     );
-  }, [hierarchy, scope]);
+
+    // If we have real sheet data, use it for current fuel and generator load
+    if (sheetData && (sheetData.fuelByRegion.size > 0 || sheetData.genLoadByRegion.size > 0)) {
+      const realCurrentData = generateCurrentDataFromSheetData(
+        scope,
+        hierarchy.cities || [],
+        hierarchy.sites || [],
+        sheetData.fuelByRegion,
+        sheetData.genLoadByRegion,
+      );
+
+      return {
+        ...mockData,
+        currentData: realCurrentData.length > 0 ? realCurrentData : mockData.currentData,
+      };
+    }
+
+    return mockData;
+  }, [hierarchy, scope, sheetData]);
 
   const isLoading = !hierarchy;
 

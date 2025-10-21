@@ -215,23 +215,46 @@ function generateMockTrendsData(
     });
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {
-    // Show all regions
-    const regionMap = new Map<string, number>();
-    const regionGenMap = new Map<string, number>();
+    // Show all regions - use actual region names from hierarchy
+    const regionMap = new Map<string, { name: string; values: number[] }>();
+    const regionGenMap = new Map<string, { name: string; values: number[] }>();
+
+    // Build region map with actual names
+    const regionNameMap = new Map<string, string>();
+    if (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SHEET_URL) {
+      // If we have real data source, we can map region IDs to names
+      allCities.forEach((city) => {
+        if (city.regionId && !regionNameMap.has(city.regionId)) {
+          // Extract actual region name from city data if available
+          regionNameMap.set(city.regionId, city.regionId); // fallback to ID
+        }
+      });
+    }
 
     filteredCities.forEach((city, idx) => {
       const regionId = city.regionId || "Unknown";
+      const regionName = regionNameMap.get(regionId) || regionId; // Use name if available
       const seed = idx * 100;
-      const prevVal = regionMap.get(regionId) || 0;
-      regionMap.set(regionId, prevVal + Math.round(seededRandom(seed + 11) * 50));
-      const prevGenVal = regionGenMap.get(regionId) || 0;
-      regionGenMap.set(regionId, prevGenVal + Math.round(seededRandom(seed + 13) * 50));
+
+      if (!regionMap.has(regionName)) {
+        regionMap.set(regionName, { name: regionName, values: [] });
+      }
+      if (!regionGenMap.has(regionName)) {
+        regionGenMap.set(regionName, { name: regionName, values: [] });
+      }
+
+      regionMap.get(regionName)!.values.push(Math.round(seededRandom(seed + 11) * 100));
+      regionGenMap.get(regionName)!.values.push(Math.round(seededRandom(seed + 13) * 100));
     });
 
     const row: any = { name: todayStr };
-    regionMap.forEach((value, regionId) => {
-      row[regionId] = value % 100;
-      row[`gen_${regionId}`] = (regionGenMap.get(regionId) || 0) % 100;
+    regionMap.forEach(({ name, values }) => {
+      const avg = values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
+      row[name] = avg;
+    });
+    regionGenMap.forEach(({ name, values }) => {
+      const avg = values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
+      row[`gen_${name}`] = avg;
     });
     if (Object.keys(row).length > 1) currentData.push(row);
   }

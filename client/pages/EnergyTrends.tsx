@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchHierarchy } from "@/lib/api";
+import { fetchHierarchy, fetchKPIs } from "@/lib/api";
 import { HierarchyFilter } from "@shared/api";
 import FuelConsumptionChart from "@/components/energy/charts/FuelConsumptionChart";
 import Co2EmissionsChart from "@/components/energy/charts/Co2EmissionsChart";
@@ -9,61 +9,10 @@ import PowerConsumptionChart from "@/components/energy/charts/PowerConsumptionCh
 import FuelLevelChart from "@/components/energy/charts/FuelLevelChart";
 import GeneratorLoadChart from "@/components/energy/charts/GeneratorLoadChart";
 
-// Function to fetch real fuel level and generator load data from Google Sheet
-async function fetchRealTrendsData(
-  scope: HierarchyFilter,
-  allCities: { id: string; name: string; regionId?: string }[],
-  allSites: { id: string; name: string; cityId: string; district?: string }[],
-): Promise<{ fuelByRegion: Map<string, number[]>; genLoadByRegion: Map<string, number[]> }> {
-  try {
-    // Fetch from the sheet API endpoint
-    const response = await fetch(`/api/sheet?sheet=${encodeURIComponent(
-      typeof import.meta !== "undefined" &&
-      (import.meta as any).env?.VITE_SHEET_URL ||
-      "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv"
-    )}`);
-
-    if (!response.ok) {
-      return { fuelByRegion: new Map(), genLoadByRegion: new Map() };
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-      return { fuelByRegion: new Map(), genLoadByRegion: new Map() };
-    }
-
-    const fuelByRegion = new Map<string, number[]>();
-    const genLoadByRegion = new Map<string, number[]>();
-
-    // Process each row
-    for (const row of data) {
-      // Get region name
-      const regionName = String(
-        row["regionName"] ?? row["Region"] ?? row["region"] ?? ""
-      ).trim();
-      if (!regionName) continue;
-
-      // Get fuel level and generator load
-      const fuelLevel = parseFloat(row["fuelTankLevelPct"] ?? 0);
-      const genLoad = parseFloat(row["generatorLoadFactorPct"] ?? 0);
-
-      // Initialize maps if needed
-      if (!fuelByRegion.has(regionName)) fuelByRegion.set(regionName, []);
-      if (!genLoadByRegion.has(regionName)) genLoadByRegion.set(regionName, []);
-
-      // Add values
-      if (fuelLevel || fuelLevel === 0) {
-        fuelByRegion.get(regionName)!.push(fuelLevel);
-      }
-      if (genLoad || genLoad === 0) {
-        genLoadByRegion.get(regionName)!.push(genLoad);
-      }
-    }
-
-    return { fuelByRegion, genLoadByRegion };
-  } catch {
-    return { fuelByRegion: new Map(), genLoadByRegion: new Map() };
-  }
+// Helper to get region name for a city ID
+function getRegionNameForCity(cityId: string, allCities: { id: string; name: string; regionId?: string }[]): string {
+  const city = allCities.find(c => c.id === cityId);
+  return city?.regionId || "Unknown";
 }
 
 interface TrendsResponse {

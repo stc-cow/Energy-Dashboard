@@ -496,11 +496,15 @@ export default function EnergyTrends() {
     },
   });
 
-  // Fetch real KPI data from Google Sheet
-  const { data: kpisData } = useQuery({
-    queryKey: ["trends-kpis", scope],
+  // Fetch real current data (fuel level and generator load) aggregated by region/district
+  const { data: realCurrentData, isLoading: isLoadingCurrentData } = useQuery({
+    queryKey: ["trends-current-data", scope],
     queryFn: async () => {
-      return await fetchKPIs(scope);
+      return await generateCurrentDataFromRawSheets(
+        scope,
+        hierarchy?.cities || [],
+        hierarchy?.sites || [],
+      );
     },
     enabled: !!hierarchy,
   });
@@ -515,23 +519,17 @@ export default function EnergyTrends() {
       hierarchy.sites || [],
     );
 
-    // If we have real KPI data, use it for current fuel and generator load
-    if (kpisData && kpisData.kpis) {
-      const realCurrentData = generateCurrentDataFromKPIs(
-        scope,
-        hierarchy.cities || [],
-        hierarchy.sites || [],
-        kpisData,
-      );
+    // Use real data if available, otherwise fall back to mock
+    const currentDataToUse =
+      realCurrentData && realCurrentData.length > 0
+        ? realCurrentData
+        : mockData.currentData;
 
-      return {
-        ...mockData,
-        currentData: realCurrentData.length > 0 ? realCurrentData : mockData.currentData,
-      };
-    }
-
-    return mockData;
-  }, [hierarchy, scope, kpisData]);
+    return {
+      ...mockData,
+      currentData: currentDataToUse,
+    };
+  }, [hierarchy, scope, realCurrentData]);
 
   const isLoading = !hierarchy;
 

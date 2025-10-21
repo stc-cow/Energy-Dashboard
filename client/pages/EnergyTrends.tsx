@@ -531,7 +531,7 @@ export default function EnergyTrends() {
     };
   }, [hierarchy, scope, realCurrentData]);
 
-  const isLoading = !hierarchy;
+  const isLoading = !hierarchy || isLoadingCurrentData;
 
   // Get districts for selected region
   const filteredCities = useMemo(() => {

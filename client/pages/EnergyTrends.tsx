@@ -18,7 +18,14 @@ function getRegionNameForCity(cityId: string, allCities: { id: string; name: str
 // Helper function to fetch and parse raw sheet data (mimic api.ts logic)
 async function getRawSheetData(): Promise<any[]> {
   try {
-    const resp = await fetch(`/api/sheet`);
+    const sheetUrl =
+      (typeof import.meta !== "undefined" &&
+        (import.meta as any).env?.VITE_SHEET_URL) ||
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
+
+    const resp = await fetch(
+      `/api/sheet?sheet=${encodeURIComponent(sheetUrl || "")}`
+    );
     if (resp.ok) {
       const data = await resp.json();
       return Array.isArray(data) ? data : [];

@@ -73,6 +73,73 @@ interface TrendsResponse {
   cities: string[];
 }
 
+// Generate current data with real fuel level and generator load from Google Sheet
+function generateCurrentDataFromSheetData(
+  scope: HierarchyFilter,
+  allCities: { id: string; name: string; regionId?: string }[],
+  allSites: { id: string; name: string; cityId: string; district?: string }[],
+  fuelByRegion: Map<string, number[]>,
+  genLoadByRegion: Map<string, number[]>,
+): Array<{ [key: string]: any }> {
+  const currentData = [];
+  const todayStr = "Today";
+
+  // Determine if grouping by region or district
+  const groupByDistrict = !!scope.district;
+  const groupByRegion = !!scope.regionId && !scope.district;
+
+  if (groupByDistrict) {
+    // Show single district for selected region
+    const row: any = { name: todayStr };
+    row[scope.district] = 0; // Will be set if data exists
+    row[`gen_${scope.district}`] = 0;
+    if (Object.keys(row).length > 1) currentData.push(row);
+  } else if (groupByRegion) {
+    // Show districts within the selected region
+    const regionSites = allSites.filter((s) => {
+      const city = allCities.find((c) => c.id === s.cityId);
+      return city && city.regionId === scope.regionId;
+    });
+    const districtSet = new Set<string>();
+
+    regionSites.forEach((site) => {
+      if (site.district) {
+        districtSet.add(site.district);
+      }
+    });
+
+    const row: any = { name: todayStr };
+    Array.from(districtSet).forEach((district) => {
+      row[district] = 0;
+      row[`gen_${district}`] = 0;
+    });
+    if (Object.keys(row).length > 1) currentData.push(row);
+  } else {
+    // Show all regions
+    const row: any = { name: todayStr };
+
+    fuelByRegion.forEach((values, regionName) => {
+      // Average fuel level for this region
+      const avgFuel = values.length > 0
+        ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10
+        : 0;
+      row[regionName] = avgFuel;
+    });
+
+    genLoadByRegion.forEach((values, regionName) => {
+      // Average generator load for this region
+      const avgGenLoad = values.length > 0
+        ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10
+        : 0;
+      row[`gen_${regionName}`] = avgGenLoad;
+    });
+
+    if (Object.keys(row).length > 1) currentData.push(row);
+  }
+
+  return currentData;
+}
+
 // Import mock data function directly for client-side data generation
 function generateMockTrendsData(
   scope: HierarchyFilter,
@@ -112,75 +179,8 @@ function generateMockTrendsData(
   const startDate = new Date(2025, 0, 1); // January 1, 2025
   const today = new Date();
 
-  // ===== CURRENT DATA (Single "Today" row with regions/districts as legend items) =====
-  const currentData = [];
-  const todayStr = "Today";
-
-  // Determine if grouping by region or district
-  const groupByDistrict = !!scope.district;
-  const groupByRegion = !!scope.regionId && !scope.district;
-
-  if (groupByDistrict) {
-    // Show districts for selected region
-    const districtSites = allSites.filter((s) => s.district === scope.district);
-    const districtCities = new Set(districtSites.map((s) => s.cityId));
-    const citiesInDistrict = filteredCities.filter((c) => districtCities.has(c.id));
-
-    const row: any = { name: todayStr };
-    citiesInDistrict.forEach((city) => {
-      const seed = `${city.id}-district`.length;
-      row[scope.district] = Math.round(seededRandom(seed * 11) * 100);
-      row[`gen_${scope.district}`] = Math.round(seededRandom(seed * 13) * 100);
-    });
-    if (Object.keys(row).length > 1) currentData.push(row);
-  } else if (groupByRegion) {
-    // Show districts within the selected region
-    const regionSites = allSites.filter((s) => {
-      const city = filteredCities.find((c) => c.id === s.cityId);
-      return city && city.regionId === scope.regionId;
-    });
-    const districtSet = new Set<string>();
-    const districtValues: Map<string, number> = new Map();
-    const districtGenValues: Map<string, number> = new Map();
-
-    regionSites.forEach((site) => {
-      if (site.district) {
-        districtSet.add(site.district);
-        const seed = `${site.id}-${site.district}`.length;
-        const prevVal = districtValues.get(site.district) || 0;
-        districtValues.set(site.district, prevVal + Math.round(seededRandom(seed * 11) * 50));
-        const prevGenVal = districtGenValues.get(site.district) || 0;
-        districtGenValues.set(site.district, prevGenVal + Math.round(seededRandom(seed * 13) * 50));
-      }
-    });
-
-    const row: any = { name: todayStr };
-    Array.from(districtSet).forEach((district) => {
-      row[district] = (districtValues.get(district) || 0) % 100;
-      row[`gen_${district}`] = (districtGenValues.get(district) || 0) % 100;
-    });
-    if (Object.keys(row).length > 1) currentData.push(row);
-  } else {
-    // Show all regions
-    const regionMap = new Map<string, number>();
-    const regionGenMap = new Map<string, number>();
-
-    filteredCities.forEach((city) => {
-      const regionId = city.regionId || "Unknown";
-      const seed = `${city.id}-${regionId}`.length;
-      const prevVal = regionMap.get(regionId) || 0;
-      regionMap.set(regionId, prevVal + Math.round(seededRandom(seed * 11) * 50));
-      const prevGenVal = regionGenMap.get(regionId) || 0;
-      regionGenMap.set(regionId, prevGenVal + Math.round(seededRandom(seed * 13) * 50));
-    });
-
-    const row: any = { name: todayStr };
-    regionMap.forEach((value, regionId) => {
-      row[regionId] = value % 100;
-      row[`gen_${regionId}`] = (regionGenMap.get(regionId) || 0) % 100;
-    });
-    if (Object.keys(row).length > 1) currentData.push(row);
-  }
+  // ===== CURRENT DATA - Will be set from real data =====
+  const currentData: Array<{ [key: string]: any }> = [];
 
   // ===== ACCUMULATIVE DATA (Monthly from Jan 2025 to today) =====
   const accumulativeData = [];

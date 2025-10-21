@@ -284,15 +284,11 @@ export default function EnergyTrends() {
     },
   });
 
-  // Fetch real fuel and generator load data
-  const { data: sheetData } = useQuery({
-    queryKey: ["trends-sheet-data"],
+  // Fetch real KPI data from Google Sheet
+  const { data: kpisData } = useQuery({
+    queryKey: ["trends-kpis", scope],
     queryFn: async () => {
-      return await fetchRealTrendsData(
-        scope,
-        hierarchy?.cities || [],
-        hierarchy?.sites || [],
-      );
+      return await fetchKPIs(scope);
     },
     enabled: !!hierarchy,
   });
@@ -307,14 +303,13 @@ export default function EnergyTrends() {
       hierarchy.sites || [],
     );
 
-    // If we have real sheet data, use it for current fuel and generator load
-    if (sheetData && (sheetData.fuelByRegion.size > 0 || sheetData.genLoadByRegion.size > 0)) {
-      const realCurrentData = generateCurrentDataFromSheetData(
+    // If we have real KPI data, use it for current fuel and generator load
+    if (kpisData && kpisData.kpis) {
+      const realCurrentData = generateCurrentDataFromKPIs(
         scope,
         hierarchy.cities || [],
         hierarchy.sites || [],
-        sheetData.fuelByRegion,
-        sheetData.genLoadByRegion,
+        kpisData,
       );
 
       return {
@@ -324,7 +319,7 @@ export default function EnergyTrends() {
     }
 
     return mockData;
-  }, [hierarchy, scope, sheetData]);
+  }, [hierarchy, scope, kpisData]);
 
   const isLoading = !hierarchy;
 

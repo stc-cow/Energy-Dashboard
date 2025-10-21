@@ -161,69 +161,142 @@ interface TrendsResponse {
   cities: string[];
 }
 
-// Generate current data by aggregating KPI data by region/district
-function generateCurrentDataFromKPIs(
+// Generate current data by aggregating raw sheet data by region/district separately
+async function generateCurrentDataFromRawSheets(
   scope: HierarchyFilter,
   allCities: { id: string; name: string; regionId?: string }[],
   allSites: { id: string; name: string; cityId: string; district?: string }[],
-  kpisData: any,
-): Array<{ [key: string]: any }> {
-  if (!kpisData || !kpisData.kpis) {
+): Promise<Array<{ [key: string]: any }>> {
+  const rawData = await getRawSheetData();
+  if (!rawData || rawData.length === 0) {
     return [];
   }
 
   const currentData = [];
   const todayStr = "Today";
 
-  // Get fuel level and generator load from KPIs
-  const fuelLevel = kpisData.kpis.fuelTankLevelPct?.value || 0;
-  const genLoad = kpisData.kpis.generatorLoadFactorPct?.value || 0;
+  // Filter rows based on scope
+  const filteredRows = rawData.filter((r) => {
+    const regionName = getRegionName(r);
+    const cityName = getCityName(r);
+    const districtName = getDistrictName(r);
 
-  // Determine if grouping by region or district
+    // Match against hierarchy
+    const matchingCity = allCities.find((c) => c.name === cityName);
+    const matchingRegion = matchingCity?.regionId;
+
+    if (scope.district && districtName && districtName !== scope.district) {
+      return false;
+    }
+
+    if (scope.regionId && matchingRegion !== scope.regionId) {
+      return false;
+    }
+
+    if (scope.cityId && matchingCity?.id !== scope.cityId) {
+      return false;
+    }
+
+    return true;
+  });
+
+  if (filteredRows.length === 0) {
+    return [];
+  }
+
   const groupByDistrict = !!scope.district;
   const groupByRegion = !!scope.regionId && !scope.district;
 
   if (groupByDistrict) {
-    // Show single district
+    // Show single district with its aggregated values
+    const districtFuels: number[] = [];
+    const districtLoads: number[] = [];
+
+    filteredRows.forEach((row) => {
+      const fuel = getFuelTankLevelPct(row);
+      const load = getGeneratorLoadFactorPct(row);
+      if (fuel > 0 || fuel === 0) districtFuels.push(fuel);
+      if (load > 0 || load === 0) districtLoads.push(load);
+    });
+
+    const avgFuel = districtFuels.length
+      ? Math.round((districtFuels.reduce((a, b) => a + b, 0) / districtFuels.length) * 10) / 10
+      : 0;
+    const avgLoad = districtLoads.length
+      ? Math.round((districtLoads.reduce((a, b) => a + b, 0) / districtLoads.length) * 10) / 10
+      : 0;
+
     const row: any = { name: todayStr };
-    row[scope.district] = fuelLevel;
-    row[`gen_${scope.district}`] = genLoad;
-    if (Object.keys(row).length > 1) currentData.push(row);
+    row[scope.district] = avgFuel;
+    row[`gen_${scope.district}`] = avgLoad;
+    currentData.push(row);
   } else if (groupByRegion) {
-    // Show districts within the selected region
-    const regionSites = allSites.filter((s) => {
-      const city = allCities.find((c) => c.id === s.cityId);
-      return city && city.regionId === scope.regionId;
-    });
-    const districtSet = new Set<string>();
+    // Show districts within the selected region with separate aggregates
+    const districtMap = new Map<
+      string,
+      { fuels: number[]; loads: number[] }
+    >();
 
-    regionSites.forEach((site) => {
-      if (site.district) {
-        districtSet.add(site.district);
+    filteredRows.forEach((row) => {
+      const districtName = getDistrictName(row);
+      const district = districtName || "Unknown";
+      const fuel = getFuelTankLevelPct(row);
+      const load = getGeneratorLoadFactorPct(row);
+
+      if (!districtMap.has(district)) {
+        districtMap.set(district, { fuels: [], loads: [] });
       }
+
+      const data = districtMap.get(district)!;
+      if (fuel > 0 || fuel === 0) data.fuels.push(fuel);
+      if (load > 0 || load === 0) data.loads.push(load);
     });
 
     const row: any = { name: todayStr };
-    Array.from(districtSet).forEach((district) => {
-      row[district] = fuelLevel;
-      row[`gen_${district}`] = genLoad;
+    districtMap.forEach(({ fuels, loads }, district) => {
+      const avgFuel = fuels.length
+        ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) / 10
+        : 0;
+      const avgLoad = loads.length
+        ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) / 10
+        : 0;
+      row[district] = avgFuel;
+      row[`gen_${district}`] = avgLoad;
     });
+
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {
-    // Show all regions - use the aggregated KPI values
-    const row: any = { name: todayStr };
+    // Show all regions with separate aggregates for each
+    const regionMap = new Map<
+      string,
+      { fuels: number[]; loads: number[] }
+    >();
 
-    // Get all unique region IDs from cities
-    const regionIds = new Set<string>();
-    allCities.forEach(city => {
-      if (city.regionId) regionIds.add(city.regionId);
+    filteredRows.forEach((row) => {
+      const regionName = getRegionName(row);
+      const region = regionName || "Unknown";
+      const fuel = getFuelTankLevelPct(row);
+      const load = getGeneratorLoadFactorPct(row);
+
+      if (!regionMap.has(region)) {
+        regionMap.set(region, { fuels: [], loads: [] });
+      }
+
+      const data = regionMap.get(region)!;
+      if (fuel > 0 || fuel === 0) data.fuels.push(fuel);
+      if (load > 0 || load === 0) data.loads.push(load);
     });
 
-    // Add fuel and generator load for each region with the same values
-    // (In real scenario with multi-region data, we'd aggregate per region)
-    regionIds.forEach(regionId => {
-      row[regionId] = fuelLevel;
-      row[`gen_${regionId}`] = genLoad;
+    const row: any = { name: todayStr };
+    regionMap.forEach(({ fuels, loads }, region) => {
+      const avgFuel = fuels.length
+        ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) / 10
+        : 0;
+      const avgLoad = loads.length
+        ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) / 10
+        : 0;
+      row[region] = avgFuel;
+      row[`gen_${region}`] = avgLoad;
     });
 
     if (Object.keys(row).length > 1) currentData.push(row);

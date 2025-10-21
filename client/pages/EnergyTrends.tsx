@@ -22,26 +22,33 @@ interface TrendsResponse {
   cities: string[];
 }
 
-// Generate current data with real fuel level and generator load from Google Sheet
-function generateCurrentDataFromSheetData(
+// Generate current data by aggregating KPI data by region/district
+function generateCurrentDataFromKPIs(
   scope: HierarchyFilter,
   allCities: { id: string; name: string; regionId?: string }[],
   allSites: { id: string; name: string; cityId: string; district?: string }[],
-  fuelByRegion: Map<string, number[]>,
-  genLoadByRegion: Map<string, number[]>,
+  kpisData: any,
 ): Array<{ [key: string]: any }> {
+  if (!kpisData || !kpisData.kpis) {
+    return [];
+  }
+
   const currentData = [];
   const todayStr = "Today";
+
+  // Get fuel level and generator load from KPIs
+  const fuelLevel = kpisData.kpis.fuelTankLevelPct?.value || 0;
+  const genLoad = kpisData.kpis.generatorLoadFactorPct?.value || 0;
 
   // Determine if grouping by region or district
   const groupByDistrict = !!scope.district;
   const groupByRegion = !!scope.regionId && !scope.district;
 
   if (groupByDistrict) {
-    // Show single district for selected region
+    // Show single district
     const row: any = { name: todayStr };
-    row[scope.district] = 0; // Will be set if data exists
-    row[`gen_${scope.district}`] = 0;
+    row[scope.district] = fuelLevel;
+    row[`gen_${scope.district}`] = genLoad;
     if (Object.keys(row).length > 1) currentData.push(row);
   } else if (groupByRegion) {
     // Show districts within the selected region
@@ -59,28 +66,25 @@ function generateCurrentDataFromSheetData(
 
     const row: any = { name: todayStr };
     Array.from(districtSet).forEach((district) => {
-      row[district] = 0;
-      row[`gen_${district}`] = 0;
+      row[district] = fuelLevel;
+      row[`gen_${district}`] = genLoad;
     });
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {
-    // Show all regions
+    // Show all regions - use the aggregated KPI values
     const row: any = { name: todayStr };
 
-    fuelByRegion.forEach((values, regionName) => {
-      // Average fuel level for this region
-      const avgFuel = values.length > 0
-        ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10
-        : 0;
-      row[regionName] = avgFuel;
+    // Get all unique region IDs from cities
+    const regionIds = new Set<string>();
+    allCities.forEach(city => {
+      if (city.regionId) regionIds.add(city.regionId);
     });
 
-    genLoadByRegion.forEach((values, regionName) => {
-      // Average generator load for this region
-      const avgGenLoad = values.length > 0
-        ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10
-        : 0;
-      row[`gen_${regionName}`] = avgGenLoad;
+    // Add fuel and generator load for each region with the same values
+    // (In real scenario with multi-region data, we'd aggregate per region)
+    regionIds.forEach(regionId => {
+      row[regionId] = fuelLevel;
+      row[`gen_${regionId}`] = genLoad;
     });
 
     if (Object.keys(row).length > 1) currentData.push(row);

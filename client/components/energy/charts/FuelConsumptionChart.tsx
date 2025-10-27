@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -8,15 +9,49 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useMemo } from "react";
+import CustomTooltip from "./CustomTooltip";
 
 const FUEL_COLORS = ["#4B0082", "#00C5D4", "#FF3B61", "#FF7A33"];
+
+function nextMonthLabel(dateStr: string) {
+  // dateStr expected "YYYY-MM" or "YYYY-MM-DD" (we support YYYY-MM)
+  const parts = dateStr.split("-").map(Number);
+  const y = parts[0];
+  const m = parts[1] || 1;
+  const d = new Date(y, m - 1, 1);
+  d.setMonth(d.getMonth() + 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function projectionSeries(accData: any[], monthsToProject = 1) {
+  const len = accData.length;
+  if (len < 2) return [];
+  const last = accData[len - 1];
+  const prev = accData[len - 2];
+
+  // keys for cities
+  const keys = Object.keys(last).filter((k) => k !== "date");
+  const months: any[] = [];
+
+  // compute a simple slope for each key and generate month(s)
+  for (let i = 1; i <= monthsToProject; i++) {
+    const nextRow: any = { date: nextMonthLabel(last.date) + (i > 1 ? `+${i - 1}` : "") };
+    keys.forEach((k) => {
+      const vLast = Number(last[k] ?? 0);
+      const vPrev = Number(prev[k] ?? 0);
+      const slope = vLast - vPrev;
+      nextRow[k] = Math.max(0, Math.round(vLast + slope * i));
+    });
+    months.push(nextRow);
+  }
+  return months;
+}
 
 export default function FuelConsumptionChart({ data }: { data: any[] }) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    // Extract all cities from data keys
+    // Extract cities from keys
     const citySet = new Set<string>();
     data.forEach((row) => {
       Object.keys(row).forEach((key) => {
@@ -29,48 +64,41 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
 
     const cities = Array.from(citySet).sort();
 
-    return data.map((row) => {
+    const formatted = data.map((row) => {
       const result: any = { date: row.date };
       cities.forEach((city) => {
         result[city] = row[`fuel_consumption_L_${city}`] || 0;
       });
       return result;
     });
+
+    return formatted;
   }, [data]);
 
   if (chartData.length === 0) {
     return <div className="text-white/60 p-4">No data available</div>;
   }
 
-  // Get cities from first row
+  // cities keys
   const cities =
     chartData.length > 0
       ? Object.keys(chartData[0]).filter((k) => k !== "date")
       : [];
 
+  // build projection (1 month) appended to the data for rendering dashed lines
+  const proj = projectionSeries(chartData, 1);
+  const combined = proj.length ? [...chartData, ...proj] : chartData;
+
   const displayCities = cities.slice(0, 4);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart
-        data={chartData}
-        margin={{ left: 8, right: 8, top: 10, bottom: 0 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-        <XAxis
-          dataKey="date"
-          stroke="rgba(255,255,255,0.6)"
-          tick={{ fontSize: 12 }}
-        />
-        <YAxis stroke="rgba(255,255,255,0.6)" />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "rgba(0,0,0,0.8)",
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
-          labelStyle={{ color: "#fff" }}
-        />
-        <Legend wrapperStyle={{ paddingTop: "16px" }} />
+      <LineChart data={combined} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <XAxis dataKey="date" stroke="#FFFFFF" tick={{ fontSize: 13, fill: "#FFFFFF" }} />
+        <YAxis stroke="#FFFFFF" tick={{ fontSize: 13, fill: "#FFFFFF" }} />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend wrapperStyle={{ paddingTop: "16px", color: "#FFFFFF", fontSize: 13 }} />
         {displayCities.map((city, idx) => (
           <Line
             key={city}
@@ -83,6 +111,22 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
             isAnimationActive={false}
           />
         ))}
+
+        {/* Render projected lines as dashed using the last element(s) */}
+        {proj.length > 0 &&
+          displayCities.map((city, idx) => (
+            <Line
+              key={`proj-${city}`}
+              type="monotone"
+              dataKey={city}
+              name={`${city} (proj)`}
+              stroke={FUEL_COLORS[idx % FUEL_COLORS.length]}
+              strokeWidth={2}
+              dot={false}
+              strokeDasharray="4 4"
+              isAnimationActive={false}
+            />
+          ))}
       </LineChart>
     </ResponsiveContainer>
   );

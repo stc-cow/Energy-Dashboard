@@ -29,7 +29,13 @@ function getCityName(r: any): string {
 }
 
 function getDistrictName(r: any): string {
-  const candidates = ["District", "district", "DistrictName", "districtName", "col7"];
+  const candidates = [
+    "District",
+    "district",
+    "DistrictName",
+    "districtName",
+    "col7",
+  ];
   for (const c of candidates) {
     if (r[c] !== undefined && r[c] !== "") return String(r[c]).trim();
   }
@@ -47,7 +53,13 @@ function getStatus(row: any): string {
 }
 
 function parseGeneratorCapacity(row: any): number | null {
-  const candidates = ["GeneratorCapacity", "generatorCapacity", "genCapacity", "Capacity", "capacity"];
+  const candidates = [
+    "GeneratorCapacity",
+    "generatorCapacity",
+    "genCapacity",
+    "Capacity",
+    "capacity",
+  ];
   for (const c of candidates) {
     if (row[c] !== undefined && row[c] !== "") {
       const raw = String(row[c]).trim();
@@ -130,7 +142,10 @@ async function generateCurrentData(
     }
 
     const status = getStatus(r).toLowerCase();
-    const isOnAir = status.includes("on-air") || status.includes("in progress") || status.includes("inprogress");
+    const isOnAir =
+      status.includes("on-air") ||
+      status.includes("in progress") ||
+      status.includes("inprogress");
     if (!isOnAir) {
       return false;
     }
@@ -143,7 +158,10 @@ async function generateCurrentData(
   }
 
   function computeAverages(values: number[]) {
-    const simple = values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10 : 0;
+    const simple = values.length
+      ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) /
+        10
+      : 0;
     return simple;
   }
 
@@ -226,7 +244,11 @@ export default function EnergyTrends() {
   const { data: currentData, isLoading: currentLoading } = useQuery({
     queryKey: ["trends-current", scope],
     queryFn: async () => {
-      return generateCurrentData(scope, hierarchy?.cities || [], hierarchy?.sites || []);
+      return generateCurrentData(
+        scope,
+        hierarchy?.cities || [],
+        hierarchy?.sites || [],
+      );
     },
     enabled: !!hierarchy,
   });
@@ -292,30 +314,40 @@ export default function EnergyTrends() {
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">Current Fuel Level per City</h2>
+                    <h2 className="text-lg font-semibold mb-4">
+                      Current Fuel Level per City
+                    </h2>
                     <FuelLevelChart data={currentData || []} cities={[]} />
                   </div>
 
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">Generator Load Trend</h2>
+                    <h2 className="text-lg font-semibold mb-4">
+                      Generator Load Trend
+                    </h2>
                     <GeneratorLoadChart data={currentData || []} cities={[]} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">Fuel Consumption (Monthly)</h2>
+                    <h2 className="text-lg font-semibold mb-4">
+                      Fuel Consumption (Monthly)
+                    </h2>
                     <FuelConsumptionChart data={accumulativeData || []} />
                   </div>
 
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">CO₂ Emissions (Monthly)</h2>
+                    <h2 className="text-lg font-semibold mb-4">
+                      CO₂ Emissions (Monthly)
+                    </h2>
                     <Co2EmissionsChart data={accumulativeData || []} />
                   </div>
                 </div>
 
                 <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                  <h2 className="text-lg font-semibold mb-4">Power Consumption (Monthly)</h2>
+                  <h2 className="text-lg font-semibold mb-4">
+                    Power Consumption (Monthly)
+                  </h2>
                   <PowerConsumptionChart data={accumulativeData || []} />
                 </div>
               </>

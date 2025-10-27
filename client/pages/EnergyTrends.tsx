@@ -154,7 +154,7 @@ async function generateCurrentDataFromRawSheets(
   allCities: { id: string; name: string; regionId?: string }[],
   allSites: { id: string; name: string; cityId: string; district?: string }[],
 ): Promise<Array<{ [key: string]: any }>> {
-  const rawData = await getRawSheetData();
+  const rawData = await getRows();
   if (!rawData || rawData.length === 0) {
     return [];
   }

@@ -12,6 +12,7 @@ import {
   getBreakdownByRegion,
   getBreakdownBySite,
 } from "./routes/energy";
+import trendsRouter from "./routes/trends";
 
 export function createServer() {
   const app = express();
@@ -75,6 +76,9 @@ export function createServer() {
   import("./routes/sheet").then((m) => {
     app.get("/api/sheet", m.proxySheet as any);
   });
+
+  // Mount trends router for accumulative data
+  app.use(trendsRouter);
 
   return app;
 }

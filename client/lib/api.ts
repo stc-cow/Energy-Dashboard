@@ -245,7 +245,7 @@ async function fetchTextWithFallback(url: string): Promise<{
   }
 }
 
-async function getRows(): Promise<any[]> {
+export async function getRows(): Promise<any[]> {
   if (!SHEET_URL) return [];
 
   // If we're running in a browser, prefer the server proxy first to avoid CORS errors

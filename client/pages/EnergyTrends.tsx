@@ -40,13 +40,7 @@ function getCityName(row: any): string {
 }
 
 function getDistrictName(row: any): string {
-  const candidates = [
-    "District",
-    "district",
-    "DistrictName",
-    "districtName",
-    "col7",
-  ];
+  const candidates = ["District", "district", "DistrictName", "districtName", "col7"];
   for (const c of candidates) {
     if (row[c] !== undefined && row[c] !== "") return String(row[c]).trim();
   }
@@ -76,13 +70,7 @@ async function generateCurrentDataFromRawSheets(
   }
 
   function parseGeneratorCapacity(row: any): number | null {
-    const candidates = [
-      "GeneratorCapacity",
-      "generatorCapacity",
-      "genCapacity",
-      "Capacity",
-      "capacity",
-    ];
+    const candidates = ["GeneratorCapacity", "generatorCapacity", "genCapacity", "Capacity", "capacity"];
     for (const c of candidates) {
       if (row[c] !== undefined && row[c] !== "") {
         const raw = String(row[c]).trim();
@@ -94,7 +82,6 @@ async function generateCurrentDataFromRawSheets(
   }
 
   function getFuelPct(row: any): number | null {
-    const keys = Object.keys(row || {});
     const candidates = [
       "fuelTankLevelPct",
       "Fuel Tank Level %",
@@ -154,14 +141,12 @@ async function generateCurrentDataFromRawSheets(
     }
 
     const status = getStatus(r).toLowerCase();
-    if (
-      !(
-        status === "on-air".toLowerCase() ||
-        status === "on-air" ||
-        status === "in progress" ||
-        status === "inprogress"
-      )
-    ) {
+    const isOnAir =
+      status === "on-air" ||
+      status.includes("on-air") ||
+      status.includes("in progress") ||
+      status.includes("inprogress");
+    if (!isOnAir) {
       return false;
     }
 
@@ -176,13 +161,8 @@ async function generateCurrentDataFromRawSheets(
   const groupByRegion = !!scope.regionId && !scope.district;
 
   function computeAverages(values: number[], capacities: Array<number | null>) {
-    const validPairs: Array<{ v: number; cap: number | null }> = values.map(
-      (v, i) => ({ v, cap: capacities[i] ?? null }),
-    );
-    const simple = values.length
-      ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) /
-        10
-      : 0;
+    const validPairs: Array<{ v: number; cap: number | null }> = values.map((v, i) => ({ v, cap: capacities[i] ?? null }));
+    const simple = values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10 : 0;
     const caps = validPairs.map((p) => (p.cap && p.cap > 0 ? p.cap : 0));
     const capSum = caps.reduce((a, b) => a + b, 0);
     let weighted = simple;
@@ -222,23 +202,14 @@ async function generateCurrentDataFromRawSheets(
     const loadAvg = computeAverages(loads, loadCaps);
 
     const row: any = { name: todayStr };
-    row[scope.district] = fuelAvg.usedWeighted
-      ? fuelAvg.weighted
-      : fuelAvg.simple;
-    row[`gen_${scope.district}`] = loadAvg.usedWeighted
-      ? loadAvg.weighted
-      : loadAvg.simple;
+    row[scope.district] = fuelAvg.usedWeighted ? fuelAvg.weighted : fuelAvg.simple;
+    row[`gen_${scope.district}`] = loadAvg.usedWeighted ? loadAvg.weighted : loadAvg.simple;
 
     currentData.push(row);
   } else if (groupByRegion) {
     const districtMap = new Map<
       string,
-      {
-        fuels: number[];
-        fuelCaps: Array<number | null>;
-        loads: number[];
-        loadCaps: Array<number | null>;
-      }
+      { fuels: number[]; fuelCaps: Array<number | null>; loads: number[]; loadCaps: Array<number | null> }
     >();
 
     filteredRows.forEach((row) => {
@@ -335,11 +306,7 @@ export default function EnergyTrends() {
   const { data: currentData, isLoading: currentLoading } = useQuery({
     queryKey: ["trends-current", scope],
     queryFn: async () => {
-      return generateCurrentDataFromRawSheets(
-        scope,
-        hierarchy?.cities || [],
-        hierarchy?.sites || [],
-      );
+      return generateCurrentDataFromRawSheets(scope, hierarchy?.cities || [], hierarchy?.sites || []);
     },
     enabled: !!hierarchy,
   });
@@ -378,13 +345,15 @@ export default function EnergyTrends() {
               <X className="w-5 h-5" />
             </Button>
           </div>
-          <FilterBar
-            regions={hierarchy?.regions || []}
-            cities={hierarchy?.cities || []}
-            sites={hierarchy?.sites || []}
-            scope={scope}
-            onChange={setScope}
-          />
+          {hierarchy && (
+            <FilterBar
+              regions={hierarchy.regions || []}
+              cities={hierarchy.cities || []}
+              sites={hierarchy.sites || []}
+              scope={scope}
+              onChange={setScope}
+            />
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -399,40 +368,30 @@ export default function EnergyTrends() {
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">
-                      Current Fuel Level per City
-                    </h2>
+                    <h2 className="text-lg font-semibold mb-4">Current Fuel Level per City</h2>
                     <FuelLevelChart data={currentData || []} cities={[]} />
                   </div>
 
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">
-                      Generator Load Trend
-                    </h2>
+                    <h2 className="text-lg font-semibold mb-4">Generator Load Trend</h2>
                     <GeneratorLoadChart data={currentData || []} cities={[]} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">
-                      Fuel Consumption (Monthly)
-                    </h2>
+                    <h2 className="text-lg font-semibold mb-4">Fuel Consumption (Monthly)</h2>
                     <FuelConsumptionChart data={accumulativeData || []} />
                   </div>
 
                   <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                    <h2 className="text-lg font-semibold mb-4">
-                      CO₂ Emissions (Monthly)
-                    </h2>
+                    <h2 className="text-lg font-semibold mb-4">CO₂ Emissions (Monthly)</h2>
                     <Co2EmissionsChart data={accumulativeData || []} />
                   </div>
                 </div>
 
                 <div className="bg-slate-900/50 backdrop-blur border border-slate-700/30 rounded-lg p-4 h-80">
-                  <h2 className="text-lg font-semibold mb-4">
-                    Power Consumption (Monthly)
-                  </h2>
+                  <h2 className="text-lg font-semibold mb-4">Power Consumption (Monthly)</h2>
                   <PowerConsumptionChart data={accumulativeData || []} />
                 </div>
               </>

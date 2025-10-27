@@ -328,7 +328,13 @@ export default function EnergyTrends() {
               <X className="w-5 h-5" />
             </Button>
           </div>
-          <FilterBar scope={scope} onScopeChange={setScope} />
+          <FilterBar
+            regions={hierarchy?.regions || []}
+            cities={hierarchy?.cities || []}
+            sites={hierarchy?.sites || []}
+            scope={scope}
+            onChange={setScope}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto">

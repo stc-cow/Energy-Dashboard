@@ -24,7 +24,8 @@ async function getRawSheetData(): Promise<any[]> {
     // App expects a server-side proxy at /api/sheet which returns JSON rows,
     // or you can set VITE_SHEET_URL and the server will use it.
     const sheetUrl =
-      (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SHEET_URL) ||
+      (typeof import.meta !== "undefined" &&
+        (import.meta as any).env?.VITE_SHEET_URL) ||
       "";
     const url = `/api/sheet?sheet=${encodeURIComponent(sheetUrl)}`;
     const resp = await fetch(url);
@@ -173,7 +174,13 @@ async function generateCurrentDataFromRawSheets(
 
   // Helper: parse GeneratorCapacity like "35KVA" or "25 KVA" -> 35 or 25
   function parseGeneratorCapacity(row: any): number | null {
-    const candidates = ["GeneratorCapacity", "generatorCapacity", "genCapacity", "Capacity", "capacity"];
+    const candidates = [
+      "GeneratorCapacity",
+      "generatorCapacity",
+      "genCapacity",
+      "Capacity",
+      "capacity",
+    ];
     for (const c of candidates) {
       if (row[c] !== undefined && row[c] !== "") {
         const raw = String(row[c]).trim();
@@ -198,7 +205,10 @@ async function generateCurrentDataFromRawSheets(
     ];
     for (const cand of candidates) {
       if (row[cand] !== undefined && row[cand] !== "") {
-        const raw = String(row[cand]).replace(/,/g, "").replace(/%/g, "").trim();
+        const raw = String(row[cand])
+          .replace(/,/g, "")
+          .replace(/%/g, "")
+          .trim();
         const n = parseFloat(raw);
         if (!isNaN(n)) return n;
       }
@@ -219,7 +229,10 @@ async function generateCurrentDataFromRawSheets(
     ];
     for (const cand of candidates) {
       if (row[cand] !== undefined && row[cand] !== "") {
-        const raw = String(row[cand]).replace(/,/g, "").replace(/%/g, "").trim();
+        const raw = String(row[cand])
+          .replace(/,/g, "")
+          .replace(/%/g, "")
+          .trim();
         const n = parseFloat(raw);
         if (!isNaN(n)) return n;
       }
@@ -274,9 +287,14 @@ async function generateCurrentDataFromRawSheets(
 
   // Utility to compute simple & capacity-weighted average from arrays
   function computeAverages(values: number[], capacities: Array<number | null>) {
-    const validPairs: Array<{ v: number; cap: number | null }> = values.map((v, i) => ({ v, cap: capacities[i] ?? null }));
+    const validPairs: Array<{ v: number; cap: number | null }> = values.map(
+      (v, i) => ({ v, cap: capacities[i] ?? null }),
+    );
     // simple average
-    const simple = values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10 : 0;
+    const simple = values.length
+      ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) /
+        10
+      : 0;
     // capacity weighted average if we have at least one valid capacity > 0
     const caps = validPairs.map((p) => (p.cap && p.cap > 0 ? p.cap : 0));
     const capSum = caps.reduce((a, b) => a + b, 0);
@@ -319,15 +337,24 @@ async function generateCurrentDataFromRawSheets(
 
     const row: any = { name: todayStr };
     // prefer capacity-weighted if available, else simple
-    row[scope.district!] = fuelAvg.usedWeighted ? fuelAvg.weighted : fuelAvg.simple;
-    row[`gen_${scope.district}`] = loadAvg.usedWeighted ? loadAvg.weighted : loadAvg.simple;
+    row[scope.district!] = fuelAvg.usedWeighted
+      ? fuelAvg.weighted
+      : fuelAvg.simple;
+    row[`gen_${scope.district}`] = loadAvg.usedWeighted
+      ? loadAvg.weighted
+      : loadAvg.simple;
 
     currentData.push(row);
   } else if (groupByRegion) {
     // Group rows by district within the selected region
     const districtMap = new Map<
       string,
-      { fuels: number[]; fuelCaps: Array<number | null>; loads: number[]; loadCaps: Array<number | null> }
+      {
+        fuels: number[];
+        fuelCaps: Array<number | null>;
+        loads: number[];
+        loadCaps: Array<number | null>;
+      }
     >();
 
     filteredRows.forEach((row) => {
@@ -365,12 +392,25 @@ async function generateCurrentDataFromRawSheets(
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {
     // National / all regions: group by region
-    const regionMap = new Map<string, { fuels: number[]; fuelCaps: Array<number | null>; loads: number[]; loadCaps: Array<number | null> }>();
+    const regionMap = new Map<
+      string,
+      {
+        fuels: number[];
+        fuelCaps: Array<number | null>;
+        loads: number[];
+        loadCaps: Array<number | null>;
+      }
+    >();
 
     filteredRows.forEach((row) => {
       const region = getRegionName(row) || "Unknown";
       if (!regionMap.has(region)) {
-        regionMap.set(region, { fuels: [], fuelCaps: [], loads: [], loadCaps: [] });
+        regionMap.set(region, {
+          fuels: [],
+          fuelCaps: [],
+          loads: [],
+          loadCaps: [],
+        });
       }
       const bucket = regionMap.get(region)!;
       const fuel = getFuelPct(row);
@@ -432,8 +472,14 @@ function generateMockTrendsData(
   const startDate = new Date(2025, 0, 1);
   const today = new Date();
   const monthsArr: string[] = [];
-  for (let m = new Date(startDate); m <= today; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
-    monthsArr.push(`${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`);
+  for (
+    let m = new Date(startDate);
+    m <= today;
+    m = new Date(m.getFullYear(), m.getMonth() + 1, 1)
+  ) {
+    monthsArr.push(
+      `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`,
+    );
   }
 
   // current data
@@ -450,7 +496,8 @@ function generateMockTrendsData(
     const districtSet = new Set<string>();
     allSites.forEach((s) => {
       const city = allCities.find((c) => c.id === s.cityId);
-      if (city && city.regionId === scope.regionId && s.district) districtSet.add(s.district);
+      if (city && city.regionId === scope.regionId && s.district)
+        districtSet.add(s.district);
     });
     let seed = 789;
     Array.from(districtSet).forEach((d) => {
@@ -474,7 +521,9 @@ function generateMockTrendsData(
 
   // accumulative data
   const accumulativeData: any[] = [];
-  const baseValues = cities.map((_, idx) => Math.round(seededRandom(idx + 17) * 200000) + 50000);
+  const baseValues = cities.map(
+    (_, idx) => Math.round(seededRandom(idx + 17) * 200000) + 50000,
+  );
   const numMonths = Math.max(1, monthsArr.length);
   monthsArr.forEach((monthStr, monthIdx) => {
     const monthRow: any = { date: monthStr };
@@ -483,7 +532,8 @@ function generateMockTrendsData(
       const noise = seededRandom(cityIdx * 31 + monthIdx) * base * 0.05;
       const value = Math.round(base * ((monthIdx + 1) / numMonths) + noise);
       monthRow[`fuel_consumption_L_${city}`] = value;
-      monthRow[`co2_emissions_tons_${city}`] = Math.round((value * 2.68) / 1000 * 100) / 100;
+      monthRow[`co2_emissions_tons_${city}`] =
+        Math.round(((value * 2.68) / 1000) * 100) / 100;
       monthRow[`power_consumption_kWh_${city}`] = Math.round(value * 0.9);
     });
     accumulativeData.push(monthRow);
@@ -520,7 +570,11 @@ export default function EnergyTrends() {
   } = useQuery({
     queryKey: ["trends-current-data", scope],
     queryFn: async () => {
-      return await generateCurrentDataFromRawSheets(scope, hierarchy?.cities || [], hierarchy?.sites || []);
+      return await generateCurrentDataFromRawSheets(
+        scope,
+        hierarchy?.cities || [],
+        hierarchy?.sites || [],
+      );
     },
     enabled: !!hierarchy,
   });
@@ -528,8 +582,15 @@ export default function EnergyTrends() {
   const trendsData = useMemo(() => {
     if (!hierarchy) return null;
 
-    const mock = generateMockTrendsData(scope, hierarchy.cities || [], hierarchy.sites || []);
-    const currentToUse = realCurrentData && realCurrentData.length ? realCurrentData : mock.currentData;
+    const mock = generateMockTrendsData(
+      scope,
+      hierarchy.cities || [],
+      hierarchy.sites || [],
+    );
+    const currentToUse =
+      realCurrentData && realCurrentData.length
+        ? realCurrentData
+        : mock.currentData;
     return {
       ...mock,
       currentData: currentToUse,
@@ -547,7 +608,9 @@ export default function EnergyTrends() {
   const filteredCities = useMemo(() => {
     if (!hierarchy) return [];
     if (!scope.regionId) return hierarchy.cities || [];
-    return hierarchy.cities?.filter((c: any) => c.regionId === scope.regionId) || [];
+    return (
+      hierarchy.cities?.filter((c: any) => c.regionId === scope.regionId) || []
+    );
   }, [hierarchy, scope.regionId]);
 
   const districts = useMemo(() => {
@@ -555,18 +618,21 @@ export default function EnergyTrends() {
     const filteredCityIds = new Set(filteredCities.map((c: any) => c.id));
     const districtSet = new Set<string>();
     (hierarchy.sites || []).forEach((site: any) => {
-      if (filteredCityIds.has(site.cityId) && site.district) districtSet.add(site.district);
+      if (filteredCityIds.has(site.cityId) && site.district)
+        districtSet.add(site.district);
     });
     return Array.from(districtSet).sort();
   }, [hierarchy, filteredCities]);
 
   // Build accumulative data range (adjust months based on range)
   function buildAccumulativeForRange(accumulativeData: any[]) {
-    if (!accumulativeData || accumulativeData.length === 0) return accumulativeData || [];
+    if (!accumulativeData || accumulativeData.length === 0)
+      return accumulativeData || [];
     if (range === "all") return accumulativeData;
     const monthsMap = accumulativeData.map((r) => r.date);
     const endIndex = monthsMap.length - 1;
-    const monthsBack = range === "1m" ? 1 : range === "3m" ? 3 : range === "6m" ? 6 : 12;
+    const monthsBack =
+      range === "1m" ? 1 : range === "3m" ? 3 : range === "6m" ? 6 : 12;
     const startIndex = Math.max(0, endIndex - (monthsBack - 1));
     return accumulativeData.slice(startIndex);
   }
@@ -615,8 +681,20 @@ export default function EnergyTrends() {
           maxWidth: 1200,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h1 id="energy-trends-title" style={{ color: "white", fontSize: 24, fontWeight: 700 }}>Energy Trends</h1>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <h1
+            id="energy-trends-title"
+            style={{ color: "white", fontSize: 24, fontWeight: 700 }}
+          >
+            Energy Trends
+          </h1>
           <button
             onClick={() => navigate("/")}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold"
@@ -626,79 +704,179 @@ export default function EnergyTrends() {
         </div>
 
         {!isLoading && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 16,
+              marginBottom: 20,
+            }}
+          >
             <div>
-              <label className="block text-white text-sm font-semibold mb-2">Region</label>
+              <label className="block text-white text-sm font-semibold mb-2">
+                Region
+              </label>
               <select
                 value={scope.regionId || ""}
                 onChange={(e) => {
                   const regionId = e.target.value || undefined;
-                  setScope((prev) => ({ ...prev, regionId, district: undefined }));
+                  setScope((prev) => ({
+                    ...prev,
+                    regionId,
+                    district: undefined,
+                  }));
                 }}
                 className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg"
                 style={{ color: "black" }}
               >
                 <option value="">All Regions</option>
                 {hierarchy?.regions?.map((r: any) => (
-                  <option key={r.id} value={r.id}>{r.name}</option>
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-white text-sm font-semibold mb-2">District</label>
+              <label className="block text-white text-sm font-semibold mb-2">
+                District
+              </label>
               <select
                 disabled={!scope.regionId}
                 value={scope.district || ""}
-                onChange={(e) => setScope((prev) => ({ ...prev, district: e.target.value || undefined }))}
+                onChange={(e) =>
+                  setScope((prev) => ({
+                    ...prev,
+                    district: e.target.value || undefined,
+                  }))
+                }
                 className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg disabled:opacity-50"
                 style={{ color: "black" }}
               >
                 <option value="">All Districts</option>
-                {districts.map((d) => <option key={d} value={d}>{d}</option>)}
+                {districts.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
         )}
 
         {isLoading && (
-          <div style={{ color: "white", opacity: 0.8, padding: 24 }}>Loading trends data...</div>
+          <div style={{ color: "white", opacity: 0.8, padding: 24 }}>
+            Loading trends data...
+          </div>
         )}
 
         {!isLoading && trendsData && (
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             {/* Today's charts side-by-side */}
             {trendsData.currentData && trendsData.currentData.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-                <div style={{ borderRadius: 8, background: "rgba(255,255,255,0.03)", padding: 16 }}>
-                  <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>Current Fuel Level by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)</h2>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 24,
+                }}
+              >
+                <div
+                  style={{
+                    borderRadius: 8,
+                    background: "rgba(255,255,255,0.03)",
+                    padding: 16,
+                  }}
+                >
+                  <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>
+                    Current Fuel Level by{" "}
+                    {scope.district
+                      ? "District"
+                      : scope.regionId
+                        ? "District"
+                        : "Region"}{" "}
+                    (Today)
+                  </h2>
                   <div style={{ height: 320 }}>
-                    <FuelLevelChart data={trendsData.currentData} cities={trendsData.cities} lowThreshold={25} highThreshold={85} />
+                    <FuelLevelChart
+                      data={trendsData.currentData}
+                      cities={trendsData.cities}
+                      lowThreshold={25}
+                      highThreshold={85}
+                    />
                   </div>
                 </div>
 
-                <div style={{ borderRadius: 8, background: "rgba(255,255,255,0.03)", padding: 16 }}>
-                  <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>Generator Load Trend by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)</h2>
+                <div
+                  style={{
+                    borderRadius: 8,
+                    background: "rgba(255,255,255,0.03)",
+                    padding: 16,
+                  }}
+                >
+                  <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>
+                    Generator Load Trend by{" "}
+                    {scope.district
+                      ? "District"
+                      : scope.regionId
+                        ? "District"
+                        : "Region"}{" "}
+                    (Today)
+                  </h2>
                   <div style={{ height: 320 }}>
-                    <GeneratorLoadChart data={trendsData.currentData} cities={trendsData.cities} lowThreshold={20} highThreshold={90} />
+                    <GeneratorLoadChart
+                      data={trendsData.currentData}
+                      cities={trendsData.cities}
+                      lowThreshold={20}
+                      highThreshold={90}
+                    />
                   </div>
                 </div>
               </div>
             )}
 
             {/* Accumulative charts */}
-            <div style={{ borderRadius: 8, background: "rgba(255,255,255,0.03)", padding: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <h2 style={{ color: "#fff", fontSize: 18 }}>Accumulative Fuel Consumption (Monthly from 1/1/2025)</h2>
+            <div
+              style={{
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.03)",
+                padding: 16,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 12,
+                }}
+              >
+                <h2 style={{ color: "#fff", fontSize: 18 }}>
+                  Accumulative Fuel Consumption (Monthly from 1/1/2025)
+                </h2>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <select value={range} onChange={(e) => setRange(e.target.value as any)} style={{ padding: "6px 10px", borderRadius: 6 }}>
+                  <select
+                    value={range}
+                    onChange={(e) => setRange(e.target.value as any)}
+                    style={{ padding: "6px 10px", borderRadius: 6 }}
+                  >
                     <option value="all">From 2025-01</option>
                     <option value="12m">Last 12 months</option>
                     <option value="6m">Last 6 months</option>
                     <option value="3m">Last 3 months</option>
                     <option value="1m">Last 1 month</option>
                   </select>
-                  <button onClick={exportCSV} style={{ padding: "6px 10px", borderRadius: 6, background: "#ffffff", color: "#5c0ba2", fontWeight: 700 }}>
+                  <button
+                    onClick={exportCSV}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 6,
+                      background: "#ffffff",
+                      color: "#5c0ba2",
+                      fontWeight: 700,
+                    }}
+                  >
                     Export CSV
                   </button>
                 </div>
@@ -709,15 +887,31 @@ export default function EnergyTrends() {
               </div>
             </div>
 
-            <div style={{ borderRadius: 8, background: "rgba(255,255,255,0.03)", padding: 16 }}>
-              <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>Accumulative CO₂ Emissions (Monthly from 1/1/2025)</h2>
+            <div
+              style={{
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.03)",
+                padding: 16,
+              }}
+            >
+              <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>
+                Accumulative CO₂ Emissions (Monthly from 1/1/2025)
+              </h2>
               <div style={{ height: 320 }}>
                 <Co2EmissionsChart data={accumulativeForDisplay} />
               </div>
             </div>
 
-            <div style={{ borderRadius: 8, background: "rgba(255,255,255,0.03)", padding: 16 }}>
-              <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>Accumulative Power Consumption (Monthly from 1/1/2025)</h2>
+            <div
+              style={{
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.03)",
+                padding: 16,
+              }}
+            >
+              <h2 style={{ color: "#fff", fontSize: 18, marginBottom: 12 }}>
+                Accumulative Power Consumption (Monthly from 1/1/2025)
+              </h2>
               <div style={{ height: 320 }}>
                 <PowerConsumptionChart data={accumulativeForDisplay} />
               </div>
@@ -725,11 +919,14 @@ export default function EnergyTrends() {
           </div>
         )}
 
-        {!isLoading && (!trendsData || !trendsData.currentData || !trendsData.accumulativeData) && (
-          <div style={{ color: "white", opacity: 0.9, padding: 24 }}>
-            No data available for the selected filters.
-          </div>
-        )}
+        {!isLoading &&
+          (!trendsData ||
+            !trendsData.currentData ||
+            !trendsData.accumulativeData) && (
+            <div style={{ color: "white", opacity: 0.9, padding: 24 }}>
+              No data available for the selected filters.
+            </div>
+          )}
       </div>
     </div>
   );

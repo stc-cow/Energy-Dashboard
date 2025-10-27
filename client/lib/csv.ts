@@ -9,7 +9,7 @@ export function objectsToCSV(rows: any[]) {
         const s = String(v).replace(/"/g, '""');
         return `"${s}"`;
       })
-      .join(",")
+      .join(","),
   );
   return [header, ...lines].join("\n");
 }

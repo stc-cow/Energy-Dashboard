@@ -231,15 +231,15 @@ async function generateCurrentDataFromRawSheets(
 
     const avgFuel = districtFuels.length
       ? Math.round(
-        (districtFuels.reduce((a, b) => a + b, 0) / districtFuels.length) *
-        10,
-      ) / 10
+          (districtFuels.reduce((a, b) => a + b, 0) / districtFuels.length) *
+            10,
+        ) / 10
       : 0;
     const avgLoad = districtLoads.length
       ? Math.round(
-        (districtLoads.reduce((a, b) => a + b, 0) / districtLoads.length) *
-        10,
-      ) / 10
+          (districtLoads.reduce((a, b) => a + b, 0) / districtLoads.length) *
+            10,
+        ) / 10
       : 0;
 
     const row: any = { name: todayStr };
@@ -269,11 +269,11 @@ async function generateCurrentDataFromRawSheets(
     districtMap.forEach(({ fuels, loads }, district) => {
       const avgFuel = fuels.length
         ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
-        10
+          10
         : 0;
       const avgLoad = loads.length
         ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
-        10
+          10
         : 0;
       row[district] = avgFuel;
       row[`gen_${district}`] = avgLoad;
@@ -303,11 +303,11 @@ async function generateCurrentDataFromRawSheets(
     regionMap.forEach(({ fuels, loads }, region) => {
       const avgFuel = fuels.length
         ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
-        10
+          10
         : 0;
       const avgLoad = loads.length
         ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
-        10
+          10
         : 0;
       row[region] = avgFuel;
       row[`gen_${region}`] = avgLoad;

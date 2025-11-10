@@ -406,10 +406,10 @@ function generateMockTrendsData(
   let citiesForAccumulative = filteredCities;
   if (!scope.district && !scope.regionId) {
     // Only filter to default regions when no region/district is selected
-    citiesForAccumulative = filteredCities.filter((c) => {
-      const regionName = getRegionNameFromId(c.regionId);
-      return regionName && DEFAULT_REGIONS.has(regionName);
-    });
+    const defaultRegionIds = getDefaultRegionIds(allCities);
+    citiesForAccumulative = filteredCities.filter((c) =>
+      c.regionId && defaultRegionIds.has(c.regionId)
+    );
   }
 
   const startDate = new Date(2025, 0, 1); // January 1, 2025

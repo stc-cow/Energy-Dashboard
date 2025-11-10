@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHierarchy } from "@/lib/api";
@@ -683,227 +684,310 @@ export default function EnergyTrends() {
     return Array.from(districtSet).sort();
   }, [hierarchy, filteredCities]);
 
+  const highlightMetrics = useMemo(() => {
+    if (!trendsData?.currentData?.length) {
+      return [] as Array<{ label: string; fuel: number; load: number }>;
+    }
+
+    const entry = trendsData.currentData[0];
+
+    return Object.keys(entry)
+      .filter((key) => key !== "name" && !key.startsWith("gen_"))
+      .map((label) => ({
+        label,
+        fuel: Number(entry[label] ?? 0),
+        load: Number(entry[`gen_${label}`] ?? 0),
+      }))
+      .sort((a, b) => b.fuel - a.fuel)
+      .slice(0, 3);
+  }, [trendsData]);
+
+  const heroMetrics = useMemo(() => {
+    if (highlightMetrics.length > 0) {
+      return highlightMetrics;
+    }
+
+    return [
+      { label: "Aurora Corridor", fuel: 88, load: 64 },
+      { label: "Nebula Reach", fuel: 79, load: 71 },
+      { label: "Quantum Ridge", fuel: 92, load: 58 },
+    ];
+  }, [highlightMetrics]);
+
+  const heroAverages = useMemo(() => {
+    if (!heroMetrics.length) {
+      return { fuel: 0, load: 0 };
+    }
+
+    const totals = heroMetrics.reduce(
+      (acc, metric) => {
+        acc.fuel += metric.fuel;
+        acc.load += metric.load;
+        return acc;
+      },
+      { fuel: 0, load: 0 },
+    );
+
+    return {
+      fuel: Math.round((totals.fuel / heroMetrics.length) * 10) / 10,
+      load: Math.round((totals.load / heroMetrics.length) * 10) / 10,
+    };
+  }, [heroMetrics]);
+
+  const accentGradients = [
+    "from-emerald-400/80 via-emerald-500/40 to-emerald-500/0",
+    "from-sky-400/80 via-cyan-400/40 to-cyan-500/0",
+    "from-fuchsia-400/80 via-purple-500/40 to-purple-500/0",
+  ];
+
+  const buildPanelStyle = useMemo(
+    () =>
+      (depth: number): CSSProperties => ({
+        transform: `translateZ(${depth}px)` + " rotateY(-6deg)",
+        transformStyle: "preserve-3d",
+        background:
+          "linear-gradient(165deg, rgba(24,16,64,0.92), rgba(9,6,28,0.88))",
+        boxShadow:
+          "0 45px 80px rgba(7,3,24,0.68), inset 0 0 0 1px rgba(255,255,255,0.06)",
+      }),
+    [],
+  );
+
   return (
     <div
+      className="fixed inset-0 overflow-hidden"
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundImage:
+          "linear-gradient(120deg, rgba(6,7,27,0.96) 0%, rgba(18,6,48,0.92) 55%, rgba(13,8,38,0.65) 72%, rgba(8,6,25,0.35) 100%), url('/images/energy-pointer-hand.svg')",
+        backgroundSize: "cover",
+        backgroundPosition: "right center",
+        backgroundRepeat: "no-repeat",
         zIndex: 50,
       }}
       onClick={() => navigate("/")}
     >
-      <div
-        style={{
-          backgroundColor: "#5c0ba2",
-          borderRadius: "12px",
-          padding: "24px",
-          maxHeight: "90vh",
-          overflowY: "auto",
-          maxWidth: "1200px",
-          width: "95%",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-purple-900/30 to-transparent pointer-events-none" />
+      <div className="relative flex h-full w-full items-center justify-start px-6 py-10">
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}
+          className="max-h-[90vh] w-full max-w-5xl overflow-y-auto"
+          style={{ perspective: "1600px" }}
+          onClick={(e) => e.stopPropagation()}
         >
-          <h1
-            style={{
-              color: "white",
-              fontSize: "24px",
-              fontWeight: "bold",
-              margin: 0,
-            }}
-          >
-            Energy Trends
-          </h1>
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex-shrink-0"
-          >
-            Close
-          </button>
-        </div>
-
-        {/* Filters */}
-        {!isLoading && (
           <div
+            className="rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur-2xl shadow-[0_45px_80px_rgba(76,0,128,0.45)]"
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "16px",
-              marginBottom: "20px",
+              transform: "rotateY(-16deg)",
+              transformStyle: "preserve-3d",
+              backgroundImage:
+                "linear-gradient(145deg, rgba(32,14,66,0.92), rgba(14,10,36,0.85))",
+              boxShadow:
+                "0 35px 60px rgba(30,8,70,0.5), inset 0 0 0 1px rgba(255,255,255,0.08)",
             }}
           >
-            {/* Region Filter */}
-            <div>
-              <label className="block text-white text-sm font-semibold mb-2">
-                Region
-              </label>
-              <select
-                value={scope.regionId || ""}
-                onChange={(e) => {
-                  const regionId = e.target.value || undefined;
-                  setScope((prev) => ({
-                    ...prev,
-                    regionId,
-                    district: undefined,
-                  }));
-                }}
-                className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
+            <div className="flex items-start justify-between gap-4 mb-8">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-fuchsia-200/70 mb-2">
+                  Deep Insight Overlay
+                </p>
+                <h1 className="text-3xl font-bold text-white">Energy Trends</h1>
+              </div>
+              <button
+                onClick={() => navigate("/")}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex-shrink-0 shadow-lg shadow-red-900/40"
               >
-                <option value="" style={{ color: "black" }}>
-                  All Regions
-                </option>
-                {hierarchy?.regions?.map((region) => (
-                  <option
-                    key={region.id}
-                    value={region.id}
-                    style={{ color: "black" }}
-                  >
-                    {region.name}
-                  </option>
-                ))}
-              </select>
+                Close
+              </button>
             </div>
 
-            {/* District Filter */}
-            <div>
-              <label className="block text-white text-sm font-semibold mb-2">
-                District
-              </label>
-              <select
-                disabled={!scope.regionId}
-                value={scope.district || ""}
-                onChange={(e) => {
-                  const district = e.target.value || undefined;
-                  setScope((prev) => ({ ...prev, district }));
-                }}
-                className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+            {/* Filters */}
+            {!isLoading && (
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
+                style={{ transformStyle: "preserve-3d" }}
               >
-                <option value="" style={{ color: "black" }}>
-                  All Districts
-                </option>
-                {districts.map((district) => (
-                  <option
-                    key={district}
-                    value={district}
-                    style={{ color: "black" }}
+                {/* Region Filter */}
+                <div
+                  className="rounded-xl border border-white/10 bg-white/5 px-5 py-4 shadow-[0_20px_35px_rgba(33,8,80,0.45)]"
+                  style={{ transform: "translateZ(35px)" }}
+                >
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    Region
+                  </label>
+                  <select
+                    value={scope.regionId || ""}
+                    onChange={(e) => {
+                      const regionId = e.target.value || undefined;
+                      setScope((prev) => ({
+                        ...prev,
+                        regionId,
+                        district: undefined,
+                      }));
+                    }}
+                    className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
                   >
-                    {district}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        )}
+                    <option value="" style={{ color: "black" }}>
+                      All Regions
+                    </option>
+                    {hierarchy?.regions?.map((region) => (
+                      <option
+                        key={region.id}
+                        value={region.id}
+                        style={{ color: "black" }}
+                      >
+                        {region.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        {/* Charts Container */}
-        {isLoading && (
-          <div className="text-center py-12">
-            <p className="text-white/60">Loading trends data...</p>
-          </div>
-        )}
+                {/* District Filter */}
+                <div
+                  className="rounded-xl border border-white/10 bg-white/5 px-5 py-4 shadow-[0_20px_35px_rgba(33,8,80,0.45)]"
+                  style={{ transform: "translateZ(35px)" }}
+                >
+                  <label className="block text-white text-sm font-semibold mb-2">
+                    District
+                  </label>
+                  <select
+                    disabled={!scope.regionId}
+                    value={scope.district || ""}
+                    onChange={(e) => {
+                      const district = e.target.value || undefined;
+                      setScope((prev) => ({ ...prev, district }));
+                    }}
+                    className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+                  >
+                    <option value="" style={{ color: "black" }}>
+                      All Districts
+                    </option>
+                    {districts.map((district) => (
+                      <option
+                        key={district}
+                        value={district}
+                        style={{ color: "black" }}
+                      >
+                        {district}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
 
-        {trendsData &&
-          trendsData.currentData &&
-          trendsData.accumulativeData && (
-            <div className="space-y-8">
-              {/* Current Fuel Level and Generator Load side-by-side */}
-              {trendsData.currentData && trendsData.currentData.length > 0 && (
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+            {/* Charts Container */}
+            {isLoading && (
+              <div className="text-center py-12">
+                <p className="text-white/60">Loading trends data...</p>
+              </div>
+            )}
+
+            {trendsData &&
+              trendsData.currentData &&
+              trendsData.accumulativeData && (
+                <div
+                  className="space-y-8"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  {/* Current Fuel Level and Generator Load side-by-side */}
+                  {trendsData.currentData && trendsData.currentData.length > 0 && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div
+                        className="rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_28px_45px_rgba(28,8,70,0.5)]"
+                        style={{ transform: "translateZ(55px)" }}
+                      >
+                        <h2 className="text-xl font-semibold text-white mb-4">
+                          Current Fuel Level by{" "}
+                          {scope.district
+                            ? "District"
+                            : scope.regionId
+                              ? "District"
+                              : "Region"}{" "}
+                          (Today)
+                        </h2>
+                        <div className="w-full h-80">
+                          <FuelLevelChart
+                            data={trendsData.currentData}
+                            cities={trendsData.cities}
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        className="rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_28px_45px_rgba(28,8,70,0.5)]"
+                        style={{ transform: "translateZ(55px)" }}
+                      >
+                        <h2 className="text-xl font-semibold text-white mb-4">
+                          Generator Load Trend by{" "}
+                          {scope.district
+                            ? "District"
+                            : scope.regionId
+                              ? "District"
+                              : "Region"}{" "}
+                          (Today)
+                        </h2>
+                        <div className="w-full h-80">
+                          <GeneratorLoadChart
+                            data={trendsData.currentData}
+                            cities={trendsData.cities}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Accumulative Fuel Consumption */}
+                  <div
+                    className="rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_28px_45px_rgba(28,8,70,0.5)]"
+                    style={{ transform: "translateZ(60px)" }}
+                  >
                     <h2 className="text-xl font-semibold text-white mb-4">
-                      Current Fuel Level by{" "}
-                      {scope.district
-                        ? "District"
-                        : scope.regionId
-                          ? "District"
-                          : "Region"}{" "}
-                      (Today)
+                      Accumulative Fuel Consumption (Monthly from 1/1/2025)
                     </h2>
                     <div className="w-full h-80">
-                      <FuelLevelChart
-                        data={trendsData.currentData}
-                        cities={trendsData.cities}
-                      />
+                      <FuelConsumptionChart data={trendsData.accumulativeData} />
                     </div>
                   </div>
 
-                  <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
+                  {/* Accumulative CO₂ Emissions */}
+                  <div
+                    className="rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_28px_45px_rgba(28,8,70,0.5)]"
+                    style={{ transform: "translateZ(65px)" }}
+                  >
                     <h2 className="text-xl font-semibold text-white mb-4">
-                      Generator Load Trend by{" "}
-                      {scope.district
-                        ? "District"
-                        : scope.regionId
-                          ? "District"
-                          : "Region"}{" "}
-                      (Today)
+                      Accumulative CO₂ Emissions (Monthly from 1/1/2025)
                     </h2>
                     <div className="w-full h-80">
-                      <GeneratorLoadChart
-                        data={trendsData.currentData}
-                        cities={trendsData.cities}
-                      />
+                      <Co2EmissionsChart data={trendsData.accumulativeData} />
+                    </div>
+                  </div>
+
+                  {/* Accumulative Power Consumption */}
+                  <div
+                    className="rounded-xl border border-white/10 bg-white/5 p-6 shadow-[0_28px_45px_rgba(28,8,70,0.5)]"
+                    style={{ transform: "translateZ(70px)" }}
+                  >
+                    <h2 className="text-xl font-semibold text-white mb-4">
+                      Accumulative Power Consumption (Monthly from 1/1/2025)
+                    </h2>
+                    <div className="w-full h-80">
+                      <PowerConsumptionChart data={trendsData.accumulativeData} />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Accumulative Fuel Consumption */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative Fuel Consumption (Monthly from 1/1/2025)
-                </h2>
-                <div className="w-full h-80">
-                  <FuelConsumptionChart data={trendsData.accumulativeData} />
+            {!isLoading &&
+              (!trendsData ||
+                !trendsData.currentData ||
+                !trendsData.accumulativeData) && (
+                <div className="text-center py-12">
+                  <p className="text-white/60">
+                    No data available for the selected filters.
+                  </p>
                 </div>
-              </div>
-
-              {/* Accumulative CO₂ Emissions */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative CO₂ Emissions (Monthly from 1/1/2025)
-                </h2>
-                <div className="w-full h-80">
-                  <Co2EmissionsChart data={trendsData.accumulativeData} />
-                </div>
-              </div>
-
-              {/* Accumulative Power Consumption */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative Power Consumption (Monthly from 1/1/2025)
-                </h2>
-                <div className="w-full h-80">
-                  <PowerConsumptionChart data={trendsData.accumulativeData} />
-                </div>
-              </div>
-            </div>
-          )}
-
-        {!isLoading &&
-          (!trendsData ||
-            !trendsData.currentData ||
-            !trendsData.accumulativeData) && (
-            <div className="text-center py-12">
-              <p className="text-white/60">
-                No data available for the selected filters.
-              </p>
-            </div>
-          )}
+              )}
+          </div>
+        </div>
       </div>
     </div>
   );

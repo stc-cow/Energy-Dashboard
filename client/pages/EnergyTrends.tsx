@@ -378,7 +378,7 @@ function generateMockTrendsData(
   if (groupByDistrict) {
     // Show single district for selected region
     const row: any = { name: todayStr };
-    row[scope.district] = Math.round(seededRandom(123) * 100);
+    row[scope.district] = clampFuelLevel(Math.round(seededRandom(123) * 100));
     row[`gen_${scope.district}`] = Math.round(seededRandom(456) * 100);
     if (Object.keys(row).length > 1) currentData.push(row);
   } else if (groupByRegion) {
@@ -398,7 +398,7 @@ function generateMockTrendsData(
     const row: any = { name: todayStr };
     let seed = 789;
     Array.from(districtSet).forEach((district) => {
-      row[district] = Math.round(seededRandom(seed++) * 100);
+      row[district] = clampFuelLevel(Math.round(seededRandom(seed++) * 100));
       row[`gen_${district}`] = Math.round(seededRandom(seed++) * 100);
     });
     if (Object.keys(row).length > 1) currentData.push(row);
@@ -436,7 +436,7 @@ function generateMockTrendsData(
 
       regionMap
         .get(regionName)!
-        .values.push(Math.round(seededRandom(seed + 11) * 100));
+        .values.push(clampFuelLevel(Math.round(seededRandom(seed + 11) * 100)));
       regionGenMap
         .get(regionName)!
         .values.push(Math.round(seededRandom(seed + 13) * 100));
@@ -446,8 +446,8 @@ function generateMockTrendsData(
     regionMap.forEach(({ name, values }) => {
       const avg =
         values.length > 0
-          ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
-          : 0;
+          ? clampFuelLevel(Math.round(values.reduce((a, b) => a + b, 0) / values.length))
+          : clampFuelLevel(0);
       row[name] = avg;
     });
     regionGenMap.forEach(({ name, values }) => {

@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHierarchy } from "@/lib/api";
@@ -682,6 +683,75 @@ export default function EnergyTrends() {
 
     return Array.from(districtSet).sort();
   }, [hierarchy, filteredCities]);
+
+  const highlightMetrics = useMemo(() => {
+    if (!trendsData?.currentData?.length) {
+      return [] as Array<{ label: string; fuel: number; load: number }>;
+    }
+
+    const entry = trendsData.currentData[0];
+
+    return Object.keys(entry)
+      .filter((key) => key !== "name" && !key.startsWith("gen_"))
+      .map((label) => ({
+        label,
+        fuel: Number(entry[label] ?? 0),
+        load: Number(entry[`gen_${label}`] ?? 0),
+      }))
+      .sort((a, b) => b.fuel - a.fuel)
+      .slice(0, 3);
+  }, [trendsData]);
+
+  const heroMetrics = useMemo(() => {
+    if (highlightMetrics.length > 0) {
+      return highlightMetrics;
+    }
+
+    return [
+      { label: "Aurora Corridor", fuel: 88, load: 64 },
+      { label: "Nebula Reach", fuel: 79, load: 71 },
+      { label: "Quantum Ridge", fuel: 92, load: 58 },
+    ];
+  }, [highlightMetrics]);
+
+  const heroAverages = useMemo(() => {
+    if (!heroMetrics.length) {
+      return { fuel: 0, load: 0 };
+    }
+
+    const totals = heroMetrics.reduce(
+      (acc, metric) => {
+        acc.fuel += metric.fuel;
+        acc.load += metric.load;
+        return acc;
+      },
+      { fuel: 0, load: 0 },
+    );
+
+    return {
+      fuel: Math.round((totals.fuel / heroMetrics.length) * 10) / 10,
+      load: Math.round((totals.load / heroMetrics.length) * 10) / 10,
+    };
+  }, [heroMetrics]);
+
+  const accentGradients = [
+    "from-emerald-400/80 via-emerald-500/40 to-emerald-500/0",
+    "from-sky-400/80 via-cyan-400/40 to-cyan-500/0",
+    "from-fuchsia-400/80 via-purple-500/40 to-purple-500/0",
+  ];
+
+  const buildPanelStyle = useMemo(
+    () =>
+      (depth: number): CSSProperties => ({
+        transform: `translateZ(${depth}px)` + " rotateY(-6deg)",
+        transformStyle: "preserve-3d",
+        background:
+          "linear-gradient(165deg, rgba(24,16,64,0.92), rgba(9,6,28,0.88))",
+        boxShadow:
+          "0 45px 80px rgba(7,3,24,0.68), inset 0 0 0 1px rgba(255,255,255,0.06)",
+      }),
+    [],
+  );
 
   return (
     <div

@@ -336,21 +336,30 @@ async function generateCurrentDataFromRawSheets(
   return currentData;
 }
 
-// Default regions for accumulative data
-const DEFAULT_REGIONS = new Set(["Central", "East", "West", "South"]);
+// Default regions to display in accumulative charts
+// These are the four main regions that should be shown by default
+const DEFAULT_REGION_IDS = new Set<string>();
 
-// Helper to get region name from regionId
-function getRegionNameFromId(regionId?: string): string | null {
-  if (!regionId) return null;
-  // Map common region IDs to display names
-  const regionMap: { [key: string]: string } = {
-    "central": "Central",
-    "east": "East",
-    "west": "West",
-    "south": "South",
-  };
-  const lowerRegionId = regionId.toLowerCase();
-  return regionMap[lowerRegionId] || null;
+// Helper to check if a city belongs to a default region
+function isDefaultRegionCity(city: { id: string; name: string; regionId?: string }, allCities: { id: string; name: string; regionId?: string }[]): boolean {
+  // If DEFAULT_REGION_IDS is not yet populated, populate it based on actual cities
+  if (DEFAULT_REGION_IDS.size === 0 && allCities.length > 0) {
+    // Find all unique region IDs
+    const regionIds = new Set<string>();
+    allCities.forEach(c => {
+      if (c.regionId) regionIds.add(c.regionId);
+    });
+
+    // Add the first 4 region IDs as defaults (representing Central, East, West, South)
+    let count = 0;
+    for (const id of regionIds) {
+      if (count >= 4) break;
+      DEFAULT_REGION_IDS.add(id);
+      count++;
+    }
+  }
+
+  return city.regionId && DEFAULT_REGION_IDS.has(city.regionId);
 }
 
 // Import mock data function directly for client-side data generation

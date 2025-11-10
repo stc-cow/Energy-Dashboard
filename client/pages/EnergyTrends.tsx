@@ -387,7 +387,9 @@ function generateMockTrendsData(
     // Show single district for selected region
     const row: any = { name: todayStr };
     row[scope.district] = clampFuelLevel(Math.round(seededRandom(123) * 100));
-    row[`gen_${scope.district}`] = clampGeneratorLoad(Math.round(seededRandom(456) * 100));
+    row[`gen_${scope.district}`] = clampGeneratorLoad(
+      Math.round(seededRandom(456) * 100),
+    );
     if (Object.keys(row).length > 1) currentData.push(row);
   } else if (groupByRegion) {
     // Show districts within the selected region
@@ -407,7 +409,9 @@ function generateMockTrendsData(
     let seed = 789;
     Array.from(districtSet).forEach((district) => {
       row[district] = clampFuelLevel(Math.round(seededRandom(seed++) * 100));
-      row[`gen_${district}`] = clampGeneratorLoad(Math.round(seededRandom(seed++) * 100));
+      row[`gen_${district}`] = clampGeneratorLoad(
+        Math.round(seededRandom(seed++) * 100),
+      );
     });
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {
@@ -447,21 +451,27 @@ function generateMockTrendsData(
         .values.push(clampFuelLevel(Math.round(seededRandom(seed + 11) * 100)));
       regionGenMap
         .get(regionName)!
-        .values.push(clampGeneratorLoad(Math.round(seededRandom(seed + 13) * 100)));
+        .values.push(
+          clampGeneratorLoad(Math.round(seededRandom(seed + 13) * 100)),
+        );
     });
 
     const row: any = { name: todayStr };
     regionMap.forEach(({ name, values }) => {
       const avg =
         values.length > 0
-          ? clampFuelLevel(Math.round(values.reduce((a, b) => a + b, 0) / values.length))
+          ? clampFuelLevel(
+              Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+            )
           : clampFuelLevel(0);
       row[name] = avg;
     });
     regionGenMap.forEach(({ name, values }) => {
       const avg =
         values.length > 0
-          ? clampGeneratorLoad(Math.round(values.reduce((a, b) => a + b, 0) / values.length))
+          ? clampGeneratorLoad(
+              Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+            )
           : clampGeneratorLoad(0);
       row[`gen_${name}`] = avg;
     });
@@ -473,8 +483,14 @@ function generateMockTrendsData(
   const monthsArr: string[] = [];
 
   // build months from Jan 2025 to current month
-  for (let m = new Date(2025, 0, 1); m <= new Date(); m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
-    monthsArr.push(`${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`);
+  for (
+    let m = new Date(2025, 0, 1);
+    m <= new Date();
+    m = new Date(m.getFullYear(), m.getMonth() + 1, 1)
+  ) {
+    monthsArr.push(
+      `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`,
+    );
   }
   const numMonths = Math.max(1, monthsArr.length);
 
@@ -498,7 +514,8 @@ function generateMockTrendsData(
 
       monthRow[`fuel_consumption_L_${city}`] = value;
       // CO2 in tons (approximation using factor 2.68 kg CO2 / L and convert to tons)
-      monthRow[`co2_emissions_tons_${city}`] = Math.round((value * 2.68) / 1000 * 100) / 100;
+      monthRow[`co2_emissions_tons_${city}`] =
+        Math.round(((value * 2.68) / 1000) * 100) / 100;
       // Power (kWh) rough proportional factor (adjust factor as you prefer)
       monthRow[`power_consumption_kWh_${city}`] = Math.round(value * 0.9);
     });
@@ -743,7 +760,13 @@ export default function EnergyTrends() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                     <h2 className="text-xl font-semibold text-white mb-4">
-                      Current Fuel Level by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
+                      Current Fuel Level by{" "}
+                      {scope.district
+                        ? "District"
+                        : scope.regionId
+                          ? "District"
+                          : "Region"}{" "}
+                      (Today)
                     </h2>
                     <div className="w-full h-80">
                       <FuelLevelChart
@@ -755,7 +778,13 @@ export default function EnergyTrends() {
 
                   <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
                     <h2 className="text-xl font-semibold text-white mb-4">
-                      Generator Load Trend by {scope.district ? "District" : scope.regionId ? "District" : "Region"} (Today)
+                      Generator Load Trend by{" "}
+                      {scope.district
+                        ? "District"
+                        : scope.regionId
+                          ? "District"
+                          : "Region"}{" "}
+                      (Today)
                     </h2>
                     <div className="w-full h-80">
                       <GeneratorLoadChart

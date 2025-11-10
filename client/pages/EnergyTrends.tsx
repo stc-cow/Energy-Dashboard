@@ -338,7 +338,9 @@ async function generateCurrentDataFromRawSheets(
 
 // Helper to get default region IDs from hierarchy
 // Returns the IDs of the first 4 unique regions (representing Central, East, West, South)
-function getDefaultRegionIds(allCities: { id: string; name: string; regionId?: string }[]): Set<string> {
+function getDefaultRegionIds(
+  allCities: { id: string; name: string; regionId?: string }[],
+): Set<string> {
   const defaultIds = new Set<string>();
 
   // Collect unique region IDs in order
@@ -353,7 +355,7 @@ function getDefaultRegionIds(allCities: { id: string; name: string; regionId?: s
   });
 
   // Take the first 4 regions as defaults
-  regionIds.slice(0, 4).forEach(id => defaultIds.add(id));
+  regionIds.slice(0, 4).forEach((id) => defaultIds.add(id));
 
   return defaultIds;
 }
@@ -399,8 +401,8 @@ function generateMockTrendsData(
   if (!scope.district && !scope.regionId) {
     // Only filter to default regions when no region/district is selected
     const defaultRegionIds = getDefaultRegionIds(allCities);
-    citiesForAccumulative = filteredCities.filter((c) =>
-      c.regionId && defaultRegionIds.has(c.regionId)
+    citiesForAccumulative = filteredCities.filter(
+      (c) => c.regionId && defaultRegionIds.has(c.regionId),
     );
   }
 
@@ -549,7 +551,9 @@ function generateMockTrendsData(
     accumulativeCities = [];
     regionMap.forEach((cities, regionId) => {
       const displayName =
-        regionIdx < regionNames.length ? regionNames[regionIdx] : `Region ${regionIdx}`;
+        regionIdx < regionNames.length
+          ? regionNames[regionIdx]
+          : `Region ${regionIdx}`;
       accumulativeRegionMap.set(displayName, regionId);
       accumulativeCities.push(displayName);
       regionIdx++;

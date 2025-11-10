@@ -35,7 +35,9 @@ function projectionSeries(accData: any[], monthsToProject = 1) {
 
   // compute a simple slope for each key and generate month(s)
   for (let i = 1; i <= monthsToProject; i++) {
-    const nextRow: any = { date: nextMonthLabel(last.date) + (i > 1 ? `+${i - 1}` : "") };
+    const nextRow: any = {
+      date: nextMonthLabel(last.date) + (i > 1 ? `+${i - 1}` : ""),
+    };
     keys.forEach((k) => {
       const vLast = Number(last[k] ?? 0);
       const vPrev = Number(prev[k] ?? 0);
@@ -89,12 +91,21 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+      <LineChart
+        data={chartData}
+        margin={{ left: 8, right: 8, top: 10, bottom: 0 }}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-        <XAxis dataKey="date" stroke="#FFFFFF" tick={{ fontSize: 13, fill: "#FFFFFF" }} />
+        <XAxis
+          dataKey="date"
+          stroke="#FFFFFF"
+          tick={{ fontSize: 13, fill: "#FFFFFF" }}
+        />
         <YAxis stroke="#FFFFFF" tick={{ fontSize: 13, fill: "#FFFFFF" }} />
         <Tooltip content={<CustomTooltip />} />
-        <Legend wrapperStyle={{ paddingTop: "16px", color: "#FFFFFF", fontSize: 13 }} />
+        <Legend
+          wrapperStyle={{ paddingTop: "16px", color: "#FFFFFF", fontSize: 13 }}
+        />
         {displayCities.map((city, idx) => (
           <Line
             key={city}

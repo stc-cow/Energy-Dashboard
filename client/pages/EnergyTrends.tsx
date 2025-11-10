@@ -245,7 +245,7 @@ async function generateCurrentDataFromRawSheets(
             10,
         ) / 10
       : 0;
-    const avgLoad = districtLoads.length
+    let avgLoad = districtLoads.length
       ? Math.round(
           (districtLoads.reduce((a, b) => a + b, 0) / districtLoads.length) *
             10,
@@ -253,6 +253,7 @@ async function generateCurrentDataFromRawSheets(
       : 0;
 
     avgFuel = clampFuelLevel(avgFuel);
+    avgLoad = clampGeneratorLoad(avgLoad);
 
     const row: any = { name: todayStr };
     row[scope.district] = avgFuel;

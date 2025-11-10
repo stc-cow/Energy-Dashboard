@@ -85,15 +85,11 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
       ? Object.keys(chartData[0]).filter((k) => k !== "date")
       : [];
 
-  // build projection (1 month) appended to the data for rendering dashed lines
-  const proj = projectionSeries(chartData, 1);
-  const combined = proj.length ? [...chartData, ...proj] : chartData;
-
   const displayCities = cities.slice(0, 4);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={combined} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+      <LineChart data={chartData} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
         <XAxis dataKey="date" stroke="#FFFFFF" tick={{ fontSize: 13, fill: "#FFFFFF" }} />
         <YAxis stroke="#FFFFFF" tick={{ fontSize: 13, fill: "#FFFFFF" }} />
@@ -111,22 +107,6 @@ export default function FuelConsumptionChart({ data }: { data: any[] }) {
             isAnimationActive={false}
           />
         ))}
-
-        {/* Render projected lines as dashed using the last element(s) */}
-        {proj.length > 0 &&
-          displayCities.map((city, idx) => (
-            <Line
-              key={`proj-${city}`}
-              type="monotone"
-              dataKey={city}
-              name={`${city} (proj)`}
-              stroke={FUEL_COLORS[idx % FUEL_COLORS.length]}
-              strokeWidth={2}
-              dot={false}
-              strokeDasharray="4 4"
-              isAnimationActive={false}
-            />
-          ))}
       </LineChart>
     </ResponsiveContainer>
   );

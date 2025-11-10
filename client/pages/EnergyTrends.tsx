@@ -336,6 +336,23 @@ async function generateCurrentDataFromRawSheets(
   return currentData;
 }
 
+// Default regions for accumulative data
+const DEFAULT_REGIONS = new Set(["Central", "East", "West", "South"]);
+
+// Helper to get region name from regionId
+function getRegionNameFromId(regionId?: string): string | null {
+  if (!regionId) return null;
+  // Map common region IDs to display names
+  const regionMap: { [key: string]: string } = {
+    "central": "Central",
+    "east": "East",
+    "west": "West",
+    "south": "South",
+  };
+  const lowerRegionId = regionId.toLowerCase();
+  return regionMap[lowerRegionId] || null;
+}
+
 // Import mock data function directly for client-side data generation
 function generateMockTrendsData(
   scope: HierarchyFilter,
@@ -371,6 +388,16 @@ function generateMockTrendsData(
 
   // Use city names for the chart
   const cities = filteredCities.map((c) => c.name);
+
+  // Filter cities for accumulative data - only include default regions
+  let citiesForAccumulative = filteredCities;
+  if (!scope.district && !scope.regionId) {
+    // Only filter to default regions when no region/district is selected
+    citiesForAccumulative = filteredCities.filter((c) => {
+      const regionName = getRegionNameFromId(c.regionId);
+      return regionName && DEFAULT_REGIONS.has(regionName);
+    });
+  }
 
   const startDate = new Date(2025, 0, 1); // January 1, 2025
   const today = new Date();

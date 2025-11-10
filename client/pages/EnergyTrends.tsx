@@ -526,10 +526,37 @@ function generateMockTrendsData(
   }
   const numMonths = Math.max(1, monthsArr.length);
 
-  // Get city names for accumulative data (filtered to default regions)
-  const accumulativeCities = citiesForAccumulative.map((c) => c.name);
+  // For accumulative data, group cities by region and use region name as the key
+  // This ensures the legend shows region names instead of city names
+  let accumulativeCities = citiesForAccumulative.map((c) => c.name);
+  let accumulativeRegionMap: Map<string, string> = new Map(); // maps region display name to regionId
 
-  // Derive a single "current month accumulative" base per city (seeded when real totals are not available).
+  // If we're filtering to default regions, group by region and use region as the key
+  if (!scope.district && !scope.regionId && citiesForAccumulative.length > 0) {
+    // Group cities by regionId
+    const regionMap = new Map<string, string[]>();
+    citiesForAccumulative.forEach((city) => {
+      const regionId = city.regionId || "Unknown";
+      if (!regionMap.has(regionId)) {
+        regionMap.set(regionId, []);
+      }
+      regionMap.get(regionId)!.push(city.name);
+    });
+
+    // Create display names for regions (e.g., "Central", "East", "West", "South")
+    const regionNames = ["Central", "East", "West", "South"];
+    let regionIdx = 0;
+    accumulativeCities = [];
+    regionMap.forEach((cities, regionId) => {
+      const displayName =
+        regionIdx < regionNames.length ? regionNames[regionIdx] : `Region ${regionIdx}`;
+      accumulativeRegionMap.set(displayName, regionId);
+      accumulativeCities.push(displayName);
+      regionIdx++;
+    });
+  }
+
+  // Derive a single "current month accumulative" base per city/region (seeded when real totals are not available).
   // This base value will be used as the current-month average and used to backfill a linear trend from Jan 2025.
   const baseValues = accumulativeCities.map((city, idx) => {
     const seed = idx + 17;

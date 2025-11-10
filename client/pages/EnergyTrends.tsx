@@ -336,30 +336,34 @@ async function generateCurrentDataFromRawSheets(
   return currentData;
 }
 
-// Default regions to display in accumulative charts
-// These are the four main regions that should be shown by default
-const DEFAULT_REGION_IDS = new Set<string>();
+// Helper to get default region IDs from hierarchy
+function getDefaultRegionIds(allCities: { id: string; name: string; regionId?: string }[]): Set<string> {
+  // These are the main 4 regions - we'll get their IDs from the cities
+  const defaultRegionNames = new Set(["central", "east", "west", "south"]);
+  const defaultIds = new Set<string>();
 
-// Helper to check if a city belongs to a default region
-function isDefaultRegionCity(city: { id: string; name: string; regionId?: string }, allCities: { id: string; name: string; regionId?: string }[]): boolean {
-  // If DEFAULT_REGION_IDS is not yet populated, populate it based on actual cities
-  if (DEFAULT_REGION_IDS.size === 0 && allCities.length > 0) {
-    // Find all unique region IDs
-    const regionIds = new Set<string>();
-    allCities.forEach(c => {
-      if (c.regionId) regionIds.add(c.regionId);
-    });
-
-    // Add the first 4 region IDs as defaults (representing Central, East, West, South)
-    let count = 0;
-    for (const id of regionIds) {
-      if (count >= 4) break;
-      DEFAULT_REGION_IDS.add(id);
-      count++;
+  // Group cities by regionId and get the name patterns
+  const regionIdMap = new Map<string, Set<string>>();
+  allCities.forEach((city) => {
+    if (city.regionId) {
+      if (!regionIdMap.has(city.regionId)) {
+        regionIdMap.set(city.regionId, new Set());
+      }
+      regionIdMap.get(city.regionId)!.add(city.name);
     }
-  }
+  });
 
-  return city.regionId && DEFAULT_REGION_IDS.has(city.regionId);
+  // Match regions by checking if any city name matches our default regions
+  regionIdMap.forEach((cityNames, regionId) => {
+    const hasMainRegion = Array.from(cityNames).some((name) =>
+      defaultRegionNames.has(name.toLowerCase().trim())
+    );
+    if (hasMainRegion) {
+      defaultIds.add(regionId);
+    }
+  });
+
+  return defaultIds;
 }
 
 // Import mock data function directly for client-side data generation

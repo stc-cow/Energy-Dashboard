@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHierarchy } from "@/lib/api";
@@ -683,227 +684,482 @@ export default function EnergyTrends() {
     return Array.from(districtSet).sort();
   }, [hierarchy, filteredCities]);
 
+  const highlightMetrics = useMemo(() => {
+    if (!trendsData?.currentData?.length) {
+      return [] as Array<{ label: string; fuel: number; load: number }>;
+    }
+
+    const entry = trendsData.currentData[0];
+
+    return Object.keys(entry)
+      .filter((key) => key !== "name" && !key.startsWith("gen_"))
+      .map((label) => ({
+        label,
+        fuel: Number(entry[label] ?? 0),
+        load: Number(entry[`gen_${label}`] ?? 0),
+      }))
+      .sort((a, b) => b.fuel - a.fuel)
+      .slice(0, 3);
+  }, [trendsData]);
+
+  const heroMetrics = useMemo(() => {
+    if (highlightMetrics.length > 0) {
+      return highlightMetrics;
+    }
+
+    return [
+      { label: "Aurora Corridor", fuel: 88, load: 64 },
+      { label: "Nebula Reach", fuel: 79, load: 71 },
+      { label: "Quantum Ridge", fuel: 92, load: 58 },
+    ];
+  }, [highlightMetrics]);
+
+  const heroAverages = useMemo(() => {
+    if (!heroMetrics.length) {
+      return { fuel: 0, load: 0 };
+    }
+
+    const totals = heroMetrics.reduce(
+      (acc, metric) => {
+        acc.fuel += metric.fuel;
+        acc.load += metric.load;
+        return acc;
+      },
+      { fuel: 0, load: 0 },
+    );
+
+    return {
+      fuel: Math.round((totals.fuel / heroMetrics.length) * 10) / 10,
+      load: Math.round((totals.load / heroMetrics.length) * 10) / 10,
+    };
+  }, [heroMetrics]);
+
+  const accentGradients = [
+    "from-emerald-400/80 via-emerald-500/40 to-emerald-500/0",
+    "from-sky-400/80 via-cyan-400/40 to-cyan-500/0",
+    "from-fuchsia-400/80 via-purple-500/40 to-purple-500/0",
+  ];
+
+  const buildPanelStyle = useMemo(
+    () =>
+      (depth: number): CSSProperties => ({
+        transform: `translateZ(${depth}px)` + " rotateY(-6deg)",
+        transformStyle: "preserve-3d",
+        background:
+          "linear-gradient(165deg, rgba(24,16,64,0.92), rgba(9,6,28,0.88))",
+        boxShadow:
+          "0 45px 80px rgba(7,3,24,0.68), inset 0 0 0 1px rgba(255,255,255,0.06)",
+      }),
+    [],
+  );
+
   return (
     <div
+      className="fixed inset-0 overflow-hidden"
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        background:
+          "radial-gradient(140% 100% at 12% 40%, rgba(10,7,38,0.98) 0%, rgba(6,5,25,0.96) 48%, rgba(2,1,12,0.92) 70%, rgba(1,0,8,0.85) 100%)",
         zIndex: 50,
       }}
       onClick={() => navigate("/")}
     >
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage:
+              "linear-gradient(160deg, rgba(94,72,255,0.45) 0%, rgba(0,210,255,0.25) 50%, rgba(255,20,147,0.4) 100%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        <div
+          className="absolute inset-y-0 right-0 w-2/3 translate-x-1/4 bg-[url('/images/energy-pointer-hand.svg')] bg-contain bg-right bg-no-repeat opacity-40"
+        />
+        <div
+          className="absolute -left-24 top-1/2 h-[42rem] w-[42rem] -translate-y-1/2 rounded-full bg-purple-700/40 blur-3xl"
+        />
+        <div
+          className="absolute bottom-10 right-1/4 h-72 w-72 rotate-12 rounded-[3rem] border border-cyan-400/40 bg-cyan-500/10 backdrop-blur-xl"
+          style={{
+            boxShadow: "0 0 120px rgba(56,189,248,0.35)",
+            transform: "translateZ(120px)",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 15% 20%, rgba(147,197,253,0.16), transparent 55%), radial-gradient(circle at 85% 80%, rgba(244,114,182,0.18), transparent 60%)",
+          }}
+        />
+      </div>
+
+      <button
+        onClick={() => navigate("/")}
+        className="absolute right-6 top-6 z-50 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-white/90 shadow-[0_12px_24px_rgba(14,8,48,0.4)] transition hover:bg-white/20"
+      >
+        Close
+      </button>
+
       <div
-        style={{
-          backgroundColor: "#5c0ba2",
-          borderRadius: "12px",
-          padding: "24px",
-          maxHeight: "90vh",
-          overflowY: "auto",
-          maxWidth: "1200px",
-          width: "95%",
-        }}
-        onClick={(e) => e.stopPropagation()}
+        className="relative z-40 flex h-full w-full items-center justify-center px-6 py-12"
+        style={{ perspective: "2200px" }}
       >
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}
+          className="relative flex w-full max-w-6xl flex-col gap-10 lg:flex-row"
+          style={{ transformStyle: "preserve-3d" }}
+          onClick={(e) => e.stopPropagation()}
         >
-          <h1
-            style={{
-              color: "white",
-              fontSize: "24px",
-              fontWeight: "bold",
-              margin: 0,
-            }}
-          >
-            Energy Trends
-          </h1>
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex-shrink-0"
-          >
-            Close
-          </button>
-        </div>
-
-        {/* Filters */}
-        {!isLoading && (
           <div
+            className="relative w-full overflow-hidden rounded-[34px] border border-white/15 text-white lg:max-w-sm"
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "16px",
-              marginBottom: "20px",
+              transform: "rotateY(-24deg) rotateX(6deg) translateZ(220px)",
+              transformStyle: "preserve-3d",
+              background:
+                "linear-gradient(160deg, rgba(48,16,94,0.96), rgba(14,10,40,0.9))",
+              boxShadow:
+                "0 70px 120px rgba(8,2,24,0.72), inset 0 0 0 1px rgba(255,255,255,0.08)",
             }}
           >
-            {/* Region Filter */}
-            <div>
-              <label className="block text-white text-sm font-semibold mb-2">
-                Region
-              </label>
-              <select
-                value={scope.regionId || ""}
-                onChange={(e) => {
-                  const regionId = e.target.value || undefined;
-                  setScope((prev) => ({
-                    ...prev,
-                    regionId,
-                    district: undefined,
-                  }));
-                }}
-                className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors"
-              >
-                <option value="" style={{ color: "black" }}>
-                  All Regions
-                </option>
-                {hierarchy?.regions?.map((region) => (
-                  <option
-                    key={region.id}
-                    value={region.id}
-                    style={{ color: "black" }}
-                  >
-                    {region.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <div
+              className="absolute inset-0 opacity-70"
+              style={{
+                backgroundImage:
+                  "linear-gradient(125deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 28%, rgba(56,189,248,0.2) 100%)",
+                mixBlendMode: "screen",
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 10px)",
+                opacity: 0.3,
+                transform: "translateZ(40px)",
+              }}
+            />
+            <div className="relative z-20 flex h-full flex-col justify-between p-8">
+              <div>
+                <p className="text-xs uppercase tracking-[0.45em] text-purple-100/80">
+                  Quantum Deep Trend Capsule
+                </p>
+                <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white">
+                  Energy Trends
+                </h1>
+                <p className="mt-5 max-w-xs text-sm text-purple-100/80">
+                  Immersive telemetry rendered with multi-layer depth, aligned to
+                  the districts leading today&apos;s energy harmony.
+                </p>
+              </div>
 
-            {/* District Filter */}
-            <div>
-              <label className="block text-white text-sm font-semibold mb-2">
-                District
-              </label>
-              <select
-                disabled={!scope.regionId}
-                value={scope.district || ""}
-                onChange={(e) => {
-                  const district = e.target.value || undefined;
-                  setScope((prev) => ({ ...prev, district }));
-                }}
-                className="w-full px-4 py-2 bg-white/10 text-black border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
-              >
-                <option value="" style={{ color: "black" }}>
-                  All Districts
-                </option>
-                {districts.map((district) => (
-                  <option
-                    key={district}
-                    value={district}
-                    style={{ color: "black" }}
+              <div className="mt-6 space-y-4">
+                {heroMetrics.map((metric, idx) => (
+                  <div
+                    key={metric.label}
+                    className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 px-5 py-4 shadow-[0_25px_45px_rgba(8,2,28,0.6)]"
+                    style={{ transform: `translateZ(${45 - idx * 8}px)` }}
                   >
-                    {district}
-                  </option>
+                    <div
+                      className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${accentGradients[idx % accentGradients.length]} opacity-70 blur-lg`}
+                      style={{ transform: "translateZ(-10px)" }}
+                    />
+                    <div className="relative z-10 flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[0.65rem] uppercase tracking-[0.4em] text-white/70">
+                          {metric.label}
+                        </p>
+                        <p className="mt-2 text-2xl font-semibold text-white">
+                          {Math.round(metric.fuel)}%
+                        </p>
+                        <p className="text-[0.7rem] text-white/60">Fuel Stability</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[0.65rem] uppercase tracking-[0.3em] text-cyan-100/80">
+                          Load
+                        </p>
+                        <p className="mt-2 text-xl font-semibold text-cyan-100">
+                          {Math.round(metric.load)}%
+                        </p>
+                        <p className="text-[0.7rem] text-white/60">Generator Pulse</p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </select>
+              </div>
+
+              <div
+                className="relative mt-8 h-56 overflow-hidden rounded-3xl border border-white/20 bg-black/30 p-5"
+                style={{ transform: "translateZ(55px)" }}
+              >
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle at 15% 15%, rgba(59,130,246,0.25), transparent 55%), radial-gradient(circle at 85% 85%, rgba(192,132,252,0.28), transparent 60%)",
+                    opacity: 0.85,
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(120deg, rgba(255,255,255,0.25) 0%, transparent 45%, transparent 60%, rgba(255,255,255,0.18) 100%)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+                <div className="relative z-20 flex h-full items-end justify-between gap-3">
+                  {heroMetrics.map((metric, idx) => {
+                    const fuelHeight = Math.max(18, Math.min(95, metric.fuel));
+                    const loadHeight = Math.max(12, Math.min(85, metric.load));
+
+                    return (
+                      <div
+                        key={`${metric.label}-tower`}
+                        className="flex w-1/3 flex-col items-center gap-2"
+                      >
+                        <div className="flex w-full items-end gap-2">
+                          <div
+                            className="flex-1 rounded-t-2xl bg-gradient-to-t from-purple-800/80 via-purple-500/70 to-fuchsia-300/90 shadow-[0_20px_45px_rgba(180,104,255,0.6)]"
+                            style={{ height: `${fuelHeight}%` }}
+                          />
+                          <div
+                            className="flex-1 rounded-t-2xl bg-gradient-to-t from-cyan-900/80 via-cyan-500/70 to-sky-300/90 shadow-[0_18px_35px_rgba(56,189,248,0.6)]"
+                            style={{ height: `${loadHeight}%` }}
+                          />
+                        </div>
+                        <p className="text-[0.7rem] uppercase tracking-[0.25em] text-white/70">
+                          {metric.label.split(" ")[0] ?? metric.label}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="pointer-events-none absolute inset-x-0 bottom-8 h-12 bg-gradient-to-r from-transparent via-white/20 to-transparent blur-2xl" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/60 to-transparent" />
+                <div className="absolute left-5 top-5 flex items-baseline gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-white/60">
+                  <span>Avg Fuel</span>
+                  <span className="text-white/90">{heroAverages.fuel}%</span>
+                  <span className="ml-3 text-cyan-200/80">Load</span>
+                  <span className="text-cyan-100/90">{heroAverages.load}%</span>
+                </div>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Charts Container */}
-        {isLoading && (
-          <div className="text-center py-12">
-            <p className="text-white/60">Loading trends data...</p>
-          </div>
-        )}
+          <div
+            className="relative flex w-full flex-col gap-8 text-white"
+            style={{
+              transform: "rotateY(-10deg) rotateX(2deg) translateZ(140px)",
+              transformStyle: "preserve-3d",
+            }}
+          >
+            <div
+              className="relative overflow-hidden rounded-[28px] border border-white/15 px-8 py-6 backdrop-blur-2xl"
+              style={{
+                ...buildPanelStyle(180),
+                background:
+                  "linear-gradient(160deg, rgba(32,22,74,0.92), rgba(10,8,32,0.88))",
+              }}
+            >
+              <div
+                className="pointer-events-none absolute inset-0 opacity-40"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(120deg, rgba(255,255,255,0.18) 0%, transparent 35%, transparent 60%, rgba(56,189,248,0.2) 100%)",
+                  mixBlendMode: "screen",
+                }}
+              />
+              <div className="relative z-20 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-white/70">
+                    Immersive Telemetry Portal
+                  </p>
+                  <p className="mt-2 max-w-md text-sm text-white/70">
+                    Refine the holographic canvas by region and district to alter
+                    the depth of the rendered trend volumes.
+                  </p>
+                </div>
+                {!isLoading && (
+                  <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
+                        Region Scope
+                      </label>
+                      <select
+                        value={scope.regionId || ""}
+                        onChange={(e) => {
+                          const regionId = e.target.value || undefined;
+                          setScope((prev) => ({
+                            ...prev,
+                            regionId,
+                            district: undefined,
+                          }));
+                        }}
+                        className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur"
+                      >
+                        <option value="">All Regions</option>
+                        {hierarchy?.regions?.map((region) => (
+                          <option key={region.id} value={region.id}>
+                            {region.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
+                        District Layer
+                      </label>
+                      <select
+                        disabled={!scope.regionId}
+                        value={scope.district || ""}
+                        onChange={(e) => {
+                          const district = e.target.value || undefined;
+                          setScope((prev) => ({ ...prev, district }));
+                        }}
+                        className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur disabled:opacity-50"
+                      >
+                        <option value="">All Districts</option>
+                        {districts.map((district) => (
+                          <option key={district} value={district}>
+                            {district}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-        {trendsData &&
-          trendsData.currentData &&
-          trendsData.accumulativeData && (
-            <div className="space-y-8">
-              {/* Current Fuel Level and Generator Load side-by-side */}
-              {trendsData.currentData && trendsData.currentData.length > 0 && (
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                    <h2 className="text-xl font-semibold text-white mb-4">
-                      Current Fuel Level by{" "}
-                      {scope.district
-                        ? "District"
-                        : scope.regionId
-                          ? "District"
-                          : "Region"}{" "}
-                      (Today)
+            {isLoading && (
+              <div
+                className="rounded-[26px] border border-white/10 px-8 py-12 text-center text-white/60"
+                style={buildPanelStyle(150)}
+              >
+                Loading trends data...
+              </div>
+            )}
+
+            {trendsData &&
+              trendsData.currentData &&
+              trendsData.accumulativeData && (
+                <div className="flex flex-col gap-8">
+                  {trendsData.currentData.length > 0 && (
+                    <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+                      <div
+                        className="rounded-[26px] border border-white/10 p-6"
+                        style={buildPanelStyle(140)}
+                      >
+                        <h2 className="text-xl font-semibold text-white">
+                          Current Fuel Level by{" "}
+                          {scope.district
+                            ? "District"
+                            : scope.regionId
+                              ? "District"
+                              : "Region"}{" "}
+                          (Today)
+                        </h2>
+                        <p className="mt-1 text-sm text-white/60">
+                          Layered bars projected across the immersive viewport
+                          for instant comparison.
+                        </p>
+                        <div className="mt-6 h-80 w-full">
+                          <FuelLevelChart
+                            data={trendsData.currentData}
+                            cities={trendsData.cities}
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        className="rounded-[26px] border border-white/10 p-6"
+                        style={buildPanelStyle(135)}
+                      >
+                        <h2 className="text-xl font-semibold text-white">
+                          Generator Load Trend by{" "}
+                          {scope.district
+                            ? "District"
+                            : scope.regionId
+                              ? "District"
+                              : "Region"}{" "}
+                          (Today)
+                        </h2>
+                        <p className="mt-1 text-sm text-white/60">
+                          Dual-axis generator harmonics mapped to the current
+                          scope.
+                        </p>
+                        <div className="mt-6 h-80 w-full">
+                          <GeneratorLoadChart
+                            data={trendsData.currentData}
+                            cities={trendsData.cities}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className="rounded-[26px] border border-white/10 p-6"
+                    style={buildPanelStyle(128)}
+                  >
+                    <h2 className="text-xl font-semibold text-white">
+                      Accumulative Fuel Consumption (Monthly from 1/1/2025)
                     </h2>
-                    <div className="w-full h-80">
-                      <FuelLevelChart
-                        data={trendsData.currentData}
-                        cities={trendsData.cities}
-                      />
+                    <p className="mt-1 text-sm text-white/60">
+                      Extruded streamlines show the cumulative upward drift of
+                      consumption.
+                    </p>
+                    <div className="mt-6 h-80 w-full">
+                      <FuelConsumptionChart data={trendsData.accumulativeData} />
                     </div>
                   </div>
 
-                  <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                    <h2 className="text-xl font-semibold text-white mb-4">
-                      Generator Load Trend by{" "}
-                      {scope.district
-                        ? "District"
-                        : scope.regionId
-                          ? "District"
-                          : "Region"}{" "}
-                      (Today)
+                  <div
+                    className="rounded-[26px] border border-white/10 p-6"
+                    style={buildPanelStyle(122)}
+                  >
+                    <h2 className="text-xl font-semibold text-white">
+                      Accumulative CO₂ Emissions (Monthly from 1/1/2025)
                     </h2>
-                    <div className="w-full h-80">
-                      <GeneratorLoadChart
-                        data={trendsData.currentData}
-                        cities={trendsData.cities}
-                      />
+                    <p className="mt-1 text-sm text-white/60">
+                      Atmospheric density ribbons reveal the emissions
+                      trajectory.
+                    </p>
+                    <div className="mt-6 h-80 w-full">
+                      <Co2EmissionsChart data={trendsData.accumulativeData} />
+                    </div>
+                  </div>
+
+                  <div
+                    className="rounded-[26px] border border-white/10 p-6"
+                    style={buildPanelStyle(116)}
+                  >
+                    <h2 className="text-xl font-semibold text-white">
+                      Accumulative Power Consumption (Monthly from 1/1/2025)
+                    </h2>
+                    <p className="mt-1 text-sm text-white/60">
+                      Power utilization arcs plotted across the deep timeline.
+                    </p>
+                    <div className="mt-6 h-80 w-full">
+                      <PowerConsumptionChart data={trendsData.accumulativeData} />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Accumulative Fuel Consumption */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative Fuel Consumption (Monthly from 1/1/2025)
-                </h2>
-                <div className="w-full h-80">
-                  <FuelConsumptionChart data={trendsData.accumulativeData} />
+            {!isLoading &&
+              (!trendsData ||
+                !trendsData.currentData ||
+                !trendsData.accumulativeData) && (
+                <div
+                  className="rounded-[26px] border border-white/10 px-8 py-12 text-center text-white/60"
+                  style={buildPanelStyle(120)}
+                >
+                  No data available for the selected filters.
                 </div>
-              </div>
-
-              {/* Accumulative CO₂ Emissions */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative CO₂ Emissions (Monthly from 1/1/2025)
-                </h2>
-                <div className="w-full h-80">
-                  <Co2EmissionsChart data={trendsData.accumulativeData} />
-                </div>
-              </div>
-
-              {/* Accumulative Power Consumption */}
-              <div className="rounded-lg border border-white/10 bg-card p-6 shadow-lg">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Accumulative Power Consumption (Monthly from 1/1/2025)
-                </h2>
-                <div className="w-full h-80">
-                  <PowerConsumptionChart data={trendsData.accumulativeData} />
-                </div>
-              </div>
-            </div>
-          )}
-
-        {!isLoading &&
-          (!trendsData ||
-            !trendsData.currentData ||
-            !trendsData.accumulativeData) && (
-            <div className="text-center py-12">
-              <p className="text-white/60">
-                No data available for the selected filters.
-              </p>
-            </div>
-          )}
+              )}
+          </div>
+        </div>
       </div>
     </div>
   );

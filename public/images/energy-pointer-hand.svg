@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Purple neon pointing hand</title>
+  <desc id="desc">An illustration of a hand pointing upward with a purple and pink neon gradient glow.</desc>
+  <defs>
+    <linearGradient id="skin" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#9a4dff" />
+      <stop offset="40%" stop-color="#7b33f6" />
+      <stop offset="70%" stop-color="#5520c6" />
+      <stop offset="100%" stop-color="#24094f" />
+    </linearGradient>
+    <radialGradient id="glow" cx="65%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="rgba(255,81,163,0.7)" />
+      <stop offset="60%" stop-color="rgba(111,30,255,0.4)" />
+      <stop offset="100%" stop-color="rgba(10,8,32,0)" />
+    </radialGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="40" stdDeviation="50" flood-color="#13052a" flood-opacity="0.85" />
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="#040411" />
+  <rect width="1024" height="1024" fill="url(#glow)" />
+  <g filter="url(#shadow)" transform="translate(185 110) rotate(-6 327 427)">
+    <path fill="url(#skin)" d="M245.6 70.3c37.7-19 87.4-19.5 116.6-13.4 70.3 15 104.1 74 110.2 128.6 2.9 26.1 7.6 86 8.7 113 1.6 38 43.3 42.8 50.8 4.6l18.6-93.5c8.9-44.6 55.1-79.8 109.8-69.9 46.6 8.5 79.9 50.1 72.4 96l-45.7 275.4c-6.4 38.6-10.4 64.6-11.3 95.1-1 33.9 4.8 73.4 11.5 111.8 8.1 45.7-19.6 91.4-65.7 105.8l-213.8 67c-74.9 23.4-158.2-12.9-194.1-84.7l-83.7-167.1c-7.7-15.4-12.7-31.9-14.8-48.9l-26.6-215.4c-9.3-74.6 27.1-149.1 94-184.6l23.4-12.4c19.7-10.4 32.2-31 31.2-53.4-1.4-33.9 15.5-71.4 48.8-88.4z" />
+    <path fill="rgba(255,255,255,0.12)" d="M383.8 78.6c64.5 10.7 109.9 71.9 114.6 127.3 3.6 41.4-7.6 103.6 9 135.4 18.3 34.7 52.7 29.7 60.1-11.6l17.6-95.6c8.3-45 51.2-71.7 95.5-63.6 44 8 72.8 49.4 64.6 90.5l-46.2 232.9c-8.7 44.1-15.1 90.4-12.3 135.8 1.8 29 7.8 65.4 12.7 96.5 7.1 45.2-23.5 88.3-68.5 99.5l-206.7 51.3c-68.6 17-139-14.9-170.6-77.1l-81.2-157.8c-6.5-12.6-10.5-26.2-12.4-40.2l-27.8-205.3c-10.6-78.6 24.1-147.4 85.6-179.8l21.6-11.3c25.8-13.6 41.8-40.4 40.4-69.4-1.7-35.1 21.1-70.9 63-77.4 16-2.5 33-2.4 51.4 0.5z" />
+  </g>
+</svg>

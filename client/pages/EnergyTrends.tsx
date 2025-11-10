@@ -222,11 +222,6 @@ async function generateCurrentDataFromRawSheets(
   const groupByDistrict = !!scope.district;
   const groupByRegion = !!scope.regionId && !scope.district;
 
-  // Helper to clamp fuel level to 60-95 range
-  const clampFuelLevel = (value: number): number => {
-    return Math.max(60, Math.min(95, value));
-  };
-
   if (groupByDistrict) {
     // Show single district with its aggregated values
     const districtFuels: number[] = [];

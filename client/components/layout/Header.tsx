@@ -8,7 +8,7 @@ export default function Header() {
         "sticky top-0 z-30 w-full border-b border-white/10 bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60",
       )}
     >
-      <div className="container mx-auto grid grid-cols-3 h-[50px] items-center">
+      <div className="container mx-auto grid grid-cols-3 h-[70px] items-center">
         <Link
           to="/"
           className="flex items-center gap-2"

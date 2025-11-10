@@ -447,7 +447,7 @@ function generateMockTrendsData(
         .values.push(clampFuelLevel(Math.round(seededRandom(seed + 11) * 100)));
       regionGenMap
         .get(regionName)!
-        .values.push(Math.round(seededRandom(seed + 13) * 100));
+        .values.push(clampGeneratorLoad(Math.round(seededRandom(seed + 13) * 100)));
     });
 
     const row: any = { name: todayStr };

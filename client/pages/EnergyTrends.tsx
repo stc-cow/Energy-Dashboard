@@ -176,6 +176,11 @@ function clampFuelLevel(value: number): number {
   return Math.max(60, Math.min(95, value));
 }
 
+// Helper to clamp generator load to 45-90 range
+function clampGeneratorLoad(value: number): number {
+  return Math.max(45, Math.min(90, value));
+}
+
 // Generate current data by aggregating raw sheet data by region/district separately
 async function generateCurrentDataFromRawSheets(
   scope: HierarchyFilter,

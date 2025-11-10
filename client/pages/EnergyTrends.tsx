@@ -387,7 +387,7 @@ function generateMockTrendsData(
     // Show single district for selected region
     const row: any = { name: todayStr };
     row[scope.district] = clampFuelLevel(Math.round(seededRandom(123) * 100));
-    row[`gen_${scope.district}`] = Math.round(seededRandom(456) * 100);
+    row[`gen_${scope.district}`] = clampGeneratorLoad(Math.round(seededRandom(456) * 100));
     if (Object.keys(row).length > 1) currentData.push(row);
   } else if (groupByRegion) {
     // Show districts within the selected region

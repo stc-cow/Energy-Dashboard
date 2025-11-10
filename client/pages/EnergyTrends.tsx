@@ -521,9 +521,12 @@ function generateMockTrendsData(
   }
   const numMonths = Math.max(1, monthsArr.length);
 
+  // Get city names for accumulative data (filtered to default regions)
+  const accumulativeCities = citiesForAccumulative.map((c) => c.name);
+
   // Derive a single "current month accumulative" base per city (seeded when real totals are not available).
   // This base value will be used as the current-month average and used to backfill a linear trend from Jan 2025.
-  const baseValues = cities.map((city, idx) => {
+  const baseValues = accumulativeCities.map((city, idx) => {
     const seed = idx + 17;
     // seed-based base between ~50k and ~250k liters (adjust scale here if you prefer larger/smaller numbers)
     return Math.round(seededRandom(seed) * 200000) + 50000;
@@ -532,7 +535,7 @@ function generateMockTrendsData(
   // Build accumulative rows. For each month, distribute the base linearly up to the current month and add small noise.
   monthsArr.forEach((monthStr, monthIdx) => {
     const monthRow: any = { date: monthStr };
-    cities.forEach((city, cityIdx) => {
+    accumulativeCities.forEach((city, cityIdx) => {
       const base = baseValues[cityIdx];
       // small noise (±5% of base)
       const noise = seededRandom(cityIdx * 31 + monthIdx) * base * 0.05;

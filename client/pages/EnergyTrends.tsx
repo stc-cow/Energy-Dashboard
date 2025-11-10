@@ -320,11 +320,12 @@ async function generateCurrentDataFromRawSheets(
         ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
           10
         : 0;
-      const avgLoad = loads.length
+      let avgLoad = loads.length
         ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
           10
         : 0;
       avgFuel = clampFuelLevel(avgFuel);
+      avgLoad = clampGeneratorLoad(avgLoad);
       row[region] = avgFuel;
       row[`gen_${region}`] = avgLoad;
     });

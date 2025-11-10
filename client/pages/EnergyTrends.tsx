@@ -337,31 +337,23 @@ async function generateCurrentDataFromRawSheets(
 }
 
 // Helper to get default region IDs from hierarchy
+// Returns the IDs of the first 4 unique regions (representing Central, East, West, South)
 function getDefaultRegionIds(allCities: { id: string; name: string; regionId?: string }[]): Set<string> {
-  // These are the main 4 regions - we'll get their IDs from the cities
-  const defaultRegionNames = new Set(["central", "east", "west", "south"]);
   const defaultIds = new Set<string>();
 
-  // Group cities by regionId and get the name patterns
-  const regionIdMap = new Map<string, Set<string>>();
+  // Collect unique region IDs in order
+  const regionIds: string[] = [];
+  const seenIds = new Set<string>();
+
   allCities.forEach((city) => {
-    if (city.regionId) {
-      if (!regionIdMap.has(city.regionId)) {
-        regionIdMap.set(city.regionId, new Set());
-      }
-      regionIdMap.get(city.regionId)!.add(city.name);
+    if (city.regionId && !seenIds.has(city.regionId)) {
+      regionIds.push(city.regionId);
+      seenIds.add(city.regionId);
     }
   });
 
-  // Match regions by checking if any city name matches our default regions
-  regionIdMap.forEach((cityNames, regionId) => {
-    const hasMainRegion = Array.from(cityNames).some((name) =>
-      defaultRegionNames.has(name.toLowerCase().trim())
-    );
-    if (hasMainRegion) {
-      defaultIds.add(regionId);
-    }
-  });
+  // Take the first 4 regions as defaults
+  regionIds.slice(0, 4).forEach(id => defaultIds.add(id));
 
   return defaultIds;
 }

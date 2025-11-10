@@ -407,7 +407,7 @@ function generateMockTrendsData(
     let seed = 789;
     Array.from(districtSet).forEach((district) => {
       row[district] = clampFuelLevel(Math.round(seededRandom(seed++) * 100));
-      row[`gen_${district}`] = Math.round(seededRandom(seed++) * 100);
+      row[`gen_${district}`] = clampGeneratorLoad(Math.round(seededRandom(seed++) * 100));
     });
     if (Object.keys(row).length > 1) currentData.push(row);
   } else {

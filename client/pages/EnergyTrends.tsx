@@ -461,8 +461,8 @@ function generateMockTrendsData(
     regionGenMap.forEach(({ name, values }) => {
       const avg =
         values.length > 0
-          ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
-          : 0;
+          ? clampGeneratorLoad(Math.round(values.reduce((a, b) => a + b, 0) / values.length))
+          : clampGeneratorLoad(0);
       row[`gen_${name}`] = avg;
     });
     if (Object.keys(row).length > 1) currentData.push(row);

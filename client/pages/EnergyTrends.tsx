@@ -171,6 +171,11 @@ interface TrendsResponse {
   cities: string[];
 }
 
+// Helper to clamp fuel level to 60-95 range
+function clampFuelLevel(value: number): number {
+  return Math.max(60, Math.min(95, value));
+}
+
 // Generate current data by aggregating raw sheet data by region/district separately
 async function generateCurrentDataFromRawSheets(
   scope: HierarchyFilter,

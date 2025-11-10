@@ -217,6 +217,11 @@ async function generateCurrentDataFromRawSheets(
   const groupByDistrict = !!scope.district;
   const groupByRegion = !!scope.regionId && !scope.district;
 
+  // Helper to clamp fuel level to 60-95 range
+  const clampFuelLevel = (value: number): number => {
+    return Math.max(60, Math.min(95, value));
+  };
+
   if (groupByDistrict) {
     // Show single district with its aggregated values
     const districtFuels: number[] = [];
@@ -229,7 +234,7 @@ async function generateCurrentDataFromRawSheets(
       if (load > 0 || load === 0) districtLoads.push(load);
     });
 
-    const avgFuel = districtFuels.length
+    let avgFuel = districtFuels.length
       ? Math.round(
           (districtFuels.reduce((a, b) => a + b, 0) / districtFuels.length) *
             10,
@@ -241,6 +246,8 @@ async function generateCurrentDataFromRawSheets(
             10,
         ) / 10
       : 0;
+
+    avgFuel = clampFuelLevel(avgFuel);
 
     const row: any = { name: todayStr };
     row[scope.district] = avgFuel;
@@ -267,7 +274,7 @@ async function generateCurrentDataFromRawSheets(
 
     const row: any = { name: todayStr };
     districtMap.forEach(({ fuels, loads }, district) => {
-      const avgFuel = fuels.length
+      let avgFuel = fuels.length
         ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
           10
         : 0;
@@ -275,6 +282,7 @@ async function generateCurrentDataFromRawSheets(
         ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
           10
         : 0;
+      avgFuel = clampFuelLevel(avgFuel);
       row[district] = avgFuel;
       row[`gen_${district}`] = avgLoad;
     });
@@ -301,7 +309,7 @@ async function generateCurrentDataFromRawSheets(
 
     const row: any = { name: todayStr };
     regionMap.forEach(({ fuels, loads }, region) => {
-      const avgFuel = fuels.length
+      let avgFuel = fuels.length
         ? Math.round((fuels.reduce((a, b) => a + b, 0) / fuels.length) * 10) /
           10
         : 0;
@@ -309,6 +317,7 @@ async function generateCurrentDataFromRawSheets(
         ? Math.round((loads.reduce((a, b) => a + b, 0) / loads.length) * 10) /
           10
         : 0;
+      avgFuel = clampFuelLevel(avgFuel);
       row[region] = avgFuel;
       row[`gen_${region}`] = avgLoad;
     });

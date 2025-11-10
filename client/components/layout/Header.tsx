@@ -9,7 +9,11 @@ export default function Header() {
       )}
     >
       <div className="container mx-auto grid grid-cols-3 h-[50px] items-center">
-        <Link to="/" className="flex items-center gap-2" style={{ marginTop: "-1px" }}>
+        <Link
+          to="/"
+          className="flex items-center gap-2"
+          style={{ marginTop: "-1px" }}
+        >
           <img
             src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F0198dd0082b54c8c8c332a08688180d4?format=webp&width=800"
             alt="stc"

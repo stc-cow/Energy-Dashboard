@@ -19,6 +19,11 @@ function getRegionNameForCity(
   return city?.regionId || "Unknown";
 }
 
+function isInvalidTextValue(value: any): boolean {
+  const text = String(value ?? "").trim().toUpperCase();
+  return !text || text === "#N/A";
+}
+
 // Helper function to fetch and parse raw sheet data (mimic api.ts logic)
 async function getRawSheetData(): Promise<any[]> {
   try {
@@ -114,8 +119,9 @@ function getRegionName(r: any): string {
   ];
 
   for (const cand of candidates) {
-    if (r[cand] !== undefined && r[cand] !== "") {
-      return String(r[cand]).trim();
+    const value = r[cand];
+    if (!isInvalidTextValue(value)) {
+      return String(value).trim();
     }
   }
   return "Unknown";
@@ -136,8 +142,9 @@ function getCityName(r: any): string {
   ];
 
   for (const cand of candidates) {
-    if (r[cand] !== undefined && r[cand] !== "") {
-      return String(r[cand]).trim();
+    const value = r[cand];
+    if (!isInvalidTextValue(value)) {
+      return String(value).trim();
     }
   }
   return "Unknown";
@@ -158,8 +165,9 @@ function getDistrictName(r: any): string {
   ];
 
   for (const cand of candidates) {
-    if (r[cand] !== undefined && r[cand] !== "") {
-      return String(r[cand]).trim();
+    const value = r[cand];
+    if (!isInvalidTextValue(value)) {
+      return String(value).trim();
     }
   }
   return "";

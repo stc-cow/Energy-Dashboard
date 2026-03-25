@@ -71,13 +71,17 @@ function pickNumberFromRow(
   const v = getValueByCandidates(row, candidates, regexes);
   return toNumber(v);
 }
+function isInvalidTextValue(value: any): boolean {
+  const text = String(value ?? "").trim().toUpperCase();
+  return !text || text === "#N/A";
+}
 function pickStringFromRow(
   row: any,
   candidates: string[],
   regexes: RegExp[] = [],
 ): string {
   const v = getValueByCandidates(row, candidates, regexes);
-  return v == null ? "" : String(v).trim();
+  return isInvalidTextValue(v) ? "" : String(v).trim();
 }
 
 // Sheet URL resolution
@@ -840,9 +844,7 @@ export async function fetchBreakdown(
         { name: string; diesel: number; energy: number }
       >();
       for (const r of rows) {
-        const regionName = String(
-          r["regionName"] ?? r["Region"] ?? r["region"] ?? "",
-        ).trim();
+        const regionName = getRegionName(r);
         const key = slug(regionName);
         if (!map.has(key))
           map.set(key, { name: regionName || "Unknown", diesel: 0, energy: 0 });

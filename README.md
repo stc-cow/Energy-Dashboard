@@ -1,27 +1,27 @@
 # COW Predictive Energy Dashboard
 
-A simple dashboard for monitoring COW site performance, energy usage, and operational status in one place.
+A simple dashboard for viewing COW site status, energy use, and operational trends in one place.
 
-## What this dashboard helps with
+## App idea
 
-- Track the overall COW fleet status at a glance
-- Filter results by region, district, city, or site
-- Monitor diesel use, electric power use, and daily CO₂ emissions
-- Review fuel tank levels and generator load indicators
-- Spot geographic patterns on the heat map
-- Follow historical trends for energy performance
+This app gives teams a clear daily view of how sites are performing. It combines status counts, energy metrics, maps, and trends so users can quickly spot where attention is needed.
 
-## Main screens
+## Layout
 
-- **Dashboard** (`#/`) — overall status, KPIs, gauges, and regional breakdown
-- **Heat Map** (`#/heatmap`) — site activity shown geographically
-- **Energy Trends** (`#/trends`) — historical charts and accumulative trends
-- **Reports** (`#/reports`) — space for exportable management reports
+- **Top header** — app title and navigation
+- **Main dashboard** (`#/`) — summary cards, status ticker, filters, regional breakdown, and KPI gauges
+- **Heat map** (`#/heatmap`) — geographic view of site activity
+- **Energy trends** (`#/trends`) — charts for fuel, power, CO₂, and generator load
+- **Reports** (`#/reports`) — space for management reports and exports
 
-## Who this is for
+## How it works
 
-Operations, energy, and management teams who need a quick view of network and power performance.
+1. Open the dashboard to see the latest overall status.
+2. Use the filters to narrow results by region, district, city, or site.
+3. Review the KPI cards and gauges to understand fuel, power, and emissions.
+4. Switch to the heat map to see where sites are concentrated.
+5. Open the trends page to compare performance over time.
 
-## Summary
+## Who it is for
 
-The dashboard is designed to make it easier to understand where attention is needed, compare regions, and support faster operational decisions.
+Operations, energy, and management teams who need a quick and practical view of network performance.
